@@ -11,7 +11,6 @@
 #include "CowLib.h"
 
 #include <cmath>
-#include <wpi/deprecated.h>
 
 namespace CowLib
 {

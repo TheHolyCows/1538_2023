@@ -47,8 +47,16 @@ namespace CowLib
         m_Spi = new frc::SPI(frc::SPI::kMXP);
         m_Spi->SetClockRate(4000000);
         m_Spi->SetChipSelectActiveLow();
-        m_Spi->SetClockActiveHigh();
-        m_Spi->SetMSBFirst();
+
+        // deprecated
+        // This is sometimes called clock polarity low or clock idle low.
+        // m_Spi->SetClockActiveHigh();
+        // replace with following
+        // Mode 0 is Clock idle low, data sampled on rising edge
+        m_Spi->SetMode(frc::SPI::kMode0);
+
+        // deprecated, does not work
+        // m_Spi->SetMSBFirst();
         CowLib::CowWait(2);
 
         m_Thread = new std::thread(CowGyro::Handle);
