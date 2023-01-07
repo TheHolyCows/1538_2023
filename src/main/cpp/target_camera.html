@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>MJPG-Streamer - Stream Example</title>
+    <style>
+    div {
+  width: 100%;
+  position: relative;
+}
+
+span {
+  position: absolute;
+  display: block;
+  height: 100%;
+  width: 2px;
+  background: red;
+}
+
+.firstOverlayLine {
+  left: 48%;
+}
+
+.secondOverlayLine {
+  left: 50%;
+}
+
+.thirdOverlayLine {
+  left: 52%;
+}
+</style>
+  </head>
+  <body>
+  	<div id="preview-image-wrapper">
+   <span class="firstOverlayLine" ></span>
+   <span class="secondOverlayLine"></span>
+   <span class="thirdOverlayLine"></span>
+      <img width=100% height=100% src="http://10.15.38.2:1181/?action=stream" />
+	</div>
+
+  </body>
+</html>
