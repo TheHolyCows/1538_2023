@@ -15,5 +15,10 @@
     "**/*~": true
   },
   "C_Cpp.default.configurationProvider": "vscode-wpilib",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.associations": {
+    "ostream": "cpp",
+    "*.inc": "cpp",
+    "string": "cpp"
+  }
 }

@@ -10,6 +10,12 @@
 
 #include "../CowConstants.h"
 
+#include <errno.h>
+#include <iostream>
+#include <string.h>
+#include <time.h>
+#include <string>
+
 #include <arpa/inet.h>
 #include <fstream>
 #include <mutex>
@@ -25,13 +31,12 @@ namespace CowLib
     public:
         static CowLogger *GetInstance();
         ~CowLogger();
-        static void LogPID(uint32_t, double, double, double, double, double);
 
         enum CowLogMsgType : uint16_t
         {
             MSG_LOG = 0,
             PID_LOG,
-            TEMP_LOG,
+            MOTR_LOG,
             BATT_LOG
         };
 
@@ -44,8 +49,13 @@ namespace CowLib
             LOG_INFO
         };
 
+        static void LogMsg(CowLogLevel,const char*);
+        static void LogPID(uint32_t, double, double, double, double, double);
+        static void LogMotor(uint32_t, double, double);
+
     private:
         CowLogger();
+        static int SendLog(void*,size_t);
         static CowLogger *m_Instance;
         struct sockaddr_in m_LogServer;
         int m_LogSocket;
@@ -63,7 +73,7 @@ namespace CowLib
         {
             CowLogHdr hdr;
             CowLogLevel logLevel;
-            char logStr[256]; // TODO: determine how to do this
+            char logStr[256];
         };
 
         struct CowPIDLog
@@ -75,6 +85,14 @@ namespace CowLib
             double pVar;
             double iVar;
             double dVar;
+        };
+
+        struct CowMotorLog
+        {
+            CowLogHdr hdr;
+            uint32_t motorId;
+            double temp;
+            double encoderCt; 
         };
 
         struct CowBattLog
