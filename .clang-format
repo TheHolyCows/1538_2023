@@ -22,7 +22,7 @@ BreakBeforeBinaryOperators: All
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
-ColumnLimit: 160
+ColumnLimit: 120
 CommentPragmas: '^ IWYU pragma:'
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
