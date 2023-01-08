@@ -1,58 +1,74 @@
 #include "AutoModes.h"
 
-#include <frc/Errors.h>
+// TODO: make auto constants reloadable for quick testing
+// TODO: still need to add timeouts
 
-AutoModes *AutoModes::m_SingletonInstance = NULL;
-
-AutoModes *AutoModes::GetInstance()
-{
-    if (m_SingletonInstance == NULL)
-    {
-        m_SingletonInstance = new AutoModes();
-    }
-    return m_SingletonInstance;
-}
+// Apparently I can just do this
+AutoModes* AutoModes::s_Instance = nullptr;
 
 AutoModes::AutoModes()
 {
-    /** Do Nothing **/
-    m_Modes["Nothing"];
-    m_Modes["Nothing"].push_back(RobotCommand(CMD_WAIT, 0, 0, 0, 1));
+    // Constants for swerve trajectories are loaded in the constructor, so maybe auto modes are created in a separate LoadAutoModes function that is called in the constructor and on a button in CowBase
+    // the issue with that is the change auto mode button and reset constants are the same button rn, so they would have to be split
 
-    /** Move Around **/
-    m_Modes["Leave Start Zone"];
-    m_Modes["Leave Start Zone"].push_back(RobotCommand(CMD_HOLD_DISTANCE, -55, 0, 0.4, 4));
+    // m_Modes["Test"].push_back(new LambdaCommand([](CowRobot* robot) {
+    //     std::cout << "Lambda command" << std::endl;
+    // }));
 
-    m_Modes["Leave And Ret"];
-    m_Modes["Leave And Ret"].push_back(RobotCommand(CMD_HOLD_DISTANCE, -55, 0, 0.4, 4));
-    m_Modes["Leave And Ret"].push_back(RobotCommand(CMD_HOLD_DISTANCE, 0, 0, 0.4, 4));
-
-    m_Modes["Test_Turn"];
-    m_Modes["Test_Turn"].push_back(RobotCommand(CMD_WAIT, 0, 0, 0, 1));
-    m_Modes["Test_Turn"].push_back(RobotCommand(CMD_TURN, 0, 45, 0.2, 1));
-    m_Modes["Test_Turn"].push_back(RobotCommand(CMD_WAIT, 0, 0, 0, 1));
+    // Theoretically this will follow trajectory "Test", then "Test2", but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
+    m_Modes["Test"].push_back(new RaceCommand(new SwerveTrajectoryCommand("Test2", 30, true),
+        { new SeriesCommand({
+            new WaitCommand(3, false),
+            new LambdaCommand([](CowRobot* robot) {
+                std::cout << "Hello from lambda" << std::endl;
+            }),
+        }) }));
+    // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();
 }
 
-std::deque<RobotCommand> AutoModes::GetCommandList()
+AutoModes::~AutoModes()
+{
+    // Delete everything (I hope)
+    for (auto& mode : m_Modes) {
+        for (auto command : mode.second) {
+            delete command;
+        }
+    }
+}
+
+AutoModes* AutoModes::GetInstance()
+{
+    if (s_Instance == nullptr) {
+        s_Instance = new AutoModes();
+    }
+
+    return s_Instance;
+}
+
+std::deque<RobotCommand*> AutoModes::GetCommandList()
 {
     return m_Iterator->second;
 }
 
-const char *AutoModes::GetName()
+std::string AutoModes::GetName()
 {
     return m_Iterator->first;
 }
 
 void AutoModes::NextMode()
 {
+    std::cout << "Trying to get to the next move" << std::endl;
+
     ++m_Iterator;
-    if (m_Iterator == m_Modes.end())
-    {
+
+    if (m_Iterator == m_Modes.end()) {
         m_Iterator = m_Modes.begin();
     }
-    std::string str(GetName());
-    std::string temp = "Auto mode: " + str;
-    FRC_ReportError(frc::err::Error, "{}", temp);
+
+    // Display the name of the current auto mode to driver station
+    std::string name = GetName();
+    std::cout << "Auto mode: " << name << std::endl;
+    // FRC_ReportError(frc::err::Error, "{}", "Auto Mode: " + name);
 }

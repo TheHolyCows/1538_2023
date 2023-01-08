@@ -1,29 +1,39 @@
 //==================================================
-// Copyright (C) 2019 Team 1538 / The Holy Cows
+// Copyright (C) 2022 Team 1538 / The Holy Cows
 //==================================================
 
 #ifndef __AUTO_MODES_H__
 #define __AUTO_MODES_H__
 
-#include "../Controllers/AutoModeController.h"
-
 #include <deque>
 #include <map>
+#include <string>
 
-class AutoModes
-{
+#include <frc/Errors.h>
+
+#include "Commands/LambdaCommand.h"
+#include "Commands/RaceCommand.h"
+#include "Commands/SeriesCommand.h"
+#include "Commands/SwerveTrajectoryCommand.h"
+#include "Commands/WaitCommand.h"
+
+class AutoModes {
 private:
-    static AutoModes *m_SingletonInstance;
-    std::map<const char *, std::deque<RobotCommand> > m_Modes;
-    std::map<const char *, std::deque<RobotCommand> >::iterator m_Iterator;
-
     AutoModes();
+    ~AutoModes();
+    static AutoModes* s_Instance;
+
+    std::map<std::string, std::deque<RobotCommand*> > m_Modes;
+    std::map<std::string, std::deque<RobotCommand*> >::iterator m_Iterator;
 
 public:
-    static AutoModes *GetInstance();
-    std::deque<RobotCommand> GetCommandList();
-    const char *GetName();
+    static AutoModes* GetInstance();
+
+    std::deque<RobotCommand*> GetCommandList();
+
+    std::string GetName();
+
     void NextMode();
 };
 
-#endif
+#endif /* __AUTO_MODES_H__ */

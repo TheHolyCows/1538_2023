@@ -17,7 +17,16 @@ CowRobot::CowRobot()
     m_Accelerometer = new frc::BuiltInAccelerometer(frc::Accelerometer::kRange_4G);
 
     // Set up drivetrain
-    m_Drivetrain = new Drivetrain::CowWestcoast(DRIVE_LEFT_A, DRIVE_LEFT_B, DRIVE_RIGHT_A, DRIVE_RIGHT_B);
+    // TODO: reset constants needs to reset this
+    // fl, fr, bl, br
+    SwerveDrive::ModuleConstants swerveModuleConstants[4]{
+        SwerveDrive::ModuleConstants{ 1, 2, 9, 2 },
+        SwerveDrive::ModuleConstants{ 3, 4, 10, 2 },
+        SwerveDrive::ModuleConstants{ 5, 6, 11, -2 },
+        SwerveDrive::ModuleConstants{ 7, 8, 12, -2 }
+    };
+
+    m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
     m_Shooter = new Shooter(11, 13, 12, 14);
 }
@@ -31,7 +40,7 @@ void CowRobot::Reset()
 
     m_PreviousGyroError = 0;
 
-    m_Drivetrain->reset();
+    m_Drivetrain->Reset();
 
     m_Shooter->ResetConstants();
 }
@@ -66,8 +75,8 @@ void CowRobot::handle()
         return;
     }
 
-    m_Controller->handle(this);
-    m_Drivetrain->handle();
+    m_Controller->Handle(this);
+    m_Drivetrain->Handle();
     m_Shooter->handle();
 
     // accelerometers
@@ -76,59 +85,14 @@ void CowRobot::handle()
     bool direction = (zVal - m_PrevZ) > 0 ? true : false;
     m_PrevZ        = zVal;
 
-    if (m_DSUpdateCount % 10 == 0)
-    {
-        // driver station logging
-    }
-
-    // handle methods for other subsystems go here
-
-    m_DSUpdateCount++;
+    PrintToDS();
 }
-
-double CowRobot::GetDriveDistance()
-{
-    return m_Drivetrain->getDriveDistance();
-}
-
-// used by autonomous
-bool CowRobot::TurnToHeading(double heading)
-{
-    double PID_P  = CONSTANT("TURN_P");
-    double PID_D  = CONSTANT("TURN_D");
-    double error  = m_Gyro->GetAngle() - heading;
-    double dError = error - m_PreviousGyroError;
-    double output = PID_P * error + PID_D * dError;
-
-    // speed *= -speed;
-
-    DriveLeftRight(-output, output);
-
-    m_PreviousGyroError = error;
-
-    return (fabs(error) < 1 && CowLib::UnitsPerSecond(fabs(dError)) < 0.5);
-}
-
-// Allows skid steer robot to be driven using tank drive style inputs
-// used by most things
-void CowRobot::DriveLeftRight(double leftDriveValue, double rightDriveValue)
-{
-    m_Drivetrain->setMotors(leftDriveValue, rightDriveValue);
-}
-
-// Allows robot to spin in place
-// unused
-void CowRobot::QuickTurn(double turnRate)
-{
-    // When provided with + turn, quick turn right
-
-    double left  = -1 * turnRate;
-    double right = turnRate;
-
-    DriveLeftRight(left, right);
-}
-
 void CowRobot::StartTime()
 {
     m_StartTime = CowLib::CowTimer::GetFPGATimestamp();
+}
+
+void CowRobot::DoNothing()
+{
+    // TODO: make the robot stop (including drive)
 }
