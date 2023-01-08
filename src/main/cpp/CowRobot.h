@@ -13,7 +13,7 @@
 #include "CowLib/CowMotorController.h"
 #include "CowLib/CowTimer.h"
 #include "CowLib/Utility.h"
-#include "Drivetrain/CowWestcoast.h"
+#include "Drivetrain/SwerveDrive.h"
 #include "Subsystems/Shooter.h"
 
 #include <frc/BuiltInAccelerometer.h>
@@ -25,7 +25,7 @@ class CowRobot
 {
 public:
     // Drive Motors
-    Drivetrain::CowWestcoast *m_Drivetrain;
+    SwerveDrive* m_Drivetrain;
 
 private:
     int m_DSUpdateCount;
@@ -55,24 +55,11 @@ private:
     double m_MatchTime;
     double m_StartTime;
 
-    void SetLeftMotors(double val);
-    void SetRightMotors(double val);
-
 public:
     CowRobot();
     void Reset();
-    void GyroHandleCalibration();
-    void GyroFinalizeCalibration();
     void SetController(GenericController *controller);
     void PrintToDS();
-    bool DoVisionTracking(double speed, double threshold = 5.0);
-    double GetDriveDistance();
-
-    void DriveSpeedTurn(double speed, double turn, bool quickTurn);
-    void DriveLeftRight(double leftDriveValue, double rightDriveValue);
-    bool TurnToHeading(double heading);
-
-    void QuickTurn(double turn);
 
     void StartTime();
 
@@ -82,9 +69,13 @@ public:
 
     CowLib::CowGyro *GetGyro() { return CowLib::CowGyro::GetInstance(); }
 
+    SwerveDrive* GetDrivetrain() { return m_Drivetrain; }
+
     Shooter *GetShooter() { return m_Shooter; }
 
     void handle();
+
+    void DoNothing(void);
 };
 
 #endif
