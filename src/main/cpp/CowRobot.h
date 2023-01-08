@@ -46,9 +46,6 @@ private:
     // display on rio
     CowLib::CowAlphaNum *m_LEDDisplay;
 
-    // logging server
-    CowLib::CowLogger *m_WebServer;
-
     double m_LeftDriveValue;
     double m_RightDriveValue;
 

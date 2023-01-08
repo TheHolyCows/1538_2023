@@ -208,7 +208,7 @@ double Shooter::GetHoodPosition()
 
 void Shooter::handle()
 {
-    if (CONSTANT("DEBUG_PID") == 1)
+    if (CONSTANT("DEBUG") == 1)
     {
         m_LogServer->LogPID(11,
                             (double) m_Setpoint,
@@ -217,7 +217,7 @@ void Shooter::handle()
                             m_MotorShooter1->GetInternalMotor()->GetIntegralAccumulator(),
                             m_MotorShooter1->GetInternalMotor()->GetOutputCurrent());
     }
-    else if (CONSTANT("DEBUG_PID") == 2)
+    else if (CONSTANT("DEBUG") == 2)
     {
         m_LogServer->LogPID(12,
                             (double) m_SetpointRoller,

@@ -9,6 +9,7 @@
 #define __COW_LOGGER_H__
 
 #include "../CowConstants.h"
+#include "CowMotorController.h"
 
 #include <errno.h>
 #include <iostream>
@@ -22,6 +23,8 @@
 #include <queue>
 #include <sys/socket.h>
 #include <thread>
+#include <vector>
+#include <algorithm>
 
 namespace CowLib
 {
@@ -49,9 +52,14 @@ namespace CowLib
             LOG_INFO
         };
 
+        const static int REGISTERED_MOTORS_MAX = 24;
+
+        void RegisterMotor(uint32_t,CowLib::CowMotorController*);
         static void LogMsg(CowLogLevel,const char*);
         static void LogPID(uint32_t, double, double, double, double, double);
         static void LogMotor(uint32_t, double, double);
+
+        void Handle();
 
     private:
         CowLogger();
@@ -60,8 +68,13 @@ namespace CowLib
         struct sockaddr_in m_LogServer;
         int m_LogSocket;
 
+        uint32_t m_TickCount; 
+
         const char *m_LogServerIP = "10.15.38.200";
         uint16_t m_LogServerPort  = 5810;
+
+        // assuming we don't have more than 24 motors ever
+        CowLib::CowMotorController* m_RegisteredMotors[REGISTERED_MOTORS_MAX];
 
         struct CowLogHdr
         {

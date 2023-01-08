@@ -1,6 +1,7 @@
 #include "CowMotorController.h"
 
-#include "ctre/phoenix/motorcontrol/StatorCurrentLimitConfiguration.h"
+// CowLogger.h MUST BE HERE, DO NOT MOVE TO HEADER
+#include "CowLogger.h"
 
 namespace CowLib
 {
@@ -10,6 +11,7 @@ namespace CowLib
         m_CowControlMode  = CowMotorController::PERCENTVBUS;
         m_CowNeutralMode  = CowMotorController::COAST;
         m_MotorController = new TalonFX(deviceNum);
+        CowLogger::GetInstance()->RegisterMotor(deviceNum,this);
     }
 
     CowMotorController::~CowMotorController()
@@ -150,4 +152,18 @@ namespace CowLib
     {
         m_MotorController->ConfigAllowableClosedloopError(0, error);
     }
+
+    /**
+     * CowMotorController::GetLogData
+     * gets data from internal motor controller that we would like to log
+     * @arg temp - internal motor temperature
+     * @arg encoderCt - current encoder units of motor
+    */
+    void CowMotorController::GetLogData(double *temp, double *encoderCt, bool *isInverted)
+    {
+        *temp = this->GetInternalMotor()->GetTemperature();
+        *encoderCt = this->GetInternalMotor()->GetSelectedSensorPosition(0);
+        *isInverted = this->GetInternalMotor()->GetInverted();
+    }
+
 } // namespace CowLib

@@ -79,7 +79,7 @@ double Arm::GetPosition()
 
 void Arm::ResetConstants(double upLimit, double downLimit, double peakOutput)
 {
-    // m_MotorA->SetPIDGains(CONSTANT("ARM_P")*CONSTANT("DEBUG_PID"), CONSTANT("ARM_I")*CONSTANT("DEBUG_PID"), CONSTANT("ARM_D")*CONSTANT("DEBUG_PID"), 0, 1);
+    // m_MotorA->SetPIDGains(CONSTANT("ARM_P")*CONSTANT("DEBUG"), CONSTANT("ARM_I")*CONSTANT("DEBUG"), CONSTANT("ARM_D")*CONSTANT("DEBUG"), 0, 1);
     // m_MotorA->SetMotionMagic(CONSTANT("ARM_ACCEL"), CONSTANT("ARM_VELOCITY"));
     std::cout << "In the arm reset constants" << std::endl;
     m_UpLimit   = upLimit;

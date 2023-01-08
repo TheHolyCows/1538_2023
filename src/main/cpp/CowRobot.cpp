@@ -70,6 +70,8 @@ void CowRobot::handle()
     m_Drivetrain->handle();
     m_Shooter->handle();
 
+    CowLib::CowLogger::GetInstance()->Handle();
+
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
     // positive is true, negative is false

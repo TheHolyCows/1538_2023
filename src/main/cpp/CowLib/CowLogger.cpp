@@ -29,6 +29,9 @@ namespace CowLib
 
     CowLogger::CowLogger()
     {
+        m_TickCount = 0;
+        memset(m_RegisteredMotors,0x0,sizeof(m_RegisteredMotors));
+        
         m_LogSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
         if (m_LogSocket < 0)
@@ -64,6 +67,27 @@ namespace CowLib
     }
 
     /**
+     * CowLogger::RegisterMotor
+    */
+    void CowLogger::RegisterMotor(uint32_t motorId, CowLib::CowMotorController* motorController)
+    {
+        if (m_Instance == NULL)
+        {
+            // will initialize incase we get here without setting things up
+            GetInstance();
+        }
+        
+        if (motorId >= 0 && motorId < REGISTERED_MOTORS_MAX && m_RegisteredMotors[motorId] == NULL)
+        {
+            m_RegisteredMotors[motorId] = motorController;
+        }
+        else
+        {
+            std::cout << "CowLogger::RegisterMotor() error: motorID: " << motorId << " has already been registered" << std::endl;
+        }
+    }
+
+    /**
      * CowLogger::LogMsg
      * sends a message with log level to our log server
      * message is limited to 255 characters
@@ -73,7 +97,7 @@ namespace CowLib
     */
    void CowLogger::LogMsg(CowLogLevel logLevel, const char* logStr)
    {
-        if (CONSTANT("DEBUG_PID") == 0)
+        if (CONSTANT("DEBUG") == 0)
         {
             return;
         }
@@ -104,7 +128,7 @@ namespace CowLib
      **/
     void CowLogger::LogPID(uint32_t motorId, double setPoint, double procVar, double P, double I, double D)
     {
-        if (CONSTANT("DEBUG_PID") == 0)
+        if (CONSTANT("DEBUG") == 0)
         {
             return;
         }
@@ -132,7 +156,7 @@ namespace CowLib
     */
     void CowLogger::LogMotor(uint32_t motorId, double temp, double encoderCt)
     {
-        if (CONSTANT("DEBUG_PID") == 0)
+        if (CONSTANT("DEBUG") == 0)
         {
             return;
         }
@@ -147,5 +171,37 @@ namespace CowLib
 
         SendLog(&logPacket,sizeof(logPacket));
     }
+
+    /**
+     * CowLogger::Handle
+     * 
+    */
+   void CowLogger::Handle()
+   {
+        if (m_Instance == NULL)
+        {
+            // will initialize incase we get here without setting things up
+            GetInstance();
+        }
+        if (m_TickCount++ % 50 != 0)
+        {
+            return;
+        }
+        int debugMotor = CONSTANT("DEBUG_MOTOR");
+        if (CONSTANT("DEBUG") == 0 || debugMotor < 0 || debugMotor >= REGISTERED_MOTORS_MAX)
+        {
+            return;
+        }
+
+        if (m_RegisteredMotors[debugMotor] != NULL)
+        {
+            double temp;
+            double encoderCt;
+            bool isInverted;
+            m_RegisteredMotors[debugMotor]->GetLogData(&temp,&encoderCt,&isInverted);
+
+            LogMotor(debugMotor,temp,encoderCt);
+        }
+   }
 
 } /* namespace CowLib */
