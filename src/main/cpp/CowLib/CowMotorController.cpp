@@ -8,10 +8,12 @@ namespace CowLib
     CowMotorController::CowMotorController(int deviceNum)
         : m_DeviceNum(deviceNum)
     {
+        m_SetPoint = 0;
+
         m_CowControlMode  = CowMotorController::PERCENTVBUS;
         m_CowNeutralMode  = CowMotorController::COAST;
         m_MotorController = new TalonFX(deviceNum);
-        CowLogger::GetInstance()->RegisterMotor(deviceNum,this);
+        CowLogger::GetInstance()->RegisterMotor(deviceNum, this);
     }
 
     CowMotorController::~CowMotorController()
@@ -134,6 +136,7 @@ namespace CowLib
 
     void CowMotorController::Set(double value)
     {
+        m_SetPoint = value;
         m_MotorController->Set(TranslateControlMode(GetControlMode()), value);
     }
 
@@ -154,15 +157,33 @@ namespace CowLib
     }
 
     /**
+     * CowMotorController::GetPIDData
+     * retrieves data for logging PID of motor and graphing motor output over time
+     * @param setPoint - current value motor is attempting to reach
+     * @param procVar - current motor speed in RPM (motor is 2048 units per revolution)
+     * @param P
+     * @param I
+     * @param D
+     */
+    void CowMotorController::GetPIDData(double *setPoint, double *procVar, double *P, double *I, double *D)
+    {
+        *setPoint = m_SetPoint;
+        *procVar  = this->GetInternalMotor()->GetSelectedSensorVelocity() * (10.0 / 2048.0) * 60;
+        *P        = this->GetInternalMotor()->GetClosedLoopError();
+        *I        = this->GetInternalMotor()->GetIntegralAccumulator();
+        *D        = this->GetInternalMotor()->GetOutputCurrent();
+    }
+
+    /**
      * CowMotorController::GetLogData
      * gets data from internal motor controller that we would like to log
-     * @arg temp - internal motor temperature
-     * @arg encoderCt - current encoder units of motor
-    */
+     * @param temp - internal motor temperature
+     * @param encoderCt - current encoder units of motor
+     */
     void CowMotorController::GetLogData(double *temp, double *encoderCt, bool *isInverted)
     {
-        *temp = this->GetInternalMotor()->GetTemperature();
-        *encoderCt = this->GetInternalMotor()->GetSelectedSensorPosition(0);
+        *temp       = this->GetInternalMotor()->GetTemperature();
+        *encoderCt  = this->GetInternalMotor()->GetSelectedSensorPosition(0);
         *isInverted = this->GetInternalMotor()->GetInverted();
     }
 

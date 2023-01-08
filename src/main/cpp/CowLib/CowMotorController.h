@@ -5,8 +5,9 @@
 #ifndef __COWLIB_COWMOTORCONTROLLER_H__
 #define __COWLIB_COWMOTORCONTROLLER_H__
 
-#include <ctre/Phoenix.h>
 #include "ctre/phoenix/motorcontrol/StatorCurrentLimitConfiguration.h"
+
+#include <ctre/Phoenix.h>
 
 namespace CowLib
 {
@@ -52,13 +53,16 @@ namespace CowLib
         TalonFX *GetInternalMotor();
 
         // logging utility
-        void GetLogData(double *temp, double *encoderCt, bool* isInverted);
+        void GetPIDData(double *setPoint, double *procVar, double *P, double *I, double *D);
+        void GetLogData(double *temp, double *encoderCt, bool *isInverted);
 
     private:
         TalonFX *m_MotorController;
         int m_DeviceNum;
         enum CowNeutralMode m_CowNeutralMode;
         enum CowControlMode m_CowControlMode;
+
+        double m_SetPoint;
 
         ControlMode TranslateControlMode(enum CowControlMode);
     };

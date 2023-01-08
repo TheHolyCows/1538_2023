@@ -73,7 +73,8 @@ void Shooter::SetHoodRollerSpeed(double speed)
 void Shooter::SetSpeedHoodRelative()
 {
     // ranges from 0 -> 1.0
-    float percentOfHood = 0; //(m_HoodPosition - CONSTANT("HOOD_DOWN_LIMIT")) / (CONSTANT("HOOD_UP_LIMIT") - CONSTANT("HOOD_DOWN_LIMIT"));
+    float percentOfHood = 0; //(m_HoodPosition - CONSTANT("HOOD_DOWN_LIMIT")) / (CONSTANT("HOOD_UP_LIMIT") -
+                             //CONSTANT("HOOD_DOWN_LIMIT"));
     // float percentOfHood = (m_HoodPosition - m_HoodDownLimit) / CONSTANT("HOOD_DELTA");
 
     int speedDelta = CONSTANT("SHOOTER_SPEED_UP") - CONSTANT("SHOOTER_SPEED_DOWN");
@@ -86,10 +87,12 @@ void Shooter::SetSpeedHoodRelative()
  **/
 void Shooter::SetHoodPosition(double position)
 {
-    position = CONSTANT("HOOD_UP_LIMIT") < CONSTANT("HOOD_DOWN_LIMIT") ? std::max((double) CONSTANT("HOOD_UP_LIMIT"), position)
-                                                                       : std::min((double) CONSTANT("HOOD_UP_LIMIT"), position);
-    position = CONSTANT("HOOD_UP_LIMIT") > CONSTANT("HOOD_DOWN_LIMIT") ? std::max((double) CONSTANT("HOOD_DOWN_LIMIT"), position)
-                                                                       : std::min((double) CONSTANT("HOOD_DOWN_LIMIT"), position);
+    position = CONSTANT("HOOD_UP_LIMIT") < CONSTANT("HOOD_DOWN_LIMIT")
+                   ? std::max((double) CONSTANT("HOOD_UP_LIMIT"), position)
+                   : std::min((double) CONSTANT("HOOD_UP_LIMIT"), position);
+    position = CONSTANT("HOOD_UP_LIMIT") > CONSTANT("HOOD_DOWN_LIMIT")
+                   ? std::max((double) CONSTANT("HOOD_DOWN_LIMIT"), position)
+                   : std::min((double) CONSTANT("HOOD_DOWN_LIMIT"), position);
 
     m_HoodPosition = position;
 
@@ -168,15 +171,31 @@ void Shooter::ZeroHoodPosition()
 void Shooter::ResetConstants()
 {
     // Shooter
-    printf("P: %lf\n I: %lf\n D: %lf\n F: %lf\n", CONSTANT("SHOOTER_P"), CONSTANT("SHOOTER_I"), CONSTANT("SHOOTER_D"), CONSTANT("SHOOTER_F"));
-    m_MotorShooter1->SetPIDGains(CONSTANT("SHOOTER_P"), CONSTANT("SHOOTER_I"), CONSTANT("SHOOTER_D"), CONSTANT("SHOOTER_F"), 1);
-    m_MotorShooter2->SetPIDGains(CONSTANT("SHOOTER_P"), CONSTANT("SHOOTER_I"), CONSTANT("SHOOTER_D"), CONSTANT("SHOOTER_F"), 1);
+    printf("P: %lf\n I: %lf\n D: %lf\n F: %lf\n",
+           CONSTANT("SHOOTER_P"),
+           CONSTANT("SHOOTER_I"),
+           CONSTANT("SHOOTER_D"),
+           CONSTANT("SHOOTER_F"));
+    m_MotorShooter1->SetPIDGains(CONSTANT("SHOOTER_P"),
+                                 CONSTANT("SHOOTER_I"),
+                                 CONSTANT("SHOOTER_D"),
+                                 CONSTANT("SHOOTER_F"),
+                                 1);
+    m_MotorShooter2->SetPIDGains(CONSTANT("SHOOTER_P"),
+                                 CONSTANT("SHOOTER_I"),
+                                 CONSTANT("SHOOTER_D"),
+                                 CONSTANT("SHOOTER_F"),
+                                 1);
 
     // Variable Hood
     m_MotorHood->SetPIDGains(CONSTANT("HOOD_P"), CONSTANT("HOOD_I"), CONSTANT("HOOD_D"), 0, 1);
     m_MotorHood->SetMotionMagic(CONSTANT("HOOD_ACCEL"), CONSTANT("HOOD_VELOCITY"));
 
-    m_MotorHoodRoller->SetPIDGains(CONSTANT("HOOD_ROLLER_P"), CONSTANT("HOOD_ROLLER_I"), CONSTANT("HOOD_ROLLER_D"), CONSTANT("HOOD_ROLLER_F"), 1);
+    m_MotorHoodRoller->SetPIDGains(CONSTANT("HOOD_ROLLER_P"),
+                                   CONSTANT("HOOD_ROLLER_I"),
+                                   CONSTANT("HOOD_ROLLER_D"),
+                                   CONSTANT("HOOD_ROLLER_F"),
+                                   1);
 
     m_HoodUpLimit   = CONSTANT("HOOD_UP");
     m_HoodDownLimit = 0;
@@ -208,25 +227,6 @@ double Shooter::GetHoodPosition()
 
 void Shooter::handle()
 {
-    if (CONSTANT("DEBUG") == 1)
-    {
-        m_LogServer->LogPID(11,
-                            (double) m_Setpoint,
-                            (double) GetSpeedF(),
-                            m_MotorShooter1->GetInternalMotor()->GetClosedLoopError(),
-                            m_MotorShooter1->GetInternalMotor()->GetIntegralAccumulator(),
-                            m_MotorShooter1->GetInternalMotor()->GetOutputCurrent());
-    }
-    else if (CONSTANT("DEBUG") == 2)
-    {
-        m_LogServer->LogPID(12,
-                            (double) m_SetpointRoller,
-                            (double) GetSpeedRoller(),
-                            m_MotorHoodRoller->GetInternalMotor()->GetClosedLoopError(),
-                            m_MotorHoodRoller->GetInternalMotor()->GetIntegralAccumulator(),
-                            m_MotorHoodRoller->GetInternalMotor()->GetOutputCurrent());
-    }
-
     // redundancy
     if (m_MotorShooter1 || m_MotorShooter2)
     {

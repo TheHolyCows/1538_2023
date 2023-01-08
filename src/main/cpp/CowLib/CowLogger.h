@@ -11,20 +11,19 @@
 #include "../CowConstants.h"
 #include "CowMotorController.h"
 
-#include <errno.h>
-#include <iostream>
-#include <string.h>
-#include <time.h>
-#include <string>
-
+#include <algorithm>
 #include <arpa/inet.h>
+#include <errno.h>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <queue>
+#include <string.h>
+#include <string>
 #include <sys/socket.h>
 #include <thread>
+#include <time.h>
 #include <vector>
-#include <algorithm>
 
 namespace CowLib
 {
@@ -54,27 +53,28 @@ namespace CowLib
 
         const static int REGISTERED_MOTORS_MAX = 24;
 
-        void RegisterMotor(uint32_t,CowLib::CowMotorController*);
-        static void LogMsg(CowLogLevel,const char*);
-        static void LogPID(uint32_t, double, double, double, double, double);
-        static void LogMotor(uint32_t, double, double);
+        void RegisterMotor(uint32_t, CowLib::CowMotorController *);
+        static void LogMsg(CowLogLevel, const char *);
 
         void Handle();
 
     private:
         CowLogger();
-        static int SendLog(void*,size_t);
+        static int SendLog(void *, size_t);
+        static void LogPID(uint32_t, double, double, double, double, double);
+        static void LogMotor(uint32_t, double, double);
+
         static CowLogger *m_Instance;
         struct sockaddr_in m_LogServer;
         int m_LogSocket;
 
-        uint32_t m_TickCount; 
+        uint32_t m_TickCount;
 
         const char *m_LogServerIP = "10.15.38.200";
         uint16_t m_LogServerPort  = 5810;
 
         // assuming we don't have more than 24 motors ever
-        CowLib::CowMotorController* m_RegisteredMotors[REGISTERED_MOTORS_MAX];
+        CowLib::CowMotorController *m_RegisteredMotors[REGISTERED_MOTORS_MAX];
 
         struct CowLogHdr
         {
@@ -105,7 +105,7 @@ namespace CowLib
             CowLogHdr hdr;
             uint32_t motorId;
             double temp;
-            double encoderCt; 
+            double encoderCt;
         };
 
         struct CowBattLog
