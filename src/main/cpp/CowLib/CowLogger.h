@@ -70,6 +70,8 @@ namespace CowLib
 
         uint32_t m_TickCount;
 
+        uint32_t m_IdToLog;
+
         const char *m_LogServerIP = "10.15.38.200";
         uint16_t m_LogServerPort  = 5810;
 

@@ -151,9 +151,9 @@ namespace CowLib
     /**
      * CowLogger::LogMotor
      * sends a selection of motor information to log server
-     * @param motorId - id of the motor
+     * @param motorId id of the motor
      * @param temp - temperatur of the motor in celcius
-     * @param encoderCt - current encoder count of the motor
+     * @param encoderCt - current count of the motor
      */
     void CowLogger::LogMotor(uint32_t motorId, double temp, double encoderCt)
     {
@@ -175,18 +175,16 @@ namespace CowLib
 
     /**
      * CowLogger::Handle
-     * handler to be called every cycle for logging within CowRobot, strictly used to log registered motors in debug
-     * mode, therefore, this function can safely be removed from production code
+     * handler to be called every cycle for logging within CowRobot, strictly used
+     * to log registered motors in debug mode, therefore, this function can safely
+     * be removed from production code
      */
     void CowLogger::Handle()
     {
-        if (CONSTANT("DEBUG") == 0 || CONSTANT("DEBUG_MOTOR_ID") < 0
-            || CONSTANT("DEBUG_MOTOR_ID") >= REGISTERED_MOTORS_MAX)
+        if (CONSTANT("DEBUG") == 0)
         {
             return;
         }
-
-        int debugMotorID = CONSTANT("DEBUG_MOTOR_ID");
 
         if (m_Instance == NULL)
         {
@@ -196,6 +194,7 @@ namespace CowLib
 
         if (CONSTANT("DEBUG_MOTOR_PID") != 0) // every cycle
         {
+            int debugMotorID = CONSTANT("DEBUG_MOTOR_ID");
             if (m_RegisteredMotors[debugMotorID] != NULL)
             {
                 double setPoint;
@@ -209,18 +208,27 @@ namespace CowLib
             }
         }
 
-        if (m_TickCount % 50 == 0) // 500 miliseconds
+        if (m_TickCount % 20 == 0) // 200 miliseconds
         {
-            if (m_RegisteredMotors[debugMotorID] != NULL)
+            uint32_t logsThisTick = 4;
+            while (m_IdToLog < REGISTERED_MOTORS_MAX && logsThisTick != 0)
             {
-                double temp;
-                double encoderCt;
-                bool isInverted;
-                m_RegisteredMotors[debugMotorID]->GetLogData(&temp, &encoderCt, &isInverted);
+                if (m_RegisteredMotors[m_IdToLog] != NULL)
+                {
+                    logsThisTick--;
+                    double temp;
+                    double encoderCt;
+                    bool isInverted;
+                    m_RegisteredMotors[m_IdToLog]->GetLogData(&temp, &encoderCt, &isInverted);
 
-                LogMotor(debugMotorID, temp, encoderCt);
+                    LogMotor(m_IdToLog, temp, encoderCt);
+                }
+                m_IdToLog++;
+            }
+            if (m_IdToLog >= REGISTERED_MOTORS_MAX)
+            {
+                m_IdToLog = 0;
             }
         }
     }
-
 } /* namespace CowLib */
