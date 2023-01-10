@@ -78,7 +78,7 @@ namespace CowLib
             GetInstance();
         }
 
-        if (motorId >= 0 && motorId < REGISTERED_MOTORS_MAX && m_RegisteredMotors[motorId] == NULL)
+        if (motorId < REGISTERED_MOTORS_MAX && m_RegisteredMotors[motorId] == NULL)
         {
             m_RegisteredMotors[motorId] = motorController;
         }
