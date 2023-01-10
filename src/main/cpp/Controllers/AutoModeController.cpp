@@ -1,178 +1,72 @@
 #include "AutoModeController.h"
+#include "../Autonomous/Commands/NullCommand.h"
 
-#include <iostream>
+#include <utility>
 
 AutoModeController::AutoModeController()
-    : m_Timer(new CowLib::CowTimer()),
-      m_CurrentCommand(RobotCommand())
 {
-    m_Timer->Start();
-    reset();
-
-    m_OriginalEncoder = 0;
 }
 
-void AutoModeController::SetCommandList(std::deque<RobotCommand> list)
+// I'm pretty sure these are all pointers to the instances created in AutoModes.cpp, which handles the deletion.
+// They're not deleted before the robot is turned off anyway lol
+AutoModeController::~AutoModeController() = default;
+
+// TODO: manage the memory like a smart person (not me)
+void AutoModeController::SetCommandList(std::deque<RobotCommand*> commandList)
 {
-    m_CommandList = list;
+    // Clang-Tidy told me to use move and I don't see why not
+    std::cout << "Setting command list (from controller)" << std::endl;
+    m_CommandList = commandList;
 }
 
-void AutoModeController::reset()
+void AutoModeController::Start(CowRobot* bot)
 {
-    CowConstants::GetInstance();
-
-    m_CommandList.clear();
-    m_CurrentCommand = RobotCommand();
+    m_CurrentCommand = m_CommandList.front();
+    m_CommandList.pop_front();
+    m_CurrentCommand->Start(bot);
+    std::cout << "Starting command is " << m_CurrentCommand << std::endl;
 }
 
-void AutoModeController::handle(CowRobot *bot)
+// 1678 does all this logic in another thread for some reason... I can't figure out why. I will not regret this.
+void AutoModeController::Handle(CowRobot* bot)
 {
-    bool result = false;
-
-    // Run the command
-    switch (m_CurrentCommand.m_Command)
-    {
-    case CMD_NULL :
-    {
-        doNothing(bot);
-        result = true;
-        break;
-    }
-    case CMD_WAIT :
-    {
-        bot->m_Drivetrain->pidHeadingDrive(m_CurrentCommand.m_Heading, 0);
-        doNothing(bot);
-        break;
-    }
-    case CMD_TURN :
-    {
-        result = bot->TurnToHeading(m_CurrentCommand.m_Heading);
-        break;
-    }
-    case CMD_TURN_INTAKE : // Why does this exist?
-    {
-        result = bot->TurnToHeading(m_CurrentCommand.m_Heading);
-        break;
-    }
-    case CMD_VISION_ALIGN :
-    {
-        // bot->DoVisionTracking(0, CONSTANT("TRACKING_THRESHOLD"));
-        break;
-    }
-    case CMD_HOLD_DISTANCE :
-    {
-        bot->m_Drivetrain->pidDistanceHeadingDrive(m_CurrentCommand.m_EncoderCount, m_CurrentCommand.m_Heading, m_CurrentCommand.m_Speed);
-        result = false;
-        break;
-    }
-    case CMD_HOLD_DISTANCE_INTAKE :
-    {
-        bot->m_Drivetrain->pidDistanceHeadingDrive(m_CurrentCommand.m_EncoderCount, m_CurrentCommand.m_Heading, m_CurrentCommand.m_Speed);
-        result = false;
-        break;
-    }
-    case CMD_DRIVE_DISTANCE :
-    {
-        // direction is forward or backwards
-        float direction = 1;
-        // std::cout << "OriginalEncoder: " << m_OriginalEncoder << "  EncoderCount: " << m_CurrentCommand.m_EncoderCount << std::endl;
-        if (m_OriginalEncoder > m_CurrentCommand.m_EncoderCount)
-        {
-            // We want to go backward
-            direction = -1;
-        }
-
-        bot->m_Drivetrain->pidHeadingDrive(m_CurrentCommand.m_Heading, m_CurrentCommand.m_Speed * direction);
-
-        if (direction == 1) // Going forward
-        {
-            if (bot->GetDriveDistance() > m_CurrentCommand.m_EncoderCount)
-            {
-                result = true;
-            }
-        }
-        else // Going backward
-        {
-            if (bot->GetDriveDistance() < m_CurrentCommand.m_EncoderCount)
-            {
-                result = true;
-            }
-        }
-
-        break;
-    }
-    case CMD_DRIVE_DISTANCE_INTAKE :
-    {
-        float direction = 1;
-        if (m_OriginalEncoder > m_CurrentCommand.m_EncoderCount)
-        {
-            // We want to go backward
-            direction = -1;
-        }
-
-        bot->m_Drivetrain->pidHeadingDrive(m_CurrentCommand.m_Heading, m_CurrentCommand.m_Speed * direction);
-
-        if (direction == 1) // Going forward
-        {
-            if (bot->GetDriveDistance() > m_CurrentCommand.m_EncoderCount)
-            {
-                result = true;
-            }
-        }
-        else // Going backward
-        {
-            if (bot->GetDriveDistance() < m_CurrentCommand.m_EncoderCount)
-            {
-                result = true;
-            }
-        }
-        break;
-    }
-    case CMD_INTAKE_EXHAUST :
-    {
-        doNothing(bot);
-        // bot->ResetEncoders(); - don't understand the reason for this
-        break;
-    }
-    default :
-    {
-        doNothing(bot);
-        result = true;
-        break;
-    }
+    // std::cout << "current command: " << m_CurrentCommand << std::endl;
+    // If command is nullptr, we must be done (or not started)
+    if (m_CurrentCommand == nullptr) {
+        bot->DoNothing();
+        return;
     }
 
-    // Check if this command is done / .value() because of seconds_t
-    if (result == true || m_CurrentCommand.m_Command == CMD_NULL || m_Timer->Get() > m_CurrentCommand.m_Timeout)
-    {
-        // This command is done, go get the next one
-        if (m_CommandList.size() > 0)
-        {
-            if (m_CurrentCommand.m_Command == CMD_TURN)
-            {
-                // bot->ResetEncoders(); - dont understand the reason for this
-            }
-            m_CurrentCommand  = m_CommandList.front();
-            m_OriginalEncoder = bot->GetDriveDistance();
+    // TODO: Do shared logic here
+
+    std::cout << "Handling command " << m_CurrentCommand << std::endl;
+    m_CurrentCommand->Handle(bot);
+
+    // If the command is done
+    if (m_CurrentCommand->IsComplete()) {
+        // Cleanup current command
+        m_CurrentCommand->Finish(bot);
+
+        // TODO: probably need to delete pointer here
+        delete m_CurrentCommand;
+
+        if (!m_CommandList.empty()) {
+            m_CurrentCommand = m_CommandList.front();
             m_CommandList.pop_front();
-            // bot->GetEncoder()->Reset(); - this is pretty old code i'd imagine
 
-            if (!m_CurrentCommand.m_Command == CMD_NULL)
-            {
-                printf("Time elapsed: %f\n", m_Timer->Get());
-            }
+            // Setup next command
+            m_CurrentCommand->Start(bot);
         }
-        else
-        {
-            // We're done clean up
-            m_CurrentCommand = RobotCommand();
+        else {
+            // Done
+            // TODO: figure better way to stop
+            m_CurrentCommand = nullptr;
         }
-        m_Timer->Reset();
     }
 }
 
-// Drive Functions
-void AutoModeController::doNothing(CowRobot *bot)
+// Gets called after SetCommandList btw
+void AutoModeController::Reset()
 {
-    bot->DriveLeftRight(0, 0);
+    m_CurrentCommand = new NullCommand();
 }

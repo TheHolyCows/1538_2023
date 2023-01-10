@@ -13,6 +13,8 @@
 #include "CowDisplay.h"
 #include "CowLib/CowLib.h"
 
+#include <iostream>
+
 #include <frc/TimedRobot.h>
 
 class CowBase : public frc::TimedRobot
@@ -21,7 +23,7 @@ private:
     CowRobot *m_Bot;
     CowControlBoard *m_ControlBoard;
     OperatorController *m_OpController;
-    AutoModeController *m_AutoController;
+    AutoModeController*m_AutoController;
     CowConstants *m_Constants;
     CowDisplay *m_Display;
 
@@ -29,17 +31,14 @@ private:
 
 public:
     CowBase();
-    ~CowBase();
-    void RobotInit();
-    void DisabledInit();
-    void AutonomousInit();
-    void TeleopInit();
-    void DisabledContinuous();
-    void AutonomousContinuous();
-    void TeleopContinuous();
-    void DisabledPeriodic();
-    void AutonomousPeriodic();
-    void TeleopPeriodic();
+    ~CowBase() override;
+    void RobotInit() override;
+    void DisabledInit() override;
+    void AutonomousInit() override;
+    void TeleopInit() override;
+    void DisabledPeriodic() override;
+    void AutonomousPeriodic() override;
+    void TeleopPeriodic() override;
 };
 
 #endif

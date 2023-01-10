@@ -1,13 +1,10 @@
 #include "CowBase.h"
 
-#include <iostream>
-
 CowBase::CowBase()
-    // for reference, these are called construction initializers
-    : m_ControlBoard(new CowControlBoard()),
-      m_OpController(new OperatorController(m_ControlBoard)),
-      m_AutoController(new AutoModeController()),
-      m_Constants(CowConstants::GetInstance())
+    : m_ControlBoard(new CowControlBoard())
+    , m_OpController(new OperatorController(m_ControlBoard))
+    , m_AutoController(new AutoModeController())
+    , m_Constants(CowConstants::GetInstance())
 {
     CowConstants::GetInstance()->RestoreData();
     m_Bot = new CowRobot();
@@ -30,6 +27,9 @@ CowBase::~CowBase()
 void CowBase::RobotInit()
 {
     m_Bot->Reset();
+
+    // Construct the auto modes class to load swerve trajectories
+    AutoModes::GetInstance();
 }
 
 void CowBase::DisabledInit()
@@ -45,9 +45,15 @@ void CowBase::AutonomousInit()
     m_Bot->GetGyro()->FinalizeCalibration();
     m_Bot->GetGyro()->ResetAngle();
 
+    std::cout << "Setting command list" << std::endl;
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
+    std::cout << "Done setting command list" << std::endl;
+
     m_Bot->SetController(m_AutoController);
     m_Bot->Reset();
+
+    std::cout << "Starting auto" << std::endl;
+    m_AutoController->Start(m_Bot);
 }
 
 void CowBase::TeleopInit()
@@ -60,36 +66,20 @@ void CowBase::TeleopInit()
     // m_Bot->GetArm()->SetBrakeMode();
 }
 
-void CowBase::DisabledContinuous()
-{
-    // taskDelay(WAIT_FOREVER);
-}
-
-void CowBase::AutonomousContinuous()
-{
-    // taskDelay(WAIT_FOREVER);
-}
-
-void CowBase::TeleopContinuous()
-{
-    // taskDelay(WAIT_FOREVER);
-}
-
 void CowBase::DisabledPeriodic()
 {
     // m_Bot->GyroHandleCalibration();
 
-    if (m_Display)
-    {
+    if (m_Display) {
         m_Display->DisplayPeriodic();
     }
 
-    if (m_ControlBoard->GetAutoSelectButton())
-    {
+    if (m_ControlBoard->GetAutoSelectButton()) {
         m_Constants->RestoreData();
 
-        if (m_ControlBoard->GetSteeringButton(7))
-        {
+        // TODO: change back to 7
+        // if (m_ControlBoard->GetSteeringButton(7)) {
+        if (m_ControlBoard->GetSteeringButton(4)) {
             m_Bot->Reset();
 
             /*
@@ -99,9 +89,13 @@ void CowBase::DisabledPeriodic()
             AutoModes::GetInstance()->NextMode();
         }
     }
+    if (m_Bot) {
+        // m_Bot->GetArm()->DisabledCalibration();
+    }
 
-    if (m_DisabledCount++ % 50 == 0)
-    {
+    if (m_DisabledCount++ % 50 == 0) {
+        // m_Bot->GetConveyor()->SetStatusFramePeriod();
+        // m_Bot->GetIntakeF()->SetStatusFramePeriod();
         m_DisabledCount = 1;
     }
 }
@@ -123,7 +117,4 @@ void CowBase::TeleopPeriodic()
     //    }
 }
 
-int main()
-{
-    return frc::StartRobot<CowBase>();
-}
+int main() { return frc::StartRobot<CowBase>(); }
