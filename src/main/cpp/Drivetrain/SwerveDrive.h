@@ -67,8 +67,8 @@ public:
     SwerveDrive(ModuleConstants constants[4], double wheelBase);
     ~SwerveDrive();
 
-    void SetVelocity(double x, double y, double rotation, bool isFieldRelative = true, bool isOpenLoop = true);
-    void SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative = true, bool isOpenLoop = true);
+    void SetVelocity(double x, double y, double rotation, bool isFieldRelative = true);
+    void SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative = true);
 
     // void SetVisionAlignVelocity(double x, double y, double rotation, bool isFieldRelative = true);
 

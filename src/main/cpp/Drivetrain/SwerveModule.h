@@ -57,7 +57,7 @@ public:
     CowLib::CowSwerveModuleState GetState();
     CowLib::CowSwerveModulePosition GetPosition();
 
-    void SetTargetState(CowLib::CowSwerveModuleState state, bool isOpenLoop);
+    void SetTargetState(CowLib::CowSwerveModuleState state);
 
     void ResetConstants();
 

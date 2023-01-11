@@ -67,57 +67,19 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
  * @brief Sets the desired module state
  *
  * @param state Target state
- * @param isOpenLoop Default true
  */
-void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool isOpenLoop)
+void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
     CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
     // frc::SwerveModuleState optimized = state;
 
-    if (isOpenLoop)
-    {
-        double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
+    double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
-        m_DriveMotor->SetControlMode(CowLib::CowMotorController::PERCENTVBUS);
+    m_DriveMotor->SetControlMode(CowLib::CowMotorController::PERCENTVBUS);
 
-        m_DriveMotor->Set(percentOutput);
+    m_DriveMotor->Set(percentOutput);
 
-        frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Speed", optimized.velocity);
-
-        // std::cout << targetSpeed << " ";
-    }
-    else
-    {
-        // Closed loop mode is used for auto and vision modes as far as I can tell
-
-        // TODO: clean up conversions
-        // TODO: make FPStoFALCON actually be coorect. BIG IMPORT
-        double velocity = CowLib::Conversions::FPSToFalcon(optimized.velocity,
-                                                           CONSTANT("WHEEL_CIRCUMFERENCE"),
-                                                           CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
-
-        // TODO: Make this work
-        // Manually woo
-        // auto s = units::volt_t { 1 };
-        units::volt_t s{ CONSTANT("SWERVE_S") };
-
-        // TODO: remove this workaround
-        auto v = units::volt_t{ CONSTANT("SWERVE_V") } * units::second_t{ 1 } / units::foot_t{ 1 };
-        auto a
-            = units::volt_t{ CONSTANT("SWERVE_A") } * units::second_t{ 1 } * units::second_t{ 1 } / units::foot_t{ 1 };
-        // units::compound_unit<units::volt_t, units::second_t, units::inverse<units::foot_t>> v { CONSTANT("SWERVE_V")
-        // }; units::compound_unit<units::volt_t, units::squared<units::second_t>, units::inverse<units::foot_t>> a {
-        // CONSTANT("SWERVE_A") };
-
-        frc::SimpleMotorFeedforward<units::feet> feedforward{ s, v, a };
-        // m_DriveMotor->GetInternalMotor()->Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity, velocityFPS,
-        // DemandType::DemandType_ArbitraryFeedForward, feedforward.Calculate(units::feet_per_second_t(targetSpeed)));
-        m_DriveMotor->GetInternalMotor()->Set(
-            ctre::phoenix::motorcontrol::TalonFXControlMode::Velocity,
-            velocity,
-            ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward,
-            feedforward.Calculate(units::feet_per_second_t(optimized.velocity)).value());
-    }
+    frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Speed", optimized.velocity);
 
     // Don't rotate for low speeds
     double targetAngle;

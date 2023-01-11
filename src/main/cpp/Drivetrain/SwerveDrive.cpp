@@ -53,10 +53,8 @@ SwerveDrive::~SwerveDrive()
  * @param y Translational Y velocity in feet per second
  * @param rotation Rotational velocity in degrees per second
  * @param isFieldRelative Controls whether drive is field relative, default true
- * @param isOpenLoop
- * Default true
  */
-void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRelative, bool isOpenLoop)
+void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRelative)
 {
     CowLib::CowChassisSpeeds chassisSpeeds{};
 
@@ -96,7 +94,7 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
 
     for (auto module : m_Modules)
     {
-        module->SetTargetState(moduleStates[module->GetId()], isOpenLoop);
+        module->SetTargetState(moduleStates[module->GetId()]);
     }
 }
 
@@ -104,11 +102,10 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
  * @brief Same as the other SetVelocity, but using CowChassisSpeeds
  * @param chassisSpeeds CowChassisSpeeds struct
  * @param isFieldRelative
- * @param isOpenLoop
  */
-void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative, bool isOpenLoop)
+void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative)
 {
-    SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative, isOpenLoop);
+    SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative);
 }
 
 /**
