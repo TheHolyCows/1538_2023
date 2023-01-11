@@ -12,10 +12,10 @@
 #include "CowControlBoard.h"
 #include "CowDisplay.h"
 #include "CowLib/CowLib.h"
-
-#include <iostream>
+#include "CowLib/CowLogger.h"
 
 #include <frc/TimedRobot.h>
+#include <iostream>
 
 class CowBase : public frc::TimedRobot
 {

@@ -11,6 +11,9 @@ CowBase::CowBase()
 
     m_Display = new CowDisplay(m_Bot);
 
+    // init logger
+    CowLib::CowLogger::GetInstance();
+
     // SetPeriod(HZ(ROBOT_HZ));
     // GetWatchdog().SetEnabled(false);
     printf("Done constructing CowBase!\n");
@@ -90,6 +93,7 @@ void CowBase::DisabledPeriodic()
              * iterates over AutoModes
              */
             AutoModes::GetInstance()->NextMode();
+            CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
         }
     }
     if (m_Bot)
@@ -97,10 +101,9 @@ void CowBase::DisabledPeriodic()
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 50 == 0)
+    if (m_DisabledCount++ % 5 == 0) // 50 ms tick rate
     {
-        // m_Bot->GetConveyor()->SetStatusFramePeriod();
-        // m_Bot->GetIntakeF()->SetStatusFramePeriod();
+        CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
     }
 }

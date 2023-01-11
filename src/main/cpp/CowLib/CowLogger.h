@@ -39,7 +39,8 @@ namespace CowLib
             MSG_LOG = 0,
             PID_LOG,
             MOTR_LOG,
-            BATT_LOG
+            BATT_LOG,
+            AUTO_LOG
         };
 
         enum CowLogLevel : uint16_t
@@ -54,6 +55,7 @@ namespace CowLib
         const static int REGISTERED_MOTORS_MAX = 24;
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
+        static void LogAutoMode(const char *);
         static void LogMsg(CowLogLevel, const char *);
 
         void Handle();
@@ -114,6 +116,12 @@ namespace CowLib
         {
             CowLogHdr hdr;
             double voltage;
+        };
+
+        struct CowAutoLog
+        {
+            CowLogHdr hdr;
+            char name[32];
         };
     };
 
