@@ -1,140 +1,148 @@
 #include "./CowSwerveOdometry.h"
 
-namespace CowLib {
-
-/**
- * @brief Creates a new CowSwerveOdometry instance
- * @param kinematics Pointer to CowSwerveKinematics instance
- * @param gyroAngle current gyro angle
- * @param initialX starting X translation in feet
- * @param initialY starting Y translation in feet
- * @param initialRotation starting rotation in degrees
- */
-CowSwerveOdometry::CowSwerveOdometry(CowSwerveKinematics* kinematics, double gyroAngle, double initialX, double initialY, double initialRotation)
+namespace CowLib
 {
-    wpi::array<frc::SwerveModulePosition,4> pos = {frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg)};
-    m_Odometry = new frc::SwerveDriveOdometry<4>(
-        *(kinematics->GetInternalKinematics()),
-        frc::Rotation2d(units::degree_t { gyroAngle }),
-        pos,
-        CreateWPIPose(initialX, initialY, initialRotation));
-}
 
-CowSwerveOdometry::~CowSwerveOdometry()
-{
-    delete m_Odometry;
-}
+    /**
+     * @brief Creates a new CowSwerveOdometry instance
+     * @param kinematics Pointer to CowSwerveKinematics instance
+     * @param gyroAngle current gyro angle
+     * @param initialX starting X translation in feet
+     * @param initialY starting Y translation in feet
+     * @param initialRotation starting rotation in degrees
+     */
+    CowSwerveOdometry::CowSwerveOdometry(CowSwerveKinematics *kinematics,
+                                         double gyroAngle,
+                                         double initialX,
+                                         double initialY,
+                                         double initialRotation)
+    {
+        std::array<frc::SwerveModulePosition, 4> zeroPositions;
+        for (int i = 0; i < 4; i++)
+        {
+            zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
+        }
 
-/**
- * Converts 3 doubles to WPILib Pose2d
- * @param x x position in feet
- * @param y y position in feet
- * @param rotation robot rotation in degrees
- * @return generated Pose2d
- */
-frc::Pose2d CowSwerveOdometry::CreateWPIPose(double x, double y, double rotation)
-{
-    return frc::Pose2d(units::foot_t { x }, units::foot_t { y }, frc::Rotation2d(units::degree_t { rotation }));
-}
+        m_Odometry = new frc::SwerveDriveOdometry<4>(*(kinematics->GetInternalKinematics()),
+                                                     frc::Rotation2d(units::degree_t{ gyroAngle }),
+                                                     zeroPositions,
+                                                     CreateWPIPose(initialX, initialY, initialRotation));
+    }
 
-/**
- * @brief Converts an array of CowSwerveModuleStates to WPILib SwerveModuleStates. Utalized ToWPI method on CowSwerveModuleState struct.
- * @param moduleStates std::array of 4 CowSwerveModuleStates
- * @return std::array of 4 WPILib SwerveModuleStates
- */
-std::array<frc::SwerveModuleState, 4> CowSwerveOdometry::CreateWPIModuleStates(std::array<CowSwerveModuleState, 4> moduleStates)
-{
-    std::array<frc::SwerveModuleState, 4> WPIModuleStates;
+    CowSwerveOdometry::~CowSwerveOdometry()
+    {
+        delete m_Odometry;
+    }
 
-    // Converts each CowSwerveModuleState to a WPILib module state and places in the new std::array
-    std::transform(moduleStates.begin(), moduleStates.end(), WPIModuleStates.begin(), [](CowSwerveModuleState state) { return state.ToWPI(); });
+    /**
+     * Converts 3 doubles to WPILib Pose2d
+     * @param x x position in feet
+     * @param y y position in feet
+     * @param rotation robot rotation in degrees
+     * @return generated Pose2d
+     */
+    frc::Pose2d CowSwerveOdometry::CreateWPIPose(double x, double y, double rotation)
+    {
+        return frc::Pose2d(units::foot_t{ x }, units::foot_t{ y }, frc::Rotation2d(units::degree_t{ rotation }));
+    }
 
-    return WPIModuleStates;
-}
+    /**
+     * @brief Converts an array of CowSwerveModulePositions to WPILib SwerveModulePositions.
+     * Utilized ToWPI method on CowSwerveModulePosition struct.
+     * @param modulePositions std::array of 4 CowSwerveModulePositions
+     * @return std::array of 4 WPILib SwerveModulePositions
+     */
+    std::array<frc::SwerveModulePosition, 4>
+    CowSwerveOdometry::CreateWPIModulePositions(std::array<CowSwerveModulePosition, 4> modulePositions)
+    {
+        std::array<frc::SwerveModulePosition, 4> WPIModulePositions;
 
-/**
- * @brief Resets the robot position on the field.
- * @param newX new X position in feet
- * @param newY new Y position in feet
- * @param newRotation new robot rotation in degrees
- * @param gyroAngle current gyro angle in degrees
- */
-void CowSwerveOdometry::Reset(double newX, double newY, double newRotation, double gyroAngle)
-{
-    wpi::array<frc::SwerveModulePosition,4> pos = {frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg),frc::SwerveModulePosition(0_m,0_deg)};
-    m_Odometry->ResetPosition(frc::Rotation2d(units::degree_t { gyroAngle }),pos, CreateWPIPose(newX, newY, newRotation));
-    m_Pose = m_Odometry->GetPose();
-}
+        // Converts each CowSwerveModulePosition to a WPILib module position and places in the new std::array
+        std::transform(modulePositions.begin(),
+                       modulePositions.end(),
+                       WPIModulePositions.begin(),
+                       [](CowSwerveModulePosition position) { return position.ToWPI(); });
 
-/**
- * @brief Gets current X position of the robot
- * @return X position in feet
- */
-double CowSwerveOdometry::GetX()
-{
-    return m_Pose.X().convert<units::foot>().value();
-}
+        return WPIModulePositions;
+    }
 
-/**
- * @brief Gets current Y position of the robot
- * @return Y position in feet
- */
-double CowSwerveOdometry::GetY()
-{
-    return m_Pose.Y().convert<units::foot>().value();
-}
+    /**
+     * @brief Resets the robot position on the field.
+     * @param newX new X position in feet
+     * @param newY new Y position in feet
+     * @param newRotation new robot rotation in degrees
+     * @param gyroAngle current gyro angle in degrees
+     */
+    void CowSwerveOdometry::Reset(double newX, double newY, double newRotation, double gyroAngle)
+    {
+        std::array<frc::SwerveModulePosition, 4> zeroPositions;
+        for (int i = 0; i < 4; i++)
+        {
+            zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
+        }
 
-/**
- * @brief Gets current robot rotation in degrees
- * @return rotation in degrees
- */
-double CowSwerveOdometry::GetRotation()
-{
-    return m_Pose.Rotation().Degrees().value();
-}
+        m_Odometry->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }),
+                                  zeroPositions,
+                                  CreateWPIPose(newX, newY, newRotation));
 
-/**
- * @brief Gets a WPILib Pose2d object of the robot's position
- * @return WPILib Pose2d
- */
-frc::Pose2d CowSwerveOdometry::GetWPIPose()
-{
-    return m_Pose;
-}
+        m_Pose = m_Odometry->GetPose();
+    }
 
-/**
- * @brief Updates the robot's position on the field using forward kinematics and integration of the pose over time
- * @param gyroAngle The angle reported by the gyroscope (in degrees)
- * @param moduleStates std::array of all 4 swerve module states. Must be in the same order.
- */
-// void CowSwerveOdometry::Update(double gyroAngle, std::array<CowSwerveModuleState, 4> moduleStates)
-// {
-//     auto WPIModuleStates = CreateWPIModuleStates(moduleStates);
+    /**
+     * @brief Gets current X position of the robot
+     * @return X position in feet
+     */
+    double CowSwerveOdometry::GetX()
+    {
+        return m_Pose.X().convert<units::foot>().value();
+    }
 
-//     m_Pose = m_Odometry->Update(frc::Rotation2d(units::degree_t { gyroAngle }), WPIModuleStates[0], WPIModuleStates[1], WPIModuleStates[2], WPIModuleStates[3]);
-// }
+    /**
+     * @brief Gets current Y position of the robot
+     * @return Y position in feet
+     */
+    double CowSwerveOdometry::GetY()
+    {
+        return m_Pose.Y().convert<units::foot>().value();
+    }
 
-/**
- * @brief Updates the robot's position on the field using forward kinematics and integration of the pose over time.
- * @param currentTime The current time in seconds
- * @param gyroAngle The angle reported by the gyroscope (in degrees)
- * @param moduleStates std::array of all 4 swerve module states. Must be in the same order.
- */
-// void CowSwerveOdometry::UpdateWithTime(double currentTime, double gyroAngle, std::array<CowSwerveModuleState, 4> moduleStates)
-// {
-//     auto WPIModuleStates = CreateWPIModuleStates(moduleStates);
+    /**
+     * @brief Gets current robot rotation in degrees
+     * @return rotation in degrees
+     */
+    double CowSwerveOdometry::GetRotation()
+    {
+        return m_Pose.Rotation().Degrees().value();
+    }
 
-//     m_Pose = m_Odometry->Update(frc::Rotation2d(units::degree_t { gyroAngle }),
-//         WPIModuleStates[0], WPIModuleStates[1], WPIModuleStates[2], WPIModuleStates[3]);
-// }
+    /**
+     * @brief Gets a WPILib Pose2d object of the robot's position
+     * @return WPILib Pose2d
+     */
+    frc::Pose2d CowSwerveOdometry::GetWPIPose()
+    {
+        return m_Pose;
+    }
 
-/**
- * @brief Retrieves the internal odometry instance
- * @return Pointer to WPILib SwerveDriveOdometry
- */
-frc::SwerveDriveOdometry<4>* CowSwerveOdometry::GetInternalOdometry()
-{
-    return m_Odometry;
-}
+    /**
+     * @brief Updates the robot's position on the field using forward kinematics and integration of the pose over time
+     * @param gyroAngle The angle reported by the gyroscope (in degrees)
+     * @param modulePositions std::array of all 4 swerve module positions. Must be in the same order.
+     */
+    void CowSwerveOdometry::Update(double gyroAngle, std::array<CowSwerveModulePosition, 4> modulePositions)
+    {
+        std::array<frc::SwerveModulePosition, 4> WPIModulePositions = CreateWPIModulePositions(modulePositions);
 
-}
+        m_Pose = m_Odometry->Update(frc::Rotation2d(units::degree_t{ gyroAngle }), WPIModulePositions);
+    }
+
+    /**
+     * @brief Retrieves the internal odometry instance
+     * @return Pointer to WPILib SwerveDriveOdometry
+     */
+    frc::SwerveDriveOdometry<4> *CowSwerveOdometry::GetInternalOdometry()
+    {
+        return m_Odometry;
+    }
+
+} // namespace CowLib

@@ -7,19 +7,24 @@
  */
 SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 {
-    m_Gyro = CowLib::CowGyro::GetInstance();
+    m_Gyro   = CowLib::CowGyro::GetInstance();
     m_Locked = false;
 
-    for (int i = 0; i < 4; i++) {
-        m_Modules[i] = new SwerveModule(i, moduleConstants[i].driveMotorId, moduleConstants[i].rotationMotorId,
-            moduleConstants[i].encoderId, moduleConstants[i].encoderOffset);
+    for (int i = 0; i < 4; i++)
+    {
+        m_Modules[i] = new SwerveModule(i,
+                                        moduleConstants[i].driveMotorId,
+                                        moduleConstants[i].rotationMotorId,
+                                        moduleConstants[i].encoderId,
+                                        moduleConstants[i].encoderOffset);
     }
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
     m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetAngle(), 0, 0, 0);
 
-    // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"), CONSTANT("SWERVE_VISION_D"), 0);
+    // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
+    // CONSTANT("SWERVE_VISION_D"), 0);
 
     // m_VisionPIDController->SetContinuous(true);
     // m_VisionPIDController->SetInputRange(-180, 180);
@@ -32,7 +37,8 @@ SwerveDrive::~SwerveDrive()
     delete m_Odometry;
     delete m_Kinematics;
 
-    for (auto module : m_Modules) {
+    for (auto module : m_Modules)
+    {
         delete module;
     }
 
@@ -46,11 +52,12 @@ SwerveDrive::~SwerveDrive()
  * @param y Translational Y velocity in feet per second
  * @param rotation Rotational velocity in degrees per second
  * @param isFieldRelative Controls whether drive is field relative, default true
- * @param isOpenLoop Default true
+ * @param isOpenLoop
+ * Default true
  */
 void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRelative, bool isOpenLoop)
 {
-    CowLib::CowChassisSpeeds chassisSpeeds {};
+    CowLib::CowChassisSpeeds chassisSpeeds{};
 
     // units::feet_per_second_t vx { x };
     // units::feet_per_second_t vy { y };
@@ -58,30 +65,36 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
 
     // frc::SmartDashboard::PutNumber("Gyro angle", m_Gyro->GetAngle());
 
-    if (isFieldRelative) {
+    if (isFieldRelative)
+    {
         // How does this know what angle it starts at
         chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetAngle());
-    } else {
-        chassisSpeeds = CowLib::CowChassisSpeeds { vx, vy, omega };
+    }
+    else
+    {
+        chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
     auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds);
 
     // This just overwrites for now. Maybe fix?
-    if (m_Locked) {
-        double angles[4] { 45, 315, 135, 225 };
+    if (m_Locked)
+    {
+        double angles[4]{ 45, 315, 135, 225 };
         // TODO: check if 0.3 is good
         // units::feet_per_second_t velocity { 0.3 };
 
-        for (int i = 0; i < 4; i++) {
-            moduleStates[i] = CowLib::CowSwerveModuleState { 0.3, angles[i] };
+        for (int i = 0; i < 4; i++)
+        {
+            moduleStates[i] = CowLib::CowSwerveModuleState{ 0.3, angles[i] };
         }
     }
 
     // Just in case
     CowLib::CowSwerveKinematics::DesaturateSpeeds(&moduleStates, CONSTANT("SWERVE_MAX_SPEED"));
 
-    for (auto module : m_Modules) {
+    for (auto module : m_Modules)
+    {
         module->SetTargetState(moduleStates[module->GetId()], isOpenLoop);
     }
 }
@@ -119,7 +132,8 @@ void SwerveDrive::SetLocked(bool isLocked)
 
 void SwerveDrive::ResetConstants()
 {
-    for (auto module : m_Modules) {
+    for (auto module : m_Modules)
+    {
         module->ResetConstants();
     }
 }
@@ -129,14 +143,19 @@ void SwerveDrive::ResetEncoders()
 {
     m_Odometry->Reset(0, 0, 0, m_Gyro->GetAngle());
 
-    for (auto module : m_Modules) {
+    for (auto module : m_Modules)
+    {
         module->ResetEncoders();
     }
 }
 
 void SwerveDrive::Handle()
 {
-    std::array<CowLib::CowSwerveModuleState, 4> moduleStates {};
-    std::transform(m_Modules.begin(), m_Modules.end(), moduleStates.begin(),
-        [](SwerveModule* module) { return module->GetState(); });
+    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
+    std::transform(m_Modules.begin(),
+                   m_Modules.end(),
+                   modulePositions.begin(),
+                   [](SwerveModule *module) { return module->GetPosition(); });
+
+    m_Odometry->Update(m_Gyro->GetAngle(), modulePositions);
 }

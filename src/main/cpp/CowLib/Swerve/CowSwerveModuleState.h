@@ -16,7 +16,7 @@ struct CowSwerveModuleState {
         return CowSwerveModuleState{state.speed.convert<units::feet_per_second>().value(), state.angle.Degrees().value()};
     }
 
-    frc::SwerveModuleState ToWPI()
+    frc::SwerveModuleState ToWPI() const
     {
         return frc::SwerveModuleState {
             units::feet_per_second_t(velocity),
