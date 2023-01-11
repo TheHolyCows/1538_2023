@@ -23,7 +23,7 @@ private:
     CowRobot *m_Bot;
     CowControlBoard *m_ControlBoard;
     OperatorController *m_OpController;
-    AutoModeController*m_AutoController;
+    AutoModeController *m_AutoController;
     CowConstants *m_Constants;
     CowDisplay *m_Display;
 
