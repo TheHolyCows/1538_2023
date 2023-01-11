@@ -36,7 +36,8 @@ namespace CowLib
 
         if (m_LogSocket < 0)
         {
-            std::cout << "error creating socket" << std::endl;
+            std::cout << "CowLogger::CowLogger() error: failed to create socket" << std::endl;
+            return;
         }
 
         m_LogServer.sin_family      = AF_INET;
@@ -90,6 +91,26 @@ namespace CowLib
     }
 
     /**
+     * CowLogger::LogAutoMode
+     * unlike other loggers, this does not depend on debug flag being set
+     * sends a message containing the name of the currently selected auto mode, up to 32 characters (including '\0')
+     * called on every auto mode selection button press and every 50ms in disabled periodic
+     * @param name - name of current auto mode
+     */
+    void CowLogger::LogAutoMode(const char *name)
+    {
+        CowAutoLog logPacket;
+        logPacket.hdr.msgType = CowLogger::AUTO_LOG;
+        logPacket.hdr.msgLen  = sizeof(logPacket);
+
+        // sub 1 from len to allow space for '\0'
+        memset(logPacket.name, 0x0, sizeof(logPacket.name));
+        strncpy(logPacket.name, name, sizeof(logPacket.name) - 1);
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    /**
      * CowLogger::LogMsg
      * sends a message with log level to our log server
      * message is limited to 255 characters
@@ -108,6 +129,7 @@ namespace CowLib
         logPacket.hdr.msgType = CowLogMsgType::MSG_LOG;
         logPacket.hdr.msgLen  = sizeof(logPacket);
         logPacket.logLevel    = logLevel;
+
         // sub 1 from len to allow space for '\0'
         memset(logPacket.logStr, 0x0, sizeof(logPacket.logStr));
         strncpy(logPacket.logStr, logStr, sizeof(logPacket.logStr) - 1);
@@ -208,8 +230,10 @@ namespace CowLib
             }
         }
 
-        if (m_TickCount % 20 == 0) // 200 miliseconds
+        if (m_TickCount++ % 20 == 0) // 200 miliseconds
         {
+            m_TickCount = 1;
+
             uint32_t logsThisTick = 4;
             while (m_IdToLog < REGISTERED_MOTORS_MAX && logsThisTick != 0)
             {
