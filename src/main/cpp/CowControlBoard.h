@@ -7,49 +7,32 @@
 
 #include <frc/Joystick.h>
 
-#define SHIFTER_BUTTON 4
-#define AUTON_BUTTON 1
-#define PID_BUTTON 3
-
-#define LEFT_GAMEPAD_X 1
-#define LEFT_GAMEPAD_Y 2
-#define RIGHT_GAMEPAD_X 3
-#define RIGHT_GAMEPAD_Y 4
-#define STEERING_X 1
-
-#define FAST_TURN 6
-
 // This class offers access to the 2010 specific Cow Control Board
+// LOL this is 2023 now
 class CowControlBoard
 {
 private:
-    frc::Joystick *m_DriveStick;
-    frc::Joystick *m_DriveWheel;
+    frc::Joystick *m_LeftDriveStick;
+    frc::Joystick *m_RightDriveStick;
     frc::Joystick *m_OperatorPanel;
-    frc::Joystick *m_OperatorGamepad;
 
     bool m_PreviousAuto;
-    //    bool m_PreviousAddAngle;
-    //    bool m_PreviousDecAngle;
 
 public:
     CowControlBoard();
 
-    bool GetQuickTurn();
     bool GetAutoSelectButton();
-    bool GetAutoAddAngleOffsetButton();
-    bool GetAutoDecAngleOffsetButton();
 
-    float GetDriveAxis(unsigned int axis);
+    double GetLeftDriveStickAxis(unsigned int axis);
+    double GetRightDriveStickAxis(unsigned int axis);
 
-    float GetDriveStickY();
-    float GetSteeringX();
+    double GetLeftDriveStickY();
+    double GetRightDriveStickY();
 
-    float GetOperatorGamepadAxis(unsigned int axis);
+    bool GetLeftDriveStickButton(const int button);
+    bool GetRightDriveStickButton(const int button);
 
-    bool GetDriveButton(int button);
-    bool GetSteeringButton(int button);
-    bool GetOperatorButton(int button);
+    bool GetOperatorButton(const int button);
 };
 
 #endif

@@ -7,7 +7,8 @@
  */
 SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 {
-    m_Gyro   = CowLib::CowGyro::GetInstance();
+    m_Gyro = CowLib::CowGyro::GetInstance();
+
     m_Locked = false;
 
     for (int i = 0; i < 4; i++)
@@ -158,4 +159,10 @@ void SwerveDrive::Handle()
                    [](SwerveModule *module) { return module->GetPosition(); });
 
     m_Odometry->Update(m_Gyro->GetAngle(), modulePositions);
+
+    // Print module angles
+    for (int i = 0; i < 4; i++)
+    {
+        std::cout << "mod " << i << " angle " << modulePositions[i].angle << std::endl;
+    }
 }

@@ -24,23 +24,10 @@ private:
 
     enum DriverButtonMap
     {
-        AUTO_AIM = 3,
     };
 
     enum OperatorButtonMap
     {
-        SWITCH_FRONT_INTAKE  = 8,
-        SWITCH_REAR_INTAKE   = 10,
-        SWITCH_CLIMBER       = 12,
-        BUTTON_FRONT_EXHAUST = 4,
-        BUTTON_REAR_EXHAUST  = 6,
-        BUTTON_FRONT_INTAKE  = 7,
-        BUTTON_REAR_INTAKE   = 9,
-        BUTTON_SHOOT         = 5,
-        SWITCH_SHOOTER       = 3,
-        BUTTON_HOOD_UP       = 1,
-        BUTTON_HOOD_DOWN     = 2,
-        BUTTON_HOOD_BOTTOM   = 11,
     };
 
 public:

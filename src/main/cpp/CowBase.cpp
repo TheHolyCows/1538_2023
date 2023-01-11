@@ -1,10 +1,10 @@
 #include "CowBase.h"
 
 CowBase::CowBase()
-    : m_ControlBoard(new CowControlBoard())
-    , m_OpController(new OperatorController(m_ControlBoard))
-    , m_AutoController(new AutoModeController())
-    , m_Constants(CowConstants::GetInstance())
+    : m_ControlBoard(new CowControlBoard()),
+      m_OpController(new OperatorController(m_ControlBoard)),
+      m_AutoController(new AutoModeController()),
+      m_Constants(CowConstants::GetInstance())
 {
     CowConstants::GetInstance()->RestoreData();
     m_Bot = new CowRobot();
@@ -70,16 +70,19 @@ void CowBase::DisabledPeriodic()
 {
     // m_Bot->GyroHandleCalibration();
 
-    if (m_Display) {
+    if (m_Display)
+    {
         m_Display->DisplayPeriodic();
     }
 
-    if (m_ControlBoard->GetAutoSelectButton()) {
+    if (m_ControlBoard->GetAutoSelectButton())
+    {
         m_Constants->RestoreData();
 
         // TODO: change back to 7
         // if (m_ControlBoard->GetSteeringButton(7)) {
-        if (m_ControlBoard->GetSteeringButton(4)) {
+        if (m_ControlBoard->GetOperatorButton(7))
+        {
             m_Bot->Reset();
 
             /*
@@ -89,11 +92,13 @@ void CowBase::DisabledPeriodic()
             AutoModes::GetInstance()->NextMode();
         }
     }
-    if (m_Bot) {
+    if (m_Bot)
+    {
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 50 == 0) {
+    if (m_DisabledCount++ % 50 == 0)
+    {
         // m_Bot->GetConveyor()->SetStatusFramePeriod();
         // m_Bot->GetIntakeF()->SetStatusFramePeriod();
         m_DisabledCount = 1;
@@ -117,4 +122,7 @@ void CowBase::TeleopPeriodic()
     //    }
 }
 
-int main() { return frc::StartRobot<CowBase>(); }
+int main()
+{
+    return frc::StartRobot<CowBase>();
+}

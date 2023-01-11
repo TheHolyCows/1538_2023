@@ -2,86 +2,57 @@
 
 // Constructor for Cow Control Board
 CowControlBoard::CowControlBoard()
-    : m_DriveStick(new frc::Joystick(0)),
-      m_DriveWheel(new frc::Joystick(1)),
+    : m_LeftDriveStick(new frc::Joystick(0)),
+      m_RightDriveStick(new frc::Joystick(1)),
       m_OperatorPanel(new frc::Joystick(2)),
-      m_OperatorGamepad(new frc::Joystick(3)),
       m_PreviousAuto(false)
 {
-}
-
-// Returns state of shifter switch
-float CowControlBoard::GetDriveAxis(unsigned int axis)
-{
-    return m_DriveStick->GetRawAxis(axis);
 }
 
 // Returns state of autonomous select button
 bool CowControlBoard::GetAutoSelectButton()
 {
-    if (GetSteeringButton(7) && !m_PreviousAuto)
+    // TODO: change this
+    if (GetOperatorButton(7) && !m_PreviousAuto)
     {
-        m_PreviousAuto = GetSteeringButton(7);
+        m_PreviousAuto = GetOperatorButton(7);
         return true;
     }
-    m_PreviousAuto = GetSteeringButton(7);
+    m_PreviousAuto = GetOperatorButton(7);
     return false;
 }
 
-// bool CowControlBoard::GetAutoAddAngleOffsetButton()
-//{
-//     if(GetSteeringButton(9) && !m_PreviousAddAngle)
-//     {
-//         m_PreviousAddAngle = GetSteeringButton(9);
-//         return true;
-//     }
-//     m_PreviousAddAngle = GetSteeringButton(9);
-//     return false;
-// }
-//
-// bool CowControlBoard::GetAutoDecAngleOffsetButton()
-//{
-//     if(GetSteeringButton(11) && !m_PreviousDecAngle)
-//     {
-//         m_PreviousDecAngle = GetSteeringButton(11);
-//         return true;
-//     }
-//     m_PreviousDecAngle = GetSteeringButton(11);
-//     return false;
-// }
-
-// Returns the state of the quick turn
-bool CowControlBoard::GetQuickTurn()
+double CowControlBoard::GetLeftDriveStickAxis(unsigned int axis)
 {
-    return !GetDriveButton(8);
+    return m_LeftDriveStick->GetRawAxis(axis);
 }
 
-float CowControlBoard::GetDriveStickY()
+double CowControlBoard::GetRightDriveStickAxis(unsigned int axis)
 {
-    return m_DriveStick->GetRawAxis(1);
+    return m_RightDriveStick->GetRawAxis(axis);
 }
 
-float CowControlBoard::GetSteeringX()
+double CowControlBoard::GetLeftDriveStickY()
 {
-    return m_DriveWheel->GetRawAxis(0);
+    return m_LeftDriveStick->GetRawAxis(1);
 }
 
-bool CowControlBoard::GetDriveButton(const int button)
+double CowControlBoard::GetRightDriveStickY()
 {
-    return m_DriveStick->GetRawButton(button);
+    return m_RightDriveStick->GetRawAxis(1);
+}
+
+bool CowControlBoard::GetLeftDriveStickButton(const int button)
+{
+    return m_LeftDriveStick->GetRawButton(button);
+}
+
+bool CowControlBoard::GetRightDriveStickButton(const int button)
+{
+    return m_LeftDriveStick->GetRawButton(button);
 }
 
 bool CowControlBoard::GetOperatorButton(const int button)
 {
     return m_OperatorPanel->GetRawButton(button);
-}
-
-bool CowControlBoard::GetSteeringButton(const int button)
-{
-    return m_DriveWheel->GetRawButton(button);
-}
-
-float CowControlBoard::GetOperatorGamepadAxis(unsigned int axis)
-{
-    return m_OperatorGamepad->GetRawAxis(axis);
 }

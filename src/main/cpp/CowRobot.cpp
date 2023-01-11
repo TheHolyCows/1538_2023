@@ -20,10 +20,10 @@ CowRobot::CowRobot()
     // TODO: reset constants needs to reset this
     // fl, fr, bl, br
     SwerveDrive::ModuleConstants swerveModuleConstants[4]{
-        SwerveDrive::ModuleConstants{ 1, 2, 9, 2 },
-        SwerveDrive::ModuleConstants{ 3, 4, 10, 2 },
-        SwerveDrive::ModuleConstants{ 5, 6, 11, -2 },
-        SwerveDrive::ModuleConstants{ 7, 8, 12, -2 }
+        SwerveDrive::ModuleConstants{ 1, 2, 9, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 3, 4, 10, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 5, 6, 11, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 7, 8, 12, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
     };
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
@@ -89,6 +89,7 @@ void CowRobot::handle()
 
     PrintToDS();
 }
+
 void CowRobot::StartTime()
 {
     m_StartTime = CowLib::CowTimer::GetFPGATimestamp();

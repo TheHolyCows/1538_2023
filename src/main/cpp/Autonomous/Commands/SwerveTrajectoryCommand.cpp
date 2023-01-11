@@ -1,17 +1,17 @@
 #include "SwerveTrajectoryCommand.h"
 
-SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string& trajectoryName, double targetAngle, bool stopAtEnd)
+SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryName, double targetAngle, bool stopAtEnd)
 {
     // This is to make sure that it is loading trajectories on start and not on demand
     std::cout << "Loading swerve trajectory " << trajectoryName << std::endl;
 
-    m_Timer = new CowLib::CowTimer();
-    m_Stop = stopAtEnd;
+    m_Timer       = new CowLib::CowTimer();
+    m_Stop        = stopAtEnd;
     m_TargetAngle = targetAngle;
 
     // Load trajectory from file
     fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
-    fs::path path = deployDirectory / "trajectories" / (trajectoryName + ".wpilib.json");
+    fs::path path            = deployDirectory / "trajectories" / (trajectoryName + ".wpilib.json");
 
     std::cout << "Got path " << path << std::endl;
 
@@ -19,10 +19,14 @@ SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string& trajectoryNa
 
     std::cout << "Loaded trajectory " << trajectoryName << std::endl;
 
-    m_HolonomicController = new CowLib::CowHolonomicController(
-        CONSTANT("AUTO_P"), CONSTANT("AUTO_I"), CONSTANT("AUTO_D"),
-        CONSTANT("AUTO_ROTATION_P"), CONSTANT("AUTO_ROTATION_I"), CONSTANT("AUTO_ROTATION_D"),
-        CONSTANT("SWERVE_MAX_ANGULAR_VELOCITY"), CONSTANT("MAX_ROTATIONAL_ACCEL"));
+    m_HolonomicController = new CowLib::CowHolonomicController(CONSTANT("AUTO_DRIVE_P"),
+                                                               CONSTANT("AUTO_DRIVE_I"),
+                                                               CONSTANT("AUTO_DRIVE_D"),
+                                                               CONSTANT("AUTO_ROTATION_P"),
+                                                               CONSTANT("AUTO_ROTATION_I"),
+                                                               CONSTANT("AUTO_ROTATION_D"),
+                                                               CONSTANT("SWERVE_MAX_ANGULAR_VELOCITY"),
+                                                               CONSTANT("SWERVE_MAX_ROTATIONAL_ACCEL"));
 
     m_TotalTime = m_Trajectory.TotalTime().value();
 
@@ -44,17 +48,17 @@ bool SwerveTrajectoryCommand::IsComplete()
     return m_Timer->HasElapsed(m_TotalTime);
 }
 
-void SwerveTrajectoryCommand::Start(CowRobot* robot)
+void SwerveTrajectoryCommand::Start(CowRobot *robot)
 {
     m_Timer->Reset();
     m_Timer->Start();
 }
 
-void SwerveTrajectoryCommand::Handle(CowRobot* robot)
+void SwerveTrajectoryCommand::Handle(CowRobot *robot)
 {
     frc::Pose2d currentPose = robot->GetDrivetrain()->GetPose();
 
-    frc::Trajectory::State targetPose = m_Trajectory.Sample(units::second_t { m_Timer->Get() });
+    frc::Trajectory::State targetPose = m_Trajectory.Sample(units::second_t{ m_Timer->Get() });
 
     CowLib::CowChassisSpeeds chassisSpeeds = m_HolonomicController->Calculate(currentPose, targetPose, m_TargetAngle);
 
@@ -63,9 +67,10 @@ void SwerveTrajectoryCommand::Handle(CowRobot* robot)
     robot->GetDrivetrain()->SetVelocity(chassisSpeeds, false);
 }
 
-void SwerveTrajectoryCommand::Finish(CowRobot* robot)
+void SwerveTrajectoryCommand::Finish(CowRobot *robot)
 {
-    if (m_Stop) {
+    if (m_Stop)
+    {
         robot->GetDrivetrain()->SetVelocity(0, 0, 0, false);
     }
 
