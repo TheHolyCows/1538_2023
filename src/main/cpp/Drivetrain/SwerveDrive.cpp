@@ -53,8 +53,15 @@ SwerveDrive::~SwerveDrive()
  * @param y Translational Y velocity in feet per second
  * @param rotation Rotational velocity in degrees per second
  * @param isFieldRelative Controls whether drive is field relative, default true
+ * @param centerOfRotationX X component of center of rotation
+ * @param centerOfRotationY Y component of center of rotation
  */
-void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRelative)
+void SwerveDrive::SetVelocity(double vx,
+                              double vy,
+                              double omega,
+                              bool isFieldRelative,
+                              double centerOfRotationX,
+                              double centerOfRotationY)
 {
     CowLib::CowChassisSpeeds chassisSpeeds{};
 
@@ -74,7 +81,7 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds);
+    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
@@ -102,8 +109,13 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
  * @brief Same as the other SetVelocity, but using CowChassisSpeeds
  * @param chassisSpeeds CowChassisSpeeds struct
  * @param isFieldRelative
+ * @param centerOfRotationX X component of center of rotation
+ * @param centerOfRotationY Y component of center of rotation
  */
-void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative)
+void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
+                              bool isFieldRelative,
+                              double centerOfRotationX,
+                              double centerOfRotationY)
 {
     SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative);
 }

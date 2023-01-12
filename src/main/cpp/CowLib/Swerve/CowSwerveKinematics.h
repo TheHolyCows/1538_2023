@@ -1,6 +1,9 @@
 #ifndef __COWLIB_COWSWERVEKINEMATICS_H__
 #define __COWLIB_COWSWERVEKINEMATICS_H__
 
+#include "./CowChassisSpeeds.h"
+#include "./CowSwerveModuleState.h"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -9,30 +12,29 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <iostream>
 
-#include "./CowChassisSpeeds.h"
-#include "./CowSwerveModuleState.h"
+namespace CowLib
+{
 
-namespace CowLib {
+    // Custom eventually, rn just wrapper for wpilib
+    class CowSwerveKinematics
+    {
+    private:
+        frc::SwerveDriveKinematics<4> *m_Kinematics;
 
-// Custom eventually, rn just wrapper for wpilib
-class CowSwerveKinematics {
+        std::array<frc::SwerveModuleState, 4> m_WPIModuleStates{};
 
-private:
-    frc::SwerveDriveKinematics<4>* m_Kinematics;
+    public:
+        CowSwerveKinematics(double wheelBase);
+        ~CowSwerveKinematics();
 
-    std::array<frc::SwerveModuleState, 4> m_WPIModuleStates {};
+        static void DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *states, double maxSpeed);
 
-public:
-    CowSwerveKinematics(double wheelBase);
-    ~CowSwerveKinematics();
+        std::array<CowSwerveModuleState, 4>
+        CalculateModuleStates(CowChassisSpeeds &chassisSpeeds, double centerOfRotationX, double centerOfRotationY);
 
-    static void DesaturateSpeeds(std::array<CowSwerveModuleState, 4>* states, double maxSpeed);
+        frc::SwerveDriveKinematics<4> *GetInternalKinematics();
+    };
 
-    std::array<CowSwerveModuleState, 4> CalculateModuleStates(CowChassisSpeeds& chassisSpeeds);
-
-    frc::SwerveDriveKinematics<4>* GetInternalKinematics();
-};
-
-}
+} // namespace CowLib
 
 #endif /* __COWLIB_COWSWERVEKINEMATICS_H__ */
