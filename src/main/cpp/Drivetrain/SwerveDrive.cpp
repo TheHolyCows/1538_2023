@@ -147,6 +147,11 @@ void SwerveDrive::ResetEncoders()
     }
 }
 
+void SwerveDrive::ResetOdometry(frc::Pose2d pose)
+{
+    m_Odometry->Reset(pose, m_Gyro->GetYaw());
+}
+
 void SwerveDrive::Handle()
 {
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};

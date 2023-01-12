@@ -8,6 +8,9 @@ AutoModes *AutoModes::s_Instance = nullptr;
 
 AutoModes::AutoModes()
 {
+    // FOR THE FIRST SWERVE DRIVE ACTION IN A MODE, YOU MUST HAVE RESET ODOMETRY TRUE
+    // BAD THINGS WILL HAPPEN
+
     // Constants for swerve trajectories are loaded in the constructor, so maybe auto modes are created in a separate LoadAutoModes function that is called in the constructor and on a button in CowBase
     // the issue with that is the change auto mode button and reset constants are the same button rn, so they would have to be split
 
@@ -17,7 +20,7 @@ AutoModes::AutoModes()
 
     // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
     m_Modes["Test"].push_back(
-        new RaceCommand(new SwerveTrajectoryCommand("Test1", 30, true),
+        new RaceCommand(new SwerveTrajectoryCommand("Test1", 30, true, true),
                         { new SeriesCommand({
                             new WaitCommand(3, false),
                             new LambdaCommand([](CowRobot *robot) { std::cout << "Hello from lambda" << std::endl; }),

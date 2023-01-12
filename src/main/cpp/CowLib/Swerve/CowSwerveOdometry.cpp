@@ -75,15 +75,18 @@ namespace CowLib
      */
     void CowSwerveOdometry::Reset(double newX, double newY, double newRotation, double gyroAngle)
     {
+        Reset(CreateWPIPose(newX, newY, newRotation), gyroAngle);
+    }
+
+    void CowSwerveOdometry::Reset(frc::Pose2d pose, double gyroAngle)
+    {
         std::array<frc::SwerveModulePosition, 4> zeroPositions;
         for (int i = 0; i < 4; i++)
         {
             zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
         }
 
-        m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }),
-                                       zeroPositions,
-                                       CreateWPIPose(newX, newY, newRotation));
+        m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }), zeroPositions, pose);
 
         m_Pose = m_PoseEstimator->GetEstimatedPosition();
     }

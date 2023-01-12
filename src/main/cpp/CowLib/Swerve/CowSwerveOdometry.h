@@ -34,6 +34,7 @@ namespace CowLib
         ~CowSwerveOdometry();
 
         void Reset(double newX, double newY, double newRotation, double gyroAngle);
+        void Reset(frc::Pose2d pose, double gyroAngle);
 
         double GetX();
         double GetY();
