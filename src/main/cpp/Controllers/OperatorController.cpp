@@ -14,7 +14,7 @@ void OperatorController::Handle(CowRobot *bot)
     auto chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(m_CB->GetLeftDriveStickAxis(0),
                                                                            -m_CB->GetLeftDriveStickAxis(1),
                                                                            m_CB->GetLeftDriveStickAxis(4),
-                                                                           bot->GetGyro()->GetAngle());
+                                                                           bot->GetGyro()->GetYaw());
 
     bot->GetDrivetrain()->SetVelocity(chassisSpeeds);
 }

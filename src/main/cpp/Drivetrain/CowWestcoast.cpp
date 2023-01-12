@@ -39,7 +39,7 @@ namespace Drivetrain
         setStatorLimits(CONSTANT("STATOR_LIMIT"), CONSTANT("STATOR_THRESHOLD"), CONSTANT("STATOR_DURATION"));
 
         // get reference to gyro for PID heading calculations
-        m_Gyro = CowLib::CowGyro::GetInstance();
+        m_Gyro = CowPigeon::GetInstance();
     }
 
     double CowWestcoast::getDriveDistance(void)
@@ -168,7 +168,7 @@ namespace Drivetrain
     bool CowWestcoast::pidHeadingDrive(double heading, double throttle)
     {
         // heading error calculation
-        double error  = m_Gyro->GetAngle() - heading;
+        double error  = m_Gyro->GetYaw() - heading;
         double dError = error - m_PreviousGyroError;
 
         // 2022 constants - TURN_P = 0.015; TURN_D = 0.045;

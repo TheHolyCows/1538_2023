@@ -8,9 +8,9 @@
 #define __COW_WESTCOAST_H__
 
 #include "../CowConstants.h"
-#include "../CowGyro.h"
 #include "../CowLib/CowMotorController.h"
 #include "../CowLib/Utility.h"
+#include "../CowPigeon.h"
 
 namespace Drivetrain
 {
@@ -51,7 +51,7 @@ namespace Drivetrain
         double m_PreviousDriveError = 0;
 
         // gyro variables for pid heading calculation
-        CowLib::CowGyro *m_Gyro;
+        CowPigeon *m_Gyro;
         double m_PreviousGyroError = 0;
     };
 } // namespace Drivetrain

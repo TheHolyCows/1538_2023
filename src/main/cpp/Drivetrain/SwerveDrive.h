@@ -2,12 +2,12 @@
 #define __SWERVE_DRIVE_H__
 
 #include "../CowConstants.h"
-#include "../CowGyro.h"
 #include "../CowLib/CowMotorController.h"
 #include "../CowLib/CowPID.h"
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveOdometry.h"
 #include "../CowLib/Utility.h"
+#include "../CowPigeon.h"
 #include "SwerveModule.h"
 
 #include <algorithm>
@@ -29,18 +29,7 @@ private:
 
     frc::Pose2d m_Pose{ 0_m, 0_m, 0_deg };
 
-    // CowLib::CowGyro* m_Gyro;
-    // struct fakeGyro {
-    //     double angle = 0;
-    //     double GetAngle() {
-    //         return angle;
-    //     }
-    //     frc::Rotation2d GetWPIRotation() {
-    //         return frc::Rotation2d(units::degree_t(angle));
-    //     }
-    // };
-
-    CowLib::CowGyro *m_Gyro;
+    CowPigeon *m_Gyro;
 
     CowLib::CowSwerveKinematics *m_Kinematics;
     CowLib::CowSwerveOdometry *m_Odometry;

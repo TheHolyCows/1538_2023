@@ -10,7 +10,7 @@ CowRobot::CowRobot()
 
     m_PowerDistributionPanel = new frc::PowerDistribution();
 
-    m_Gyro = CowLib::CowGyro::GetInstance();
+    m_Gyro = CowPigeon::GetInstance();
 
     m_PreviousGyroError = 0;
     // m_Gyro->Reset(); - don't know why we have this commented

@@ -21,6 +21,11 @@ CowPigeon::CowPigeon()
     m_Inverted = false;
 }
 
+void CowPigeon::SetInverted(bool inverted)
+{
+    m_Inverted = inverted;
+}
+
 double CowPigeon::GetYaw()
 {
     return GetRawYaw() * (m_Inverted ? -1 : 1);

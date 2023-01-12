@@ -8,9 +8,7 @@
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveModuleState.h"
-#include "../CowLib/CowCANCoder.h"
 
-#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/DataLogManager.h>
 #include <frc/geometry/Rotation2d.h>

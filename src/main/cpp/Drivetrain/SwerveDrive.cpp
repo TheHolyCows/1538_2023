@@ -7,7 +7,7 @@
  */
 SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 {
-    m_Gyro = CowLib::CowGyro::GetInstance();
+    m_Gyro = CowPigeon::GetInstance();
 
     m_Locked = false;
 
@@ -22,7 +22,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
-    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetAngle(), 0, 0, 0);
+    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYaw(), 0, 0, 0);
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -67,7 +67,7 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
     if (isFieldRelative)
     {
         // How does this know what angle it starts at
-        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetAngle());
+        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetYaw());
     }
     else
     {
@@ -139,7 +139,7 @@ void SwerveDrive::ResetConstants()
 /// @brief Resets odometry
 void SwerveDrive::ResetEncoders()
 {
-    m_Odometry->Reset(0, 0, 0, m_Gyro->GetAngle());
+    m_Odometry->Reset(0, 0, 0, m_Gyro->GetYaw());
 
     for (auto module : m_Modules)
     {
@@ -155,7 +155,7 @@ void SwerveDrive::Handle()
                    modulePositions.begin(),
                    [](SwerveModule *module) { return module->GetPosition(); });
 
-    m_Odometry->Update(m_Gyro->GetAngle(), modulePositions);
+    m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
 
     // Print module angles
     for (int i = 0; i < 4; i++)

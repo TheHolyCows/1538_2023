@@ -18,6 +18,8 @@ private:
 public:
     static CowPigeon *GetInstance();
 
+    void SetInverted(bool inverted);
+
     double GetYaw();
     double GetPitch();
     double GetRoll();
