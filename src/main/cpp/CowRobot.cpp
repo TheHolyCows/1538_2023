@@ -27,8 +27,6 @@ CowRobot::CowRobot()
     };
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
-
-    m_Shooter = new Shooter(11, 13, 12, 14);
 }
 
 /**
@@ -41,8 +39,6 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->Reset();
-
-    m_Shooter->ResetConstants();
 }
 
 /**
@@ -77,7 +73,6 @@ void CowRobot::handle()
 
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
-    m_Shooter->handle();
 
     CowLib::CowLogger::GetInstance()->Handle();
 
