@@ -48,7 +48,6 @@ void CowBase::AutonomousInit()
     // m_Bot->GetGyro()->FinalizeCalibration();
     // m_Bot->GetGyro()->ResetAngle();
 
-    std::cout << "Setting command list" << std::endl;
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
 

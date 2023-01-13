@@ -4,6 +4,7 @@
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowCANCoder.h"
+#include "../CowLib/CowLogger.h"
 #include "../CowLib/CowMotorController.h"
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"

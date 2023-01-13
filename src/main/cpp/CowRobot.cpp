@@ -79,8 +79,8 @@ void CowRobot::handle()
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
     // positive is true, negative is false
-    bool direction = (zVal - m_PrevZ) > 0 ? true : false;
-    m_PrevZ        = zVal;
+    // bool direction = (zVal - m_PrevZ) > 0 ? true : false;
+    m_PrevZ = zVal;
 
     PrintToDS();
 }
