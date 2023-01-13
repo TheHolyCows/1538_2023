@@ -64,8 +64,6 @@ std::string AutoModes::GetName()
 
 void AutoModes::NextMode()
 {
-    std::cout << "Trying to get to the next move" << std::endl;
-
     ++m_Iterator;
 
     if (m_Iterator == m_Modes.end())

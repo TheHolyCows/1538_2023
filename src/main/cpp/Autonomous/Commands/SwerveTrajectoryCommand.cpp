@@ -21,7 +21,9 @@ SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryNa
 
     m_Trajectory = frc::TrajectoryUtil::FromPathweaverJson(path.string());
 
-    std::cout << "Loaded trajectory " << trajectoryName << std::endl;
+    char *logMsg;
+    asprintf(&logMsg, "Loaded trajectory %s", trajectoryName.c_str());
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, logMsg);
 
     m_HolonomicController = new CowLib::CowHolonomicController(CONSTANT("AUTO_DRIVE_P"),
                                                                CONSTANT("AUTO_DRIVE_I"),
