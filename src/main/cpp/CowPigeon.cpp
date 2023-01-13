@@ -28,7 +28,7 @@ void CowPigeon::SetInverted(bool inverted)
 
 double CowPigeon::GetYaw()
 {
-    return GetRawYaw() * (m_Inverted ? -1 : 1);
+    return (GetRawYaw() - m_YawOffset) * (m_Inverted ? -1 : 1);
 }
 
 double CowPigeon::GetPitch()
@@ -39,6 +39,11 @@ double CowPigeon::GetPitch()
 double CowPigeon::GetRoll()
 {
     return GetRawRoll() * (m_Inverted ? -1 : 1);
+}
+
+void CowPigeon::SetYaw(double angle)
+{
+    m_YawOffset = angle - GetRawYaw();
 }
 
 double CowPigeon::GetRawYaw()

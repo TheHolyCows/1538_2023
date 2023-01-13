@@ -149,7 +149,8 @@ void SwerveDrive::ResetEncoders()
 
 void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 {
-    m_Odometry->Reset(pose, m_Gyro->GetYaw());
+    m_Odometry->Reset(pose, pose.Rotation().Degrees().value());
+    m_Gyro->SetYaw(m_Odometry->GetRotation());
 }
 
 void SwerveDrive::Handle()

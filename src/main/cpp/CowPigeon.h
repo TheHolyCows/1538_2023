@@ -15,6 +15,8 @@ private:
 
     bool m_Inverted;
 
+    double m_YawOffset;
+
 public:
     static CowPigeon *GetInstance();
 
@@ -24,7 +26,7 @@ public:
     double GetPitch();
     double GetRoll();
 
-    // void SetYaw(double angle);
+    void SetYaw(double angle);
     // void SetPitch(double angle);
     // void SetRoll(double angle);
 
