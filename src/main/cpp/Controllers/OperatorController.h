@@ -39,7 +39,7 @@ private:
         BACK_RIGHT
     };
 
-    Wheel m_QuickTurnWheel;
+    Wheel m_EvasiveSwerveWheel;
 
 public:
     OperatorController(CowControlBoard *controlboard);

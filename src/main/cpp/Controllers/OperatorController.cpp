@@ -7,7 +7,7 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
 {
     m_TrackingCooldownTimer = 0.0;
 
-    m_QuickTurnWheel = NONE;
+    m_EvasiveSwerveWheel = NONE;
 }
 
 void OperatorController::Handle(CowRobot *bot)
@@ -17,32 +17,39 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
     {
-        if (m_QuickTurnWheel == NONE)
+        if (m_EvasiveSwerveWheel == NONE)
         {
-            const bool xPositive = m_CB->GetLeftDriveStickAxis(0) > 0.0;
-            const bool yPositive = m_CB->GetLeftDriveStickAxis(1) > 0.0;
+            const double robotAngle = bot->GetGyro()->GetYaw();
+            double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
+            stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
+            const double robotOrientedAngle = robotAngle + stickAngle;
 
-            if (xPositive && yPositive)
+            // set wheel based on quadrant
+            if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
             {
-                m_QuickTurnWheel = FRONT_LEFT;
+                m_EvasiveSwerveWheel = FRONT_LEFT;
             }
-            else if (xPositive && !yPositive)
+            else if (robotOrientedAngle >= 90 && robotOrientedAngle < 180)
             {
-                m_QuickTurnWheel = BACK_LEFT;
+                m_EvasiveSwerveWheel = FRONT_RIGHT;
             }
-            else if (!xPositive && yPositive)
+            else if (robotOrientedAngle >= 180 && robotOrientedAngle < 270)
             {
-                m_QuickTurnWheel = FRONT_RIGHT;
+                m_EvasiveSwerveWheel = BACK_RIGHT;
             }
-            else if (!xPositive && !yPositive)
+            else if (robotOrientedAngle >= 270 && robotOrientedAngle < 360)
             {
-                m_QuickTurnWheel = BACK_RIGHT;
+                m_EvasiveSwerveWheel = BACK_LEFT;
+            }
+            else
+            {
+                CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "Invalid angle for quick turn");
             }
         }
 
         const double wb = CONSTANT("WHEEL_BASE") / 2.0;
 
-        switch (m_QuickTurnWheel)
+        switch (m_EvasiveSwerveWheel)
         {
         case FRONT_LEFT :
             centerOfRotationX = wb;
@@ -66,7 +73,7 @@ void OperatorController::Handle(CowRobot *bot)
     }
     else
     {
-        m_QuickTurnWheel = NONE;
+        m_EvasiveSwerveWheel = NONE;
     }
 
     // Swerve controls for xbox controller
