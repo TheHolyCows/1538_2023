@@ -30,6 +30,17 @@ private:
     {
     };
 
+    enum Wheel
+    {
+        NONE = -1,
+        FRONT_LEFT,
+        FRONT_RIGHT,
+        BACK_LEFT,
+        BACK_RIGHT
+    };
+
+    Wheel m_QuickTurnWheel;
+
 public:
     OperatorController(CowControlBoard *controlboard);
     void Handle(CowRobot *bot);
