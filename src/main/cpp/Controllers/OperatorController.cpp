@@ -76,6 +76,9 @@ void OperatorController::Handle(CowRobot *bot)
         m_EvasiveSwerveWheel = NONE;
     }
 
+    // Left trigger
+    bool robotRelative = m_CB->GetLeftDriveStickButton(2);
+
     // Swerve controls for xbox controller
     auto chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
@@ -84,5 +87,5 @@ void OperatorController::Handle(CowRobot *bot)
         bot->GetGyro()->GetYaw());
 
     // Can use triggers to do funny turn thing
-    bot->GetDrivetrain()->SetVelocity(chassisSpeeds, centerOfRotationX, centerOfRotationY);
+    bot->GetDrivetrain()->SetVelocity(chassisSpeeds, !robotRelative, centerOfRotationX, centerOfRotationY);
 }
