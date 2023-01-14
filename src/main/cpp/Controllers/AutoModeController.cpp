@@ -41,7 +41,7 @@ void AutoModeController::Handle(CowRobot *bot)
 
     // TODO: Do shared logic here
 
-    std::cout << "Handling command " << m_CurrentCommand << std::endl;
+    // std::cout << "Handling command " << m_CurrentCommand << std::endl;
     m_CurrentCommand->Handle(bot);
 
     // If the command is done
