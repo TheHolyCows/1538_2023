@@ -65,7 +65,7 @@ void CowRobot::handle()
 {
     m_MatchTime = CowLib::CowTimer::GetFPGATimestamp() - m_StartTime;
 
-    if (m_Controller == NULL)
+    if (m_Controller == nullptr)
     {
         printf("No controller for CowRobot!!\n");
         return;
@@ -75,6 +75,9 @@ void CowRobot::handle()
     m_Drivetrain->Handle();
 
     CowLib::CowLogger::GetInstance()->Handle();
+
+    // Log gyro angle (only yaw for now)
+    CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());

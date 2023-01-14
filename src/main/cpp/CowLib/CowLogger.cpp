@@ -110,6 +110,21 @@ namespace CowLib
         SendLog(&logPacket, sizeof(logPacket));
     }
 
+    void CowLogger::LogGyroAngle(double angle)
+    {
+        if (CONSTANT("DEBUG") == 0)
+        {
+            return;
+        }
+
+        CowGyroLog logPacket;
+        logPacket.hdr.msgType = CowLogger::GYRO_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowGyroLog);
+        logPacket.angle       = angle;
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
     /**
      * CowLogger::LogMsg
      * sends a message with log level to our log server
