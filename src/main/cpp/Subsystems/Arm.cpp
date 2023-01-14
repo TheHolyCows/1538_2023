@@ -1,122 +1,67 @@
-/*
- * Arm.cpp
- *
- *  Created on: Feb 18, 2018
- *      Author: kchau
- */
+//==================================================
+// Copyright (C) 2022 Team 1538 / The Holy Cows
+// Climber.h
+// author: Goober Gang
+// created on: 2023-1-14
+//==================================================
 
 #include "Arm.h"
 
-#include "string.h"
-
-#include <frc/Timer.h>
-#include <iostream>
-
-Arm::Arm(int motorControllerA,
-         int motorControllerB,
-         double maxSpeed,
-         double upLimit,
-         double downLimit,
-         std::string name,
-         bool changeDirectionA,
-         bool changeDirectionB,
-         double degreesPerTick,
-         double peakOutput)
+Arm::Arm(int leftMotor, int rightMotor)
 {
-    m_MotorA = new CowLib::CowMotorController(motorControllerA);
-    m_MotorA->SetControlMode(CowLib::CowMotorController::MOTIONMAGIC);
-    m_MotorB = new CowLib::CowMotorController(motorControllerB);
-    m_MotorB->SetControlMode(CowLib::CowMotorController::FOLLOWER);
-    m_MotorAID       = motorControllerA;
-    m_Position       = 0;
-    m_DegreesPerTick = degreesPerTick;
-    // m_MaxSpeed = maxSpeed;
+    m_LeftMotor  = new CowLib::CowMotorController(leftMotor);
+    m_RightMotor = new CowLib::CowMotorController(rightMotor);
 
-    // SetCurrentLimit();
+    m_LeftMotor->SetControlMode(CowLib::CowMotorController::POSITION);
+    m_RightMotor->SetControlMode(CowLib::CowMotorController::POSITION);
 
-    m_UpLimit   = upLimit;
-    m_DownLimit = downLimit;
+    m_LeftMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    m_RightMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    //set one motor to inverted
+    m_RightMotor->GetInternalMotor()->SetSensorPhase(true);
+    m_RightMotor->GetInternalMotor()->SetSensorPhase(false);
+    
 
-    m_Name       = name;
-    m_PeakOutput = peakOutput;
+    m_Position  = 0;
 
-    ResetConstants(upLimit, downLimit, peakOutput);
-    m_MotorA->SetInverted(changeDirectionA);
-    m_MotorB->GetInternalMotor()->SetInverted(changeDirectionB);
-    SetCoastMode();
-}
-
-bool Arm::AtTarget()
-{
-    std::string toleranceName = m_Name + "_TOLERANCE";
-    return (fabs(m_Position - m_MotorA->GetPosition() * m_DegreesPerTick) < CONSTANT(toleranceName.c_str()));
+    ResetConstants();
 }
 
 void Arm::SetPosition(double position)
 {
-    // if(position < m_DownLimit)
-    //{
-    //	position = m_DownLimit;
-    // }
-    // else if(position > m_UpLimit)
-    //{
-    //		position = m_UpLimit;
-    //	}
-    // position = position / m_DegreesPerTick;
-    // m_CalculateGain = true;
     m_Position = position;
 }
 
-double Arm::GetSetpoint()
-{
-    return m_Position;
-}
 
 double Arm::GetPosition()
 {
-    return m_MotorA->GetPosition();
+    return m_RightMotor->GetPosition();
 }
 
-void Arm::ResetConstants(double upLimit, double downLimit, double peakOutput)
-{
-    // m_MotorA->SetPIDGains(CONSTANT("ARM_P")*CONSTANT("DEBUG"), CONSTANT("ARM_I")*CONSTANT("DEBUG"), CONSTANT("ARM_D")*CONSTANT("DEBUG"), 0, 1);
-    // m_MotorA->SetMotionMagic(CONSTANT("ARM_ACCEL"), CONSTANT("ARM_VELOCITY"));
-    std::cout << "In the arm reset constants" << std::endl;
-    m_UpLimit   = upLimit;
-    m_DownLimit = downLimit;
-}
 
-void Arm::DisabledCalibration()
-{
-    double currentPosition = m_MotorA->GetPosition();
 
-    if (currentPosition < 0)
-    {
-        m_MotorA->SetSensorPosition(0);
-    }
+void Arm::ResetConstants()
+{
+    m_LeftMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), 0, 1);
+    m_RightMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), 0, 1);
 }
 
 void Arm::handle()
 {
-    if (m_MotorA && m_MotorB)
+    //one of these must be inverted
+    if (m_LeftMotor)
     {
-        m_MotorA->Set(m_Position);
-        m_MotorB->Set(m_MotorAID);
+        m_LeftMotor->Set(m_Position);
     }
-    // SmartDashboard::PutNumber("Arm", (m_Motor->GetPosition()-m_PlanetaryHardstop));
-    // std::cout << m_Name << " position: " << m_Position << std::endl;
-}
 
-void Arm::SetCurrentLimit(double peakAmps, double continuousAmps, int peakDuration, int ms)
-{
-    // m_Motor->GetInternalMotor()->ConfigPeakCurrentLimit(peakAmps, ms);
-    // m_Motor->GetInternalMotor()->ConfigPeakCurrentDuration(peakDuration, ms);
-    // m_Motor->GetInternalMotor()->ConfigContinuousCurrentLimit(continuousAmps, ms);
-    // m_Motor->GetInternalMotor()->EnableCurrentLimit(true);
+    if (m_RightMotor)
+    {
+        m_RightMotor->Set(m_Position);
+    }
 }
 
 Arm::~Arm()
 {
-    delete m_MotorA;
-    delete m_MotorB;
+    delete m_LeftMotor;
+    delete m_RightMotor;
 }
