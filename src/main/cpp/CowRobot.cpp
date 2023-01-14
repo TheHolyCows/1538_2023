@@ -1,5 +1,7 @@
 #include "CowRobot.h"
 
+#include <frc/XboxController.h>
+
 CowRobot::CowRobot()
 {
     m_MatchTime     = 0;

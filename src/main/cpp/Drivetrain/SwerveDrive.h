@@ -56,8 +56,17 @@ public:
     SwerveDrive(ModuleConstants constants[4], double wheelBase);
     ~SwerveDrive();
 
-    void SetVelocity(double x, double y, double rotation, bool isFieldRelative = true);
-    void SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative = true);
+    void SetVelocity(double x,
+                     double y,
+                     double rotation,
+                     bool isFieldRelative     = true,
+                     double centerOfRotationX = 0,
+                     double centerOfRotationY = 0);
+
+    void SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
+                     bool isFieldRelative     = true,
+                     double centerOfRotationX = 0,
+                     double centerOfRotationY = 0);
 
     // void SetVisionAlignVelocity(double x, double y, double rotation, bool isFieldRelative = true);
 
