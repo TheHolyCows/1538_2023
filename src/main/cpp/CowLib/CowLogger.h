@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <arpa/inet.h>
+#include <cstdarg>
 #include <errno.h>
 #include <fstream>
 #include <iostream>
@@ -49,8 +50,8 @@ namespace CowLib
             LOG_OFF = 0,
             LOG_ERR,
             LOG_WARN,
-            LOG_DBG,
-            LOG_INFO
+            LOG_INFO,
+            LOG_DBG
         };
 
         const static int REGISTERED_MOTORS_MAX = 24;
@@ -58,7 +59,7 @@ namespace CowLib
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
         static void LogAutoMode(const char *);
         static void LogGyroAngle(double);
-        static void LogMsg(CowLogLevel, const char *);
+        static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         void Handle();
 
