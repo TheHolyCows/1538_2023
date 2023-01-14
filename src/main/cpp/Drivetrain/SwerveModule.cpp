@@ -34,9 +34,6 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     m_Velocity = 0;
     m_Angle    = 0;
 
-    m_TargetSpeed = 0_mps;
-    m_TargetAngle = 0_deg;
-
     ResetConstants();
     ResetEncoders();
 
@@ -79,11 +76,7 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
-    m_DriveMotor->SetControlMode(CowLib::CowMotorController::PERCENTVBUS);
-
     m_DriveMotor->Set(percentOutput);
-
-    frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Speed", optimized.velocity);
 
     // Don't rotate for low speeds
     double targetAngle;
@@ -99,9 +92,7 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
     m_PreviousAngle = targetAngle;
 
-    frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Angle", targetAngle);
     m_RotationMotor->Set(CowLib::Conversions::DegreesToFalcon(targetAngle, CONSTANT("SWERVE_ROTATION_GEAR_RATIO")));
-    // std::cout << targetAngle << "\n";
 }
 
 /**
@@ -128,7 +119,7 @@ void SwerveModule::ResetConstants()
  */
 void SwerveModule::ResetEncoders()
 {
-    double absolutePosition = CowLib::Conversions::DegreesToFalcon(m_Encoder->GetAbsolutePosition(),
+    double absolutePosition = CowLib::Conversions::DegreesToFalcon(m_Encoder->GetAbsolutePosition() - m_EncoderOffset,
                                                                    CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 
     m_RotationMotor->GetInternalMotor()->SetSelectedSensorPosition(absolutePosition);
@@ -136,17 +127,18 @@ void SwerveModule::ResetEncoders()
 
 /**
  * @brief Doesn't set anything but reads the current real world state
- *
  */
 void SwerveModule::Handle()
 {
-    double velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),
-                                                       CONSTANT("WHEEL_CIRCUMFERENCE"),
-                                                       CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
-
     // Update current positions once per loop
-    m_Velocity = units::convert<units::meters_per_second, units::feet_per_second>(velocity);
-    m_Position = m_DriveMotor->GetPosition();
+    m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),
+                                                  CONSTANT("WHEEL_CIRCUMFERENCE"),
+                                                  CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
+
+    // I think this is right...
+    m_Position = (m_DriveMotor->GetPosition() * (600.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
+                 * CONSTANT("WHEEL_CIRCUMFERENCE");
+
     m_Angle
         = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 }

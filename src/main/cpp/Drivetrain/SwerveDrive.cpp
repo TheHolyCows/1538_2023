@@ -136,11 +136,9 @@ void SwerveDrive::ResetConstants()
     }
 }
 
-/// @brief Resets odometry
+/// @brief Resets encoders
 void SwerveDrive::ResetEncoders()
 {
-    m_Odometry->Reset(0, 0, 0, m_Gyro->GetYaw());
-
     for (auto module : m_Modules)
     {
         module->ResetEncoders();
@@ -155,6 +153,11 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 
 void SwerveDrive::Handle()
 {
+    for (auto module : m_Modules)
+    {
+        module->Handle();
+    }
+
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
     std::transform(m_Modules.begin(),
                    m_Modules.end(),
@@ -162,10 +165,4 @@ void SwerveDrive::Handle()
                    [](SwerveModule *module) { return module->GetPosition(); });
 
     m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
-
-    // Print module angles
-    for (int i = 0; i < 4; i++)
-    {
-        std::cout << "mod " << i << " angle " << modulePositions[i].angle << std::endl;
-    }
 }

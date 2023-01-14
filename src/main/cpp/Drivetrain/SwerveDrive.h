@@ -75,7 +75,7 @@ public:
         ResetEncoders();
     }
 
-    void ResetOdometry(frc::Pose2d pose);
+    void ResetOdometry(frc::Pose2d pose = frc::Pose2d{ 0_m, 0_m, 0_deg });
 
     void Handle();
 };
