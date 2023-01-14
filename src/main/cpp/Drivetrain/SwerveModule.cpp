@@ -40,9 +40,10 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     ResetConstants();
     ResetEncoders();
 
-    char *dbgMsg;
-    asprintf(&dbgMsg, "Module %d abs encoder angle: %f", id, m_Encoder->GetAbsolutePosition());
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, dbgMsg);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "Module %d abs encoder angle: %f",
+                              id,
+                              m_Encoder->GetAbsolutePosition());
 }
 
 SwerveModule::~SwerveModule()
