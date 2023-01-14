@@ -1,7 +1,7 @@
 //==================================================
-// Copyright (C) 2022 Team 1538 / The Holy Cows
-// Climber.h
-// author: Goober Gang
+// Copyright (C) 2023 Team 1538 / The Holy Cows
+// Arm.h
+// author: Cole/JT/Constantine
 // created on: 2023-1-14
 //==================================================
 
