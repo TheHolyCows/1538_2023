@@ -10,7 +10,6 @@
 
 #include "../CowConstants.h"
 #include "../CowLib/CowMotorController.h"
-#include "../CowLib/CowTimer.h"
 
 #include <iostream>
 
@@ -27,12 +26,11 @@ public:
 
     void SetPosition(double position);
 
-
     double GetPosition();
 
     void ResetConstants();
 
-    void handle();
+    void Handle();
 
     virtual ~Arm();
 };

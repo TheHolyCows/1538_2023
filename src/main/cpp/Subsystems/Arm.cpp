@@ -17,12 +17,12 @@ Arm::Arm(int leftMotor, int rightMotor)
 
     m_LeftMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_RightMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
-    //set one motor to inverted
+
+    // TODO: set one motor to inverted / as a follower
     m_RightMotor->GetInternalMotor()->SetSensorPhase(true);
     m_RightMotor->GetInternalMotor()->SetSensorPhase(false);
-    
 
-    m_Position  = 0;
+    m_Position = 0;
 
     ResetConstants();
 }
@@ -32,23 +32,19 @@ void Arm::SetPosition(double position)
     m_Position = position;
 }
 
-
 double Arm::GetPosition()
 {
     return m_RightMotor->GetPosition();
 }
 
-
-
 void Arm::ResetConstants()
 {
-    m_LeftMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), 0, 1);
-    m_RightMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), 0, 1);
+    m_LeftMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"), 1);
+    m_RightMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"), 1);
 }
 
-void Arm::handle()
+void Arm::Handle()
 {
-    //one of these must be inverted
     if (m_LeftMotor)
     {
         m_LeftMotor->Set(m_Position);
