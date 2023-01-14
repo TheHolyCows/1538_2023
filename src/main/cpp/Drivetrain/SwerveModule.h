@@ -32,9 +32,6 @@ private:
 
     CowLib::CowCANCoder *m_Encoder;
 
-    units::meters_per_second_t m_TargetSpeed;
-    frc::Rotation2d m_TargetAngle;
-
     double m_Velocity;
     double m_Position;
     double m_Angle;
