@@ -40,7 +40,8 @@ namespace CowLib
             PID_LOG,
             MOTR_LOG,
             BATT_LOG,
-            AUTO_LOG
+            AUTO_LOG,
+            GYRO_LOG
         };
 
         enum CowLogLevel : uint16_t
@@ -56,6 +57,7 @@ namespace CowLib
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
         static void LogAutoMode(const char *);
+        static void LogGyroAngle(double);
         static void LogMsg(CowLogLevel, const char *);
 
         void Handle();
@@ -122,6 +124,12 @@ namespace CowLib
         {
             CowLogHdr hdr;
             char name[32];
+        };
+
+        struct CowGyroLog
+        {
+            CowLogHdr hdr;
+            double angle;
         };
     };
 
