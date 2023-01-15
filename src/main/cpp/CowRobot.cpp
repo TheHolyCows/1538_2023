@@ -1,7 +1,5 @@
 #include "CowRobot.h"
 
-#include <frc/XboxController.h>
-
 CowRobot::CowRobot()
 {
     m_MatchTime     = 0;
@@ -21,6 +19,7 @@ CowRobot::CowRobot()
     // Set up drivetrain
     // TODO: reset constants needs to reset this
     // fl, fr, bl, br
+    // drive motor, angle motor, encoder canId's
     SwerveDrive::ModuleConstants swerveModuleConstants[4]{
         SwerveDrive::ModuleConstants{ 2, 1, 9, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
         SwerveDrive::ModuleConstants{ 4, 3, 10, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
@@ -63,7 +62,7 @@ void CowRobot::PrintToDS()
 
 // Used to handle the recurring logic funtions inside the robot.
 // Please call this once per update cycle.
-void CowRobot::handle()
+void CowRobot::Handle()
 {
     m_MatchTime = CowLib::CowTimer::GetFPGATimestamp() - m_StartTime;
 
@@ -79,7 +78,7 @@ void CowRobot::handle()
     CowLib::CowLogger::GetInstance()->Handle();
 
     // Log gyro angle (only yaw for now)
-    CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
+    //CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());

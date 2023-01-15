@@ -12,7 +12,7 @@ namespace CowLib
 
         m_CowControlMode  = CowMotorController::PERCENTVBUS;
         m_CowNeutralMode  = CowMotorController::COAST;
-        m_MotorController = new TalonFX(deviceNum);
+        m_MotorController = new TalonFX(deviceNum, "cowbus");
         CowLogger::GetInstance()->RegisterMotor(deviceNum, this);
     }
 

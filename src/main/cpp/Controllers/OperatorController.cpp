@@ -19,10 +19,10 @@ void OperatorController::Handle(CowRobot *bot)
     {
         if (m_EvasiveSwerveWheel == NONE)
         {
-            const double robotAngle = bot->GetGyro()->GetYaw();
             double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
             stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
-            const double robotOrientedAngle = robotAngle + stickAngle;
+
+            double robotOrientedAngle = bot->GetGyro()->GetYaw() + stickAngle;
 
             // set wheel based on quadrant
             if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
@@ -77,13 +77,13 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // Left trigger
-    bool robotRelative = m_CB->GetLeftDriveStickButton(2);
+    bool robotRelative = m_CB->GetLeftDriveStickAxis(2) > 0.85;
 
     // Swerve controls for xbox controller
     auto chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
-        CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")),
+        CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_ANG_VEL"),
         bot->GetGyro()->GetYaw());
 
     // Can use triggers to do funny turn thing

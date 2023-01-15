@@ -30,6 +30,7 @@ namespace CowLib
     CowLogger::CowLogger()
     {
         m_TickCount = 0;
+        m_IdToLog   = 0;
         memset(m_RegisteredMotors, 0x0, sizeof(m_RegisteredMotors));
 
         m_LogSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -85,8 +86,9 @@ namespace CowLib
         }
         else
         {
-            std::cout << "CowLogger::RegisterMotor() error: motorID: " << motorId << " has already been registered"
-                      << std::endl;
+            LogMsg(CowLogger::LOG_ERR,
+                   "CowLogger::RegisterMotor() error: motorID: %i has already been registered",
+                   motorId);
         }
     }
 
@@ -233,9 +235,9 @@ namespace CowLib
             GetInstance();
         }
 
-        if (CONSTANT("DEBUG_MOTOR_PID") != 0) // every cycle
+        if (CONSTANT("DEBUG_MOTOR_PID") >= 0) // every cycle
         {
-            int debugMotorID = CONSTANT("DEBUG_MOTOR_ID");
+            int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
             if (m_RegisteredMotors[debugMotorID] != NULL)
             {
                 double setPoint;

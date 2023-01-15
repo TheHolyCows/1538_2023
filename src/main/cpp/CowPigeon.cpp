@@ -16,7 +16,7 @@ CowPigeon::CowPigeon()
 {
     constexpr int PIGEON_ID = 24;
 
-    m_Pigeon = new ctre::phoenix::sensors::Pigeon2(PIGEON_ID);
+    m_Pigeon = new ctre::phoenix::sensors::Pigeon2(PIGEON_ID, "cowbus");
 
     m_Inverted = false;
 }
