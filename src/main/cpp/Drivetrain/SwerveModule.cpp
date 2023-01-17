@@ -2,16 +2,11 @@
 
 /**
  * @brief Construct a new SwerveModule object
- *
  * @param id Module ID
  * @param driveMotor Drive motor ID
- *
- *
  * @param rotationMotor Rotation motor ID
  * @param encoderId CANCoder ID
- * @param encoderOffset Absolute encoder
- *
- * offset
+ * @param encoderOffset Absolute encoder offset
  * @param locationX Module X translation
  * @param locationY Module Y translation
  */
@@ -53,7 +48,6 @@ SwerveModule::~SwerveModule()
 
 /**
  * @brief Returns the current module state
- *
  * @return Physical module state
  */
 CowLib::CowSwerveModuleState SwerveModule::GetState()
@@ -68,13 +62,12 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
 
 /**
  * @brief Sets the desired module state
- *
  * @param state Target state
  */
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
-    // CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
-    auto optimized = state;
+    CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    // auto optimized = state;
     // frc::SwerveModuleState optimized = state;
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
@@ -100,7 +93,6 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
 /**
  * @brief Resets PID constants
- *
  */
 void SwerveModule::ResetConstants()
 {
@@ -118,7 +110,6 @@ void SwerveModule::ResetConstants()
 
 /**
  * @brief Resets encoder to absolute offset
- *
  */
 void SwerveModule::ResetEncoders()
 {
@@ -150,12 +141,9 @@ void SwerveModule::Handle()
 
 /**
  * @brief Helper function for optimize
- *
  * @param scopeReference Current angle
  * @param newAngle Target angle
- *
-
- * * @return The closed angle within scope
+ * @return The closed angle within scope
  */
 double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double newAngle)
 {
@@ -198,20 +186,11 @@ double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double
 
 /**
  * @brief Modified WPILib optimize function.
- * Minimize the change in heading the desired swerve module state
- * would
- * require by potentially
- * reversing the direction the wheel spins. Customized from WPILib's version to
- * include
- * placing
- * in appropriate scope for CTRE onboard control.
- * Port of
- *
- * https://github.com/frc1678/C2022/blob/main/src/main/java/com/lib/util/CTREModuleState.java
- *
- * @param desiredState
-
- * * The desired module state
+ * Minimize the change in heading the desired swerve module state would require by potentially
+ * reversing the direction the wheel spins. Customized from WPILib's version to include
+ * placing in appropriate scope for CTRE onboard control.
+ * Port ofhttps://github.com/frc1678/C2022/blob/main/src/main/java/com/lib/util/CTREModuleState.java
+ * @param desiredState The desired module state
  * @param currentAngle The current module angle
  * @return frc::SwerveModuleState
  */
