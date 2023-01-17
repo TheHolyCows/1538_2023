@@ -36,6 +36,8 @@ void CowBase::RobotInit()
 
     // Construct the auto modes class to load swerve trajectories
     AutoModes::GetInstance();
+
+    CowPigeon::GetInstance()->SetYaw(0);
 }
 
 void CowBase::DisabledInit()
@@ -109,6 +111,7 @@ void CowBase::DisabledPeriodic()
     {
         CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
+        printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }
 }

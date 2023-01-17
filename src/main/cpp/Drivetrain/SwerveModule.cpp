@@ -38,9 +38,10 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     ResetEncoders();
 
     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "Module %d abs encoder angle: %f",
+                              "Module %d abs encoder angle: %f  motor angle %f  \n",
                               id,
-                              m_Encoder->GetAbsolutePosition());
+                              m_Encoder->GetAbsolutePosition(),
+                              m_RotationMotor->GetPosition());
 }
 
 SwerveModule::~SwerveModule()
@@ -72,7 +73,8 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
  */
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
-    CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    // CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    auto optimized = state;
     // frc::SwerveModuleState optimized = state;
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
@@ -131,6 +133,8 @@ void SwerveModule::ResetEncoders()
  */
 void SwerveModule::Handle()
 {
+    printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
+
     // Update current positions once per loop
     m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),
                                                   CONSTANT("WHEEL_CIRCUMFERENCE"),

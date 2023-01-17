@@ -83,9 +83,8 @@ void OperatorController::Handle(CowRobot *bot)
     auto chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
-        CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_ANG_VEL"),
+        CowLib::Deadband(m_CB->GetRightDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_ANG_VEL"),
         bot->GetGyro()->GetYaw());
 
-    // Can use triggers to do funny turn thing
     bot->GetDrivetrain()->SetVelocity(chassisSpeeds, !robotRelative, centerOfRotationX, centerOfRotationY);
 }
