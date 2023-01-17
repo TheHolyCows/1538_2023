@@ -77,14 +77,13 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // Left trigger
-    bool robotRelative = m_CB->GetLeftDriveStickAxis(2) > 0.85;
+    bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    // Swerve controls for xbox controller
-    auto chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(
+    bot->GetDrivetrain()->SetVelocity(
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
         CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
         CowLib::Deadband(m_CB->GetRightDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_ANG_VEL"),
-        bot->GetGyro()->GetYaw());
-
-    bot->GetDrivetrain()->SetVelocity(chassisSpeeds, !robotRelative, centerOfRotationX, centerOfRotationY);
+        fieldRelative,
+        centerOfRotationX,
+        centerOfRotationY);
 }
