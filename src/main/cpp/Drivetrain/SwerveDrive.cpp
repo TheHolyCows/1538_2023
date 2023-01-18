@@ -7,7 +7,7 @@
  */
 SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 {
-    m_Gyro = CowLib::CowGyro::GetInstance();
+    m_Gyro = CowPigeon::GetInstance();
 
     m_Locked = false;
 
@@ -22,7 +22,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
-    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetAngle(), 0, 0, 0);
+    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYaw(), 0, 0, 0);
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -53,8 +53,15 @@ SwerveDrive::~SwerveDrive()
  * @param y Translational Y velocity in feet per second
  * @param rotation Rotational velocity in degrees per second
  * @param isFieldRelative Controls whether drive is field relative, default true
+ * @param centerOfRotationX X component of center of rotation
+ * @param centerOfRotationY Y component of center of rotation
  */
-void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRelative)
+void SwerveDrive::SetVelocity(double vx,
+                              double vy,
+                              double omega,
+                              bool isFieldRelative,
+                              double centerOfRotationX,
+                              double centerOfRotationY)
 {
     CowLib::CowChassisSpeeds chassisSpeeds{};
 
@@ -67,14 +74,14 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
     if (isFieldRelative)
     {
         // How does this know what angle it starts at
-        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetAngle());
+        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetYaw());
     }
     else
     {
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds);
+    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
@@ -102,8 +109,13 @@ void SwerveDrive::SetVelocity(double vx, double vy, double omega, bool isFieldRe
  * @brief Same as the other SetVelocity, but using CowChassisSpeeds
  * @param chassisSpeeds CowChassisSpeeds struct
  * @param isFieldRelative
+ * @param centerOfRotationX X component of center of rotation
+ * @param centerOfRotationY Y component of center of rotation
  */
-void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds, bool isFieldRelative)
+void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
+                              bool isFieldRelative,
+                              double centerOfRotationX,
+                              double centerOfRotationY)
 {
     SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative);
 }
@@ -136,30 +148,33 @@ void SwerveDrive::ResetConstants()
     }
 }
 
-/// @brief Resets odometry
+/// @brief Resets encoders
 void SwerveDrive::ResetEncoders()
 {
-    m_Odometry->Reset(0, 0, 0, m_Gyro->GetAngle());
-
     for (auto module : m_Modules)
     {
         module->ResetEncoders();
     }
 }
 
+void SwerveDrive::ResetOdometry(frc::Pose2d pose)
+{
+    m_Odometry->Reset(pose, pose.Rotation().Degrees().value());
+    m_Gyro->SetYaw(m_Odometry->GetRotation());
+}
+
 void SwerveDrive::Handle()
 {
+    for (auto module : m_Modules)
+    {
+        module->Handle();
+    }
+
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
     std::transform(m_Modules.begin(),
                    m_Modules.end(),
                    modulePositions.begin(),
                    [](SwerveModule *module) { return module->GetPosition(); });
 
-    m_Odometry->Update(m_Gyro->GetAngle(), modulePositions);
-
-    // Print module angles
-    for (int i = 0; i < 4; i++)
-    {
-        std::cout << "mod " << i << " angle " << modulePositions[i].angle << std::endl;
-    }
+    m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
 }

@@ -7,14 +7,13 @@
 
 #include "Controllers/GenericController.h"
 #include "CowConstants.h"
-#include "CowGyro.h"
 #include "CowLib/CowAlphaNum.h"
 #include "CowLib/CowLogger.h"
 #include "CowLib/CowMotorController.h"
 #include "CowLib/CowTimer.h"
 #include "CowLib/Utility.h"
+#include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
-#include "Subsystems/Shooter.h"
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/filter/LinearFilter.h>
@@ -25,17 +24,15 @@ class CowRobot
 {
 public:
     // Drive Motors
-    SwerveDrive* m_Drivetrain;
+    SwerveDrive *m_Drivetrain;
 
 private:
     int m_DSUpdateCount;
 
     GenericController *m_Controller = nullptr;
 
-    Shooter *m_Shooter = nullptr;
-
     // gyro and accelerometers
-    CowLib::CowGyro *m_Gyro;
+    CowPigeon *m_Gyro;
     frc::Accelerometer *m_Accelerometer;
     frc::LinearFilter<double> m_ZFilter = frc::LinearFilter<double>::MovingAverage(12);
     double m_PrevZ;
@@ -67,13 +64,11 @@ public:
 
     frc::PowerDistribution *GetPowerDistributionPanel() { return m_PowerDistributionPanel; }
 
-    CowLib::CowGyro *GetGyro() { return CowLib::CowGyro::GetInstance(); }
+    CowPigeon *GetGyro() { return CowPigeon::GetInstance(); }
 
-    SwerveDrive* GetDrivetrain() { return m_Drivetrain; }
+    SwerveDrive *GetDrivetrain() { return m_Drivetrain; }
 
-    Shooter *GetShooter() { return m_Shooter; }
-
-    void handle();
+    void Handle();
 
     void DoNothing(void);
 };

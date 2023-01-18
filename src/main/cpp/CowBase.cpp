@@ -11,6 +11,12 @@ CowBase::CowBase()
 
     m_Display = new CowDisplay(m_Bot);
 
+    // init logger
+    CowLib::CowLogger::GetInstance();
+
+    // init gyro
+    CowPigeon::GetInstance();
+
     // SetPeriod(HZ(ROBOT_HZ));
     // GetWatchdog().SetEnabled(false);
     printf("Done constructing CowBase!\n");
@@ -30,22 +36,21 @@ void CowBase::RobotInit()
 
     // Construct the auto modes class to load swerve trajectories
     AutoModes::GetInstance();
+
+    CowPigeon::GetInstance()->SetYaw(0);
 }
 
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
-    m_Bot->GetGyro()->ResetAngle();
-    m_Bot->GetGyro()->BeginCalibration();
     m_Bot->Reset();
 }
 
 void CowBase::AutonomousInit()
 {
-    m_Bot->GetGyro()->FinalizeCalibration();
-    m_Bot->GetGyro()->ResetAngle();
+    // m_Bot->GetGyro()->FinalizeCalibration();
+    // m_Bot->GetGyro()->ResetAngle();
 
-    std::cout << "Setting command list" << std::endl;
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
 
@@ -59,15 +64,18 @@ void CowBase::AutonomousInit()
 void CowBase::TeleopInit()
 {
     m_Bot->StartTime();
-    m_Bot->GetGyro()->FinalizeCalibration();
+    // m_Bot->GetGyro()->FinalizeCalibration();
     std::cout << "setting controller " << m_OpController << std::endl;
     m_Bot->SetController(m_OpController);
     std::cout << "controller set successfully" << std::endl;
-    // m_Bot->GetArm()->SetBrakeMode();
+    // m_Bot->GetArm()->SetBrakeMode(); TODO: add back in
 }
 
 void CowBase::DisabledPeriodic()
 {
+    // log motor info
+    CowLib::CowLogger::GetInstance()->Handle();
+
     // m_Bot->GyroHandleCalibration();
 
     if (m_Display)
@@ -90,36 +98,32 @@ void CowBase::DisabledPeriodic()
              * iterates over AutoModes
              */
             AutoModes::GetInstance()->NextMode();
+            CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
         }
     }
     if (m_Bot)
     {
+        // TODO: add this back in
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 50 == 0)
+    if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
     {
-        // m_Bot->GetConveyor()->SetStatusFramePeriod();
-        // m_Bot->GetIntakeF()->SetStatusFramePeriod();
+        CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
+        // printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }
 }
 
 void CowBase::AutonomousPeriodic()
 {
-    m_Bot->handle();
+    m_Bot->Handle();
 }
 
 void CowBase::TeleopPeriodic()
 {
-    m_Bot->handle();
-
-    // std::cout << "gyro angle: " << m_Bot->GetGyro()->GetAngle() << std::endl;
-
-    //    if(m_Display)
-    //    {
-    //        m_Display->DisplayPeriodic();
-    //    }
+    m_Bot->Handle();
 }
 
 int main()

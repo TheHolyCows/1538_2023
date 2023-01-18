@@ -4,13 +4,12 @@
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowCANCoder.h"
+#include "../CowLib/CowLogger.h"
 #include "../CowLib/CowMotorController.h"
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveModuleState.h"
-#include "../CowLib/CowCANCoder.h"
 
-#include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/DataLogManager.h>
 #include <frc/geometry/Rotation2d.h>
@@ -32,9 +31,6 @@ private:
     CowLib::CowMotorController *m_RotationMotor;
 
     CowLib::CowCANCoder *m_Encoder;
-
-    units::meters_per_second_t m_TargetSpeed;
-    frc::Rotation2d m_TargetAngle;
 
     double m_Velocity;
     double m_Position;

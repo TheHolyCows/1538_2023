@@ -1,17 +1,14 @@
 #include "SwerveModule.h"
 
+#include <frc/kinematics/SwerveModuleState.h>
+
 /**
  * @brief Construct a new SwerveModule object
- *
  * @param id Module ID
  * @param driveMotor Drive motor ID
- *
- *
  * @param rotationMotor Rotation motor ID
  * @param encoderId CANCoder ID
- * @param encoderOffset Absolute encoder
- *
- * offset
+ * @param encoderOffset Absolute encoder offset
  * @param locationX Module X translation
  * @param locationY Module Y translation
  */
@@ -34,11 +31,14 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     m_Velocity = 0;
     m_Angle    = 0;
 
-    m_TargetSpeed = 0_mps;
-    m_TargetAngle = 0_deg;
-
     ResetConstants();
     ResetEncoders();
+
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "Module %d abs encoder angle: %f  motor angle %f  \n",
+                              id,
+                              m_Encoder->GetAbsolutePosition(),
+                              m_RotationMotor->GetPosition());
 }
 
 SwerveModule::~SwerveModule()
@@ -50,7 +50,6 @@ SwerveModule::~SwerveModule()
 
 /**
  * @brief Returns the current module state
- *
  * @return Physical module state
  */
 CowLib::CowSwerveModuleState SwerveModule::GetState()
@@ -65,21 +64,33 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
 
 /**
  * @brief Sets the desired module state
- *
  * @param state Target state
  */
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
     CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    // auto wpistate
+    //     = frc::SwerveModuleState{ units::feet_per_second_t{ state.velocity }, units::degree_t{ state.angle } };
+    // frc::SwerveModuleState::Optimize(wpistate, frc::Rotation2d(units::degree_t{ m_Angle }));
+    // auto optimized = CowLib::CowSwerveModuleState::FromWPI(wpistate);
+
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target velocity", optimized.velocity);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target angle", optimized.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti ang", state.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle to deg", m_Angle);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "Module %d velocity: %f target angle: %f current angle: %f\n",
+                              m_Id,
+                              optimized.velocity,
+                              optimized.angle,
+                              m_Angle);
+
+    // auto optimized = state;
     // frc::SwerveModuleState optimized = state;
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
-    m_DriveMotor->SetControlMode(CowLib::CowMotorController::PERCENTVBUS);
-
     m_DriveMotor->Set(percentOutput);
-
-    frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Speed", optimized.velocity);
 
     // Don't rotate for low speeds
     double targetAngle;
@@ -90,19 +101,16 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     }
     else
     {
-        targetAngle = state.angle;
+        targetAngle = optimized.angle;
     }
 
     m_PreviousAngle = targetAngle;
 
-    frc::SmartDashboard::PutNumber("Mod " + std::to_string(m_Id) + " Angle", targetAngle);
     m_RotationMotor->Set(CowLib::Conversions::DegreesToFalcon(targetAngle, CONSTANT("SWERVE_ROTATION_GEAR_RATIO")));
-    // std::cout << targetAngle << "\n";
 }
 
 /**
  * @brief Resets PID constants
- *
  */
 void SwerveModule::ResetConstants()
 {
@@ -120,11 +128,10 @@ void SwerveModule::ResetConstants()
 
 /**
  * @brief Resets encoder to absolute offset
- *
  */
 void SwerveModule::ResetEncoders()
 {
-    double absolutePosition = CowLib::Conversions::DegreesToFalcon(m_Encoder->GetAbsolutePosition(),
+    double absolutePosition = CowLib::Conversions::DegreesToFalcon(m_Encoder->GetAbsolutePosition() - m_EncoderOffset,
                                                                    CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 
     m_RotationMotor->GetInternalMotor()->SetSelectedSensorPosition(absolutePosition);
@@ -132,29 +139,29 @@ void SwerveModule::ResetEncoders()
 
 /**
  * @brief Doesn't set anything but reads the current real world state
- *
  */
 void SwerveModule::Handle()
 {
-    double velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),
-                                                       CONSTANT("WHEEL_CIRCUMFERENCE"),
-                                                       CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
+    // printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
 
     // Update current positions once per loop
-    m_Velocity = units::convert<units::meters_per_second, units::feet_per_second>(velocity);
-    m_Position = m_DriveMotor->GetPosition();
+    m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),
+                                                  CONSTANT("WHEEL_CIRCUMFERENCE"),
+                                                  CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
+
+    // I think this is right...
+    m_Position = (m_DriveMotor->GetPosition() * (600.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
+                 * CONSTANT("WHEEL_CIRCUMFERENCE");
+
     m_Angle
         = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 }
 
 /**
  * @brief Helper function for optimize
- *
  * @param scopeReference Current angle
  * @param newAngle Target angle
- *
-
- * * @return The closed angle within scope
+ * @return The closed angle within scope
  */
 double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double newAngle)
 {
@@ -197,20 +204,11 @@ double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double
 
 /**
  * @brief Modified WPILib optimize function.
- * Minimize the change in heading the desired swerve module state
- * would
- * require by potentially
- * reversing the direction the wheel spins. Customized from WPILib's version to
- * include
- * placing
- * in appropriate scope for CTRE onboard control.
- * Port of
- *
- * https://github.com/frc1678/C2022/blob/main/src/main/java/com/lib/util/CTREModuleState.java
- *
- * @param desiredState
-
- * * The desired module state
+ * Minimize the change in heading the desired swerve module state would require by potentially
+ * reversing the direction the wheel spins. Customized from WPILib's version to include
+ * placing in appropriate scope for CTRE onboard control.
+ * Port ofhttps://github.com/frc1678/C2022/blob/main/src/main/java/com/lib/util/CTREModuleState.java
+ * @param desiredState The desired module state
  * @param currentAngle The current module angle
  * @return frc::SwerveModuleState
  */

@@ -23,15 +23,15 @@ namespace CowLib
             zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
         }
 
-        m_Odometry = new frc::SwerveDriveOdometry<4>(*(kinematics->GetInternalKinematics()),
-                                                     frc::Rotation2d(units::degree_t{ gyroAngle }),
-                                                     zeroPositions,
-                                                     CreateWPIPose(initialX, initialY, initialRotation));
+        m_PoseEstimator = new frc::SwerveDrivePoseEstimator<4>(*(kinematics->GetInternalKinematics()),
+                                                               frc::Rotation2d(units::degree_t{ gyroAngle }),
+                                                               zeroPositions,
+                                                               CreateWPIPose(initialX, initialY, initialRotation));
     }
 
     CowSwerveOdometry::~CowSwerveOdometry()
     {
-        delete m_Odometry;
+        delete m_PoseEstimator;
     }
 
     /**
@@ -75,17 +75,20 @@ namespace CowLib
      */
     void CowSwerveOdometry::Reset(double newX, double newY, double newRotation, double gyroAngle)
     {
+        Reset(CreateWPIPose(newX, newY, newRotation), gyroAngle);
+    }
+
+    void CowSwerveOdometry::Reset(frc::Pose2d pose, double gyroAngle)
+    {
         std::array<frc::SwerveModulePosition, 4> zeroPositions;
         for (int i = 0; i < 4; i++)
         {
             zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
         }
 
-        m_Odometry->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }),
-                                  zeroPositions,
-                                  CreateWPIPose(newX, newY, newRotation));
+        m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }), zeroPositions, pose);
 
-        m_Pose = m_Odometry->GetPose();
+        m_Pose = m_PoseEstimator->GetEstimatedPosition();
     }
 
     /**
@@ -133,16 +136,16 @@ namespace CowLib
     {
         std::array<frc::SwerveModulePosition, 4> WPIModulePositions = CreateWPIModulePositions(modulePositions);
 
-        m_Pose = m_Odometry->Update(frc::Rotation2d(units::degree_t{ gyroAngle }), WPIModulePositions);
+        m_Pose = m_PoseEstimator->Update(frc::Rotation2d(units::degree_t{ gyroAngle }), WPIModulePositions);
     }
 
     /**
-     * @brief Retrieves the internal odometry instance
-     * @return Pointer to WPILib SwerveDriveOdometry
+     * @brief Retrieves the internal pose estimator instance
+     * @return Pointer to WPILib SwerveDrivePoseEstimator
      */
-    frc::SwerveDriveOdometry<4> *CowSwerveOdometry::GetInternalOdometry()
+    frc::SwerveDrivePoseEstimator<4> *CowSwerveOdometry::GetInternalPoseEstimator()
     {
-        return m_Odometry;
+        return m_PoseEstimator;
     }
 
 } // namespace CowLib

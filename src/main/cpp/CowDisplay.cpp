@@ -67,7 +67,8 @@ void CowDisplay::DisplayUpdateState()
             if (m_UserStatePeriodicCount == 50)
             {
                 char volt[64];
-                sprintf(volt, "%.2f ", m_Bot->GetGyro()->GetRate());
+                // sprintf(volt, "%.2f ", m_Bot->GetGyro()->GetRate());
+                sprintf(volt, "%.2f ", 0.0); // Pigeon has no rate...
                 std::string msg(volt);
                 msg = msg + " ";
                 alphaNumLED->SetBanner(msg);

@@ -30,13 +30,15 @@ namespace CowLib
     CowLogger::CowLogger()
     {
         m_TickCount = 0;
+        m_IdToLog   = 0;
         memset(m_RegisteredMotors, 0x0, sizeof(m_RegisteredMotors));
 
         m_LogSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
         if (m_LogSocket < 0)
         {
-            std::cout << "error creating socket" << std::endl;
+            std::cout << "CowLogger::CowLogger() error: failed to create socket" << std::endl;
+            return;
         }
 
         m_LogServer.sin_family      = AF_INET;
@@ -84,9 +86,45 @@ namespace CowLib
         }
         else
         {
-            std::cout << "CowLogger::RegisterMotor() error: motorID: " << motorId << " has already been registered"
-                      << std::endl;
+            LogMsg(CowLogger::LOG_ERR,
+                   "CowLogger::RegisterMotor() error: motorID: %i has already been registered",
+                   motorId);
         }
+    }
+
+    /**
+     * CowLogger::LogAutoMode
+     * unlike other loggers, this does not depend on debug flag being set
+     * sends a message containing the name of the currently selected auto mode, up to 32 characters (including '\0')
+     * called on every auto mode selection button press and every 50ms in disabled periodic
+     * @param name - name of current auto mode
+     */
+    void CowLogger::LogAutoMode(const char *name)
+    {
+        CowAutoLog logPacket;
+        logPacket.hdr.msgType = CowLogger::AUTO_LOG;
+        logPacket.hdr.msgLen  = sizeof(logPacket);
+
+        // sub 1 from len to allow space for '\0'
+        memset(logPacket.name, 0x0, sizeof(logPacket.name));
+        strncpy(logPacket.name, name, sizeof(logPacket.name) - 1);
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    void CowLogger::LogGyroAngle(double angle)
+    {
+        if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
+        {
+            return;
+        }
+
+        CowGyroLog logPacket;
+        logPacket.hdr.msgType = CowLogger::GYRO_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowGyroLog);
+        logPacket.angle       = angle;
+
+        SendLog(&logPacket, sizeof(logPacket));
     }
 
     /**
@@ -97,9 +135,9 @@ namespace CowLib
      * @param logLevel - enum specified in this header
      * @param logStr - string to send to log server
      */
-    void CowLogger::LogMsg(CowLogLevel logLevel, const char *logStr)
+    void CowLogger::LogMsg(CowLogLevel logLevel, const char *fmt, ...)
     {
-        if (CONSTANT("DEBUG") == 0)
+        if (logLevel > (int) CONSTANT("DEBUG"))
         {
             return;
         }
@@ -108,9 +146,14 @@ namespace CowLib
         logPacket.hdr.msgType = CowLogMsgType::MSG_LOG;
         logPacket.hdr.msgLen  = sizeof(logPacket);
         logPacket.logLevel    = logLevel;
-        // sub 1 from len to allow space for '\0'
+
+        // pull all strings into logStr until no more strings or no more room
+        va_list args;
+        va_start(args, fmt);
+
         memset(logPacket.logStr, 0x0, sizeof(logPacket.logStr));
-        strncpy(logPacket.logStr, logStr, sizeof(logPacket.logStr) - 1);
+        // sub 1 from len to allow space for '\0'
+        vsnprintf(logPacket.logStr, sizeof(logPacket.logStr) - 1, fmt, args);
 
         // we are not checking to see if the strlen is less than 255 and therefore
         // sending the full packet each time, for efficiency we should only send
@@ -129,7 +172,7 @@ namespace CowLib
      **/
     void CowLogger::LogPID(uint32_t motorId, double setPoint, double procVar, double P, double I, double D)
     {
-        if (CONSTANT("DEBUG") == 0)
+        if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
             return;
         }
@@ -157,7 +200,7 @@ namespace CowLib
      */
     void CowLogger::LogMotor(uint32_t motorId, double temp, double encoderCt)
     {
-        if (CONSTANT("DEBUG") == 0)
+        if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
             return;
         }
@@ -176,12 +219,12 @@ namespace CowLib
     /**
      * CowLogger::Handle
      * handler to be called every cycle for logging within CowRobot, strictly used
-     * to log registered motors in debug mode, therefore, this function can safely
+     * to log registered motors in , therefore, this function can safely
      * be removed from production code
      */
     void CowLogger::Handle()
     {
-        if (CONSTANT("DEBUG") == 0)
+        if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
             return;
         }
@@ -192,9 +235,9 @@ namespace CowLib
             GetInstance();
         }
 
-        if (CONSTANT("DEBUG_MOTOR_PID") != 0) // every cycle
+        if (CONSTANT("DEBUG_MOTOR_PID") >= 0) // every cycle
         {
-            int debugMotorID = CONSTANT("DEBUG_MOTOR_ID");
+            int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
             if (m_RegisteredMotors[debugMotorID] != NULL)
             {
                 double setPoint;
@@ -208,8 +251,10 @@ namespace CowLib
             }
         }
 
-        if (m_TickCount % 20 == 0) // 200 miliseconds
+        if (m_TickCount++ % 20 == 0) // 200 miliseconds
         {
+            m_TickCount = 1;
+
             uint32_t logsThisTick = 4;
             while (m_IdToLog < REGISTERED_MOTORS_MAX && logsThisTick != 0)
             {

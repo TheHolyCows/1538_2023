@@ -1,13 +1,17 @@
 #include "SwerveTrajectoryCommand.h"
 
-SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryName, double targetAngle, bool stopAtEnd)
+SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryName,
+                                                 double targetAngle,
+                                                 bool stopAtEnd,
+                                                 bool resetOdometry)
 {
     // This is to make sure that it is loading trajectories on start and not on demand
     std::cout << "Loading swerve trajectory " << trajectoryName << std::endl;
 
-    m_Timer       = new CowLib::CowTimer();
-    m_Stop        = stopAtEnd;
-    m_TargetAngle = targetAngle;
+    m_Timer         = new CowLib::CowTimer();
+    m_Stop          = stopAtEnd;
+    m_TargetAngle   = targetAngle;
+    m_ResetOdometry = resetOdometry;
 
     // Load trajectory from file
     fs::path deployDirectory = frc::filesystem::GetDeployDirectory();
@@ -17,7 +21,7 @@ SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryNa
 
     m_Trajectory = frc::TrajectoryUtil::FromPathweaverJson(path.string());
 
-    std::cout << "Loaded trajectory " << trajectoryName << std::endl;
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Loaded trajectory %s", trajectoryName.c_str());
 
     m_HolonomicController = new CowLib::CowHolonomicController(CONSTANT("AUTO_DRIVE_P"),
                                                                CONSTANT("AUTO_DRIVE_I"),
@@ -50,6 +54,11 @@ bool SwerveTrajectoryCommand::IsComplete()
 
 void SwerveTrajectoryCommand::Start(CowRobot *robot)
 {
+    if (m_ResetOdometry)
+    {
+        robot->GetDrivetrain()->ResetOdometry(m_Trajectory.InitialPose());
+    }
+
     m_Timer->Reset();
     m_Timer->Start();
 }
@@ -77,4 +86,9 @@ void SwerveTrajectoryCommand::Finish(CowRobot *robot)
     m_Timer->Stop();
 
     // Do we have to delete stuff here? Worth memory savings? idk
+}
+
+frc::Pose2d SwerveTrajectoryCommand::GetStartingPose()
+{
+    return m_Trajectory.InitialPose();
 }
