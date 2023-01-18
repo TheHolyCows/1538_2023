@@ -73,17 +73,23 @@ namespace CowLib
      * @param newRotation new robot rotation in degrees
      * @param gyroAngle current gyro angle in degrees
      */
-    void CowSwerveOdometry::Reset(double newX, double newY, double newRotation, double gyroAngle)
+    void CowSwerveOdometry::Reset(double newX,
+                                  double newY,
+                                  double newRotation,
+                                  double gyroAngle,
+                                  std::array<CowLib::CowSwerveModulePosition, 4> modPositions)
     {
-        Reset(CreateWPIPose(newX, newY, newRotation), gyroAngle);
+        Reset(CreateWPIPose(newX, newY, newRotation), gyroAngle, modPositions);
     }
 
-    void CowSwerveOdometry::Reset(frc::Pose2d pose, double gyroAngle)
+    void CowSwerveOdometry::Reset(frc::Pose2d pose,
+                                  double gyroAngle,
+                                  std::array<CowLib::CowSwerveModulePosition, 4> modPositions)
     {
         std::array<frc::SwerveModulePosition, 4> zeroPositions;
         for (int i = 0; i < 4; i++)
         {
-            zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
+            zeroPositions[i] = modPositions[i].ToWPI();
         }
 
         m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }), zeroPositions, pose);

@@ -159,7 +159,13 @@ void SwerveDrive::ResetEncoders()
 
 void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 {
-    m_Odometry->Reset(pose, pose.Rotation().Degrees().value());
+    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions;
+    for (auto module : m_Modules)
+    {
+        modulePositions[module->GetId()] = module->GetPosition();
+    }
+
+    m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
     m_Gyro->SetYaw(m_Odometry->GetRotation());
 }
 

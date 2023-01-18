@@ -34,11 +34,11 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     ResetConstants();
     ResetEncoders();
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "Module %d abs encoder angle: %f  motor angle %f  \n",
-                              id,
-                              m_Encoder->GetAbsolutePosition(),
-                              m_RotationMotor->GetPosition());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "Module %d abs encoder angle: %f  motor angle %f  \n",
+    //                           id,
+    //                           m_Encoder->GetAbsolutePosition(),
+    //                           m_RotationMotor->GetPosition());
 }
 
 SwerveModule::~SwerveModule()
@@ -78,12 +78,12 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target angle", optimized.angle);
     frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti ang", state.angle);
     frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle to deg", m_Angle);
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "Module %d velocity: %f target angle: %f current angle: %f\n",
-                              m_Id,
-                              optimized.velocity,
-                              optimized.angle,
-                              m_Angle);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "Module %d velocity: %f target angle: %f current angle: %f\n",
+    //                           m_Id,
+    //                           optimized.velocity,
+    //                           optimized.angle,
+    //                           m_Angle);
 
     // auto optimized = state;
     // frc::SwerveModuleState optimized = state;

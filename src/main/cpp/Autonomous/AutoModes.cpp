@@ -19,12 +19,7 @@ AutoModes::AutoModes()
     // }));
 
     // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
-    m_Modes["Test"].push_back(
-        new RaceCommand(new SwerveTrajectoryCommand("Test1", 30, true, true),
-                        { new SeriesCommand({
-                            new WaitCommand(3, false),
-                            new LambdaCommand([](CowRobot *robot) { std::cout << "Hello from lambda" << std::endl; }),
-                        }) }));
+    m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();

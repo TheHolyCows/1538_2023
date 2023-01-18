@@ -1,9 +1,9 @@
 {
   "lengthUnit": "Foot",
-  "exportUnit": "Same as Project",
-  "maxVelocity": 16.5,
-  "maxAcceleration": 4.0,
+  "exportUnit": "Always Meters",
+  "maxVelocity": 5.0,
+  "maxAcceleration": 2.0,
   "trackWidth": 1.15625,
   "gameName": "Charged Up",
-  "outputDir": "../output"
+  "outputDir": "../../src/main/deploy/trajectories"
 }

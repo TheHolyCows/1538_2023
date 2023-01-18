@@ -110,7 +110,7 @@ void CowBase::DisabledPeriodic()
     if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
     {
         CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
+        // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
         // printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }

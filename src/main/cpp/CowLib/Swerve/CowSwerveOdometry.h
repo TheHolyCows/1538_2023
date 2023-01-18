@@ -33,8 +33,8 @@ namespace CowLib
                           double initialRotation);
         ~CowSwerveOdometry();
 
-        void Reset(double newX, double newY, double newRotation, double gyroAngle);
-        void Reset(frc::Pose2d pose, double gyroAngle);
+        void Reset(double newX, double newY, double newRotation, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
+        void Reset(frc::Pose2d pose, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
 
         double GetX();
         double GetY();
