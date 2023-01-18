@@ -16,9 +16,11 @@ CowPigeon::CowPigeon()
 {
     constexpr int PIGEON_ID = 24;
 
-    m_Pigeon = new ctre::phoenix::sensors::Pigeon2(PIGEON_ID);
+    m_Pigeon = new ctre::phoenix::sensors::Pigeon2(PIGEON_ID, "cowbus");
 
     m_Inverted = false;
+
+    m_YawOffset = 0;
 }
 
 void CowPigeon::SetInverted(bool inverted)
@@ -43,7 +45,7 @@ double CowPigeon::GetRoll()
 
 void CowPigeon::SetYaw(double angle)
 {
-    m_YawOffset = angle - GetRawYaw();
+    m_YawOffset = GetRawYaw() - angle;
 }
 
 double CowPigeon::GetRawYaw()

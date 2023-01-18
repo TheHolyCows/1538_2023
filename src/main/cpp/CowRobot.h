@@ -68,7 +68,7 @@ public:
 
     SwerveDrive *GetDrivetrain() { return m_Drivetrain; }
 
-    void handle();
+    void Handle();
 
     void DoNothing(void);
 };

@@ -30,6 +30,7 @@ namespace CowLib
     CowLogger::CowLogger()
     {
         m_TickCount = 0;
+        m_IdToLog   = 0;
         memset(m_RegisteredMotors, 0x0, sizeof(m_RegisteredMotors));
 
         m_LogSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -85,8 +86,9 @@ namespace CowLib
         }
         else
         {
-            std::cout << "CowLogger::RegisterMotor() error: motorID: " << motorId << " has already been registered"
-                      << std::endl;
+            LogMsg(CowLogger::LOG_ERR,
+                   "CowLogger::RegisterMotor() error: motorID: %i has already been registered",
+                   motorId);
         }
     }
 
@@ -135,7 +137,7 @@ namespace CowLib
      */
     void CowLogger::LogMsg(CowLogLevel logLevel, const char *fmt, ...)
     {
-        if (logLevel <= (int) CONSTANT("DEBUG"))
+        if (logLevel > (int) CONSTANT("DEBUG"))
         {
             return;
         }
@@ -151,7 +153,7 @@ namespace CowLib
 
         memset(logPacket.logStr, 0x0, sizeof(logPacket.logStr));
         // sub 1 from len to allow space for '\0'
-        vsnprintf(logPacket.logStr, sizeof(sizeof(logPacket.logStr) - 1), fmt, args);
+        vsnprintf(logPacket.logStr, sizeof(logPacket.logStr) - 1, fmt, args);
 
         // we are not checking to see if the strlen is less than 255 and therefore
         // sending the full packet each time, for efficiency we should only send
@@ -233,9 +235,9 @@ namespace CowLib
             GetInstance();
         }
 
-        if (CONSTANT("DEBUG_MOTOR_PID") != 0) // every cycle
+        if (CONSTANT("DEBUG_MOTOR_PID") >= 0) // every cycle
         {
-            int debugMotorID = CONSTANT("DEBUG_MOTOR_ID");
+            int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
             if (m_RegisteredMotors[debugMotorID] != NULL)
             {
                 double setPoint;

@@ -14,6 +14,9 @@ CowBase::CowBase()
     // init logger
     CowLib::CowLogger::GetInstance();
 
+    // init gyro
+    CowPigeon::GetInstance();
+
     // SetPeriod(HZ(ROBOT_HZ));
     // GetWatchdog().SetEnabled(false);
     printf("Done constructing CowBase!\n");
@@ -33,13 +36,13 @@ void CowBase::RobotInit()
 
     // Construct the auto modes class to load swerve trajectories
     AutoModes::GetInstance();
+
+    CowPigeon::GetInstance()->SetYaw(0);
 }
 
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
-    // m_Bot->GetGyro()->ResetAngle();
-    // m_Bot->GetGyro()->BeginCalibration();
     m_Bot->Reset();
 }
 
@@ -65,11 +68,14 @@ void CowBase::TeleopInit()
     std::cout << "setting controller " << m_OpController << std::endl;
     m_Bot->SetController(m_OpController);
     std::cout << "controller set successfully" << std::endl;
-    // m_Bot->GetArm()->SetBrakeMode();
+    // m_Bot->GetArm()->SetBrakeMode(); TODO: add back in
 }
 
 void CowBase::DisabledPeriodic()
 {
+    // log motor info
+    CowLib::CowLogger::GetInstance()->Handle();
+
     // m_Bot->GyroHandleCalibration();
 
     if (m_Display)
@@ -97,31 +103,27 @@ void CowBase::DisabledPeriodic()
     }
     if (m_Bot)
     {
+        // TODO: add this back in
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 5 == 0) // 50 ms tick rate
+    if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
     {
         CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
+        // printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }
 }
 
 void CowBase::AutonomousPeriodic()
 {
-    m_Bot->handle();
+    m_Bot->Handle();
 }
 
 void CowBase::TeleopPeriodic()
 {
-    m_Bot->handle();
-
-    // std::cout << "gyro angle: " << m_Bot->GetGyro()->GetYaw() << std::endl;
-
-    //    if(m_Display)
-    //    {
-    //        m_Display->DisplayPeriodic();
-    //    }
+    m_Bot->Handle();
 }
 
 int main()
