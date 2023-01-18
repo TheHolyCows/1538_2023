@@ -1,5 +1,7 @@
 #include "SwerveModule.h"
 
+#include <frc/kinematics/SwerveModuleState.h>
+
 /**
  * @brief Construct a new SwerveModule object
  * @param id Module ID
@@ -67,6 +69,22 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
     CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    // auto wpistate
+    //     = frc::SwerveModuleState{ units::feet_per_second_t{ state.velocity }, units::degree_t{ state.angle } };
+    // frc::SwerveModuleState::Optimize(wpistate, frc::Rotation2d(units::degree_t{ m_Angle }));
+    // auto optimized = CowLib::CowSwerveModuleState::FromWPI(wpistate);
+
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target velocity", optimized.velocity);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target angle", optimized.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti ang", state.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle to deg", m_Angle);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "Module %d velocity: %f target angle: %f current angle: %f\n",
+                              m_Id,
+                              optimized.velocity,
+                              optimized.angle,
+                              m_Angle);
+
     // auto optimized = state;
     // frc::SwerveModuleState optimized = state;
 
@@ -83,7 +101,7 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     }
     else
     {
-        targetAngle = state.angle;
+        targetAngle = optimized.angle;
     }
 
     m_PreviousAngle = targetAngle;
@@ -124,7 +142,7 @@ void SwerveModule::ResetEncoders()
  */
 void SwerveModule::Handle()
 {
-    printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
+    // printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
 
     // Update current positions once per loop
     m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetInternalMotor()->GetSelectedSensorVelocity(),

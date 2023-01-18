@@ -137,7 +137,7 @@ namespace CowLib
      */
     void CowLogger::LogMsg(CowLogLevel logLevel, const char *fmt, ...)
     {
-        if (logLevel <= (int) CONSTANT("DEBUG"))
+        if (logLevel > (int) CONSTANT("DEBUG"))
         {
             return;
         }
@@ -153,7 +153,7 @@ namespace CowLib
 
         memset(logPacket.logStr, 0x0, sizeof(logPacket.logStr));
         // sub 1 from len to allow space for '\0'
-        vsnprintf(logPacket.logStr, sizeof(sizeof(logPacket.logStr) - 1), fmt, args);
+        vsnprintf(logPacket.logStr, sizeof(logPacket.logStr) - 1, fmt, args);
 
         // we are not checking to see if the strlen is less than 255 and therefore
         // sending the full packet each time, for efficiency we should only send

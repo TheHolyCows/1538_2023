@@ -79,11 +79,13 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    bot->GetDrivetrain()->SetVelocity(
-        CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
-        CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_SPEED"),
-        CowLib::Deadband(m_CB->GetRightDriveStickAxis(0), CONSTANT("STICK_DEADBAND")) * CONSTANT("DESIRED_MAX_ANG_VEL"),
-        fieldRelative,
-        centerOfRotationX,
-        centerOfRotationY);
+    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND"))
+                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
+                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND"))
+                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
+                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND"))
+                                          * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
+                                      fieldRelative,
+                                      centerOfRotationX,
+                                      centerOfRotationY);
 }

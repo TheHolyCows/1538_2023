@@ -21,9 +21,9 @@ CowRobot::CowRobot()
     // fl, fr, bl, br
     // drive motor, angle motor, encoder canId's
     SwerveDrive::ModuleConstants swerveModuleConstants[4]{
-        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
         SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
     };
 

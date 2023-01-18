@@ -77,7 +77,7 @@ namespace CowLib
 
         uint32_t m_IdToLog;
 
-        const char *m_LogServerIP = "10.15.38.200";
+        const char *m_LogServerIP = "10.15.38.138";
         uint16_t m_LogServerPort  = 5810;
 
         // assuming we don't have more than 24 motors ever
