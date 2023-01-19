@@ -38,6 +38,8 @@ void CowBase::RobotInit()
     AutoModes::GetInstance();
 
     CowPigeon::GetInstance()->SetYaw(0);
+
+    m_Bot->GetDrivetrain()->Reset();
 }
 
 void CowBase::DisabledInit()

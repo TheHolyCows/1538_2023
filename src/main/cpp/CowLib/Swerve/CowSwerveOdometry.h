@@ -3,6 +3,7 @@
 
 #include "./CowSwerveKinematics.h"
 #include "./CowSwerveModulePosition.h"
+#include "./CowSwerveModuleState.h"
 
 #include <algorithm>
 #include <array>
@@ -14,7 +15,6 @@
 
 namespace CowLib
 {
-
     class CowSwerveOdometry
     {
     private:
@@ -33,7 +33,11 @@ namespace CowLib
                           double initialRotation);
         ~CowSwerveOdometry();
 
-        void Reset(double newX, double newY, double newRotation, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
+        void Reset(double newX,
+                   double newY,
+                   double newRotation,
+                   double gyroAngle,
+                   std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
         void Reset(frc::Pose2d pose, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
 
         double GetX();

@@ -135,6 +135,7 @@ void SwerveModule::ResetEncoders()
                                                                    CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 
     m_RotationMotor->GetInternalMotor()->SetSelectedSensorPosition(absolutePosition);
+    m_DriveMotor->GetInternalMotor()->SetSelectedSensorPosition(0);
 }
 
 /**
@@ -150,8 +151,8 @@ void SwerveModule::Handle()
                                                   CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
 
     // I think this is right...
-    m_Position = (m_DriveMotor->GetPosition() * (600.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
-                 * CONSTANT("WHEEL_CIRCUMFERENCE");
+    m_Position = ((m_DriveMotor->GetPosition() * (360.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
+                  * CONSTANT("WHEEL_CIRCUMFERENCE"));
 
     m_Angle
         = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));

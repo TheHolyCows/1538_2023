@@ -166,7 +166,7 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
     }
 
     m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
-    m_Gyro->SetYaw(m_Odometry->GetRotation());
+    m_Gyro->SetYaw(pose.Rotation().Degrees().value());
 }
 
 void SwerveDrive::Handle()
@@ -183,4 +183,13 @@ void SwerveDrive::Handle()
                    [](SwerveModule *module) { return module->GetPosition(); });
 
     m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
+
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "odometry pose: x %f, y %f, %fdeg",
+                              m_Odometry->GetX(),
+                              m_Odometry->GetY(),
+                              m_Odometry->GetRotation());
+
+    // frc::SmartDashboard::PutNumberArray("odometry pose (x, y, deg)",
+    //                                     { m_Odometry->GetX(), m_Odometry->GetY(), m_Odometry->GetRotation() });
 }

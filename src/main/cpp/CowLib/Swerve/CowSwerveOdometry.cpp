@@ -86,13 +86,9 @@ namespace CowLib
                                   double gyroAngle,
                                   std::array<CowLib::CowSwerveModulePosition, 4> modPositions)
     {
-        std::array<frc::SwerveModulePosition, 4> zeroPositions;
-        for (int i = 0; i < 4; i++)
-        {
-            zeroPositions[i] = modPositions[i].ToWPI();
-        }
-
-        m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }), zeroPositions, pose);
+        m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }),
+                                       CreateWPIModulePositions(modPositions),
+                                       pose);
 
         m_Pose = m_PoseEstimator->GetEstimatedPosition();
     }

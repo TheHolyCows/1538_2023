@@ -5,31 +5,32 @@
 #ifndef __AUTO_MODES_H__
 #define __AUTO_MODES_H__
 
-#include <deque>
-#include <map>
-#include <string>
-
-#include <frc/Errors.h>
-
+#include "Commands/HoldPositionCommand.h"
 #include "Commands/LambdaCommand.h"
 #include "Commands/RaceCommand.h"
 #include "Commands/SeriesCommand.h"
 #include "Commands/SwerveTrajectoryCommand.h"
 #include "Commands/WaitCommand.h"
 
-class AutoModes {
+#include <deque>
+#include <frc/Errors.h>
+#include <map>
+#include <string>
+
+class AutoModes
+{
 private:
     AutoModes();
     ~AutoModes();
-    static AutoModes* s_Instance;
+    static AutoModes *s_Instance;
 
-    std::map<std::string, std::deque<RobotCommand*> > m_Modes;
-    std::map<std::string, std::deque<RobotCommand*> >::iterator m_Iterator;
+    std::map<std::string, std::deque<RobotCommand *>> m_Modes;
+    std::map<std::string, std::deque<RobotCommand *>>::iterator m_Iterator;
 
 public:
-    static AutoModes* GetInstance();
+    static AutoModes *GetInstance();
 
-    std::deque<RobotCommand*> GetCommandList();
+    std::deque<RobotCommand *> GetCommandList();
 
     std::string GetName();
 
