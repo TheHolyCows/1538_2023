@@ -184,11 +184,11 @@ void SwerveDrive::Handle()
 
     m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "odometry pose: x %f, y %f, %fdeg",
-                              m_Odometry->GetX(),
-                              m_Odometry->GetY(),
-                              m_Odometry->GetRotation());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "odometry pose: x %f, y %f, %fdeg",
+    //                           m_Odometry->GetX(),
+    //                           m_Odometry->GetY(),
+    //                           m_Odometry->GetRotation());
 
     // frc::SmartDashboard::PutNumberArray("odometry pose (x, y, deg)",
     //                                     { m_Odometry->GetX(), m_Odometry->GetY(), m_Odometry->GetRotation() });

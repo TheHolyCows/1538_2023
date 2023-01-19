@@ -59,6 +59,16 @@ void HoldPositionCommand::Start(CowRobot *robot)
 void HoldPositionCommand::Handle(CowRobot *robot)
 {
     frc::Pose2d currentPose = robot->GetDrivetrain()->GetPose();
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "current: x %f y %f angle %f",
+                              currentPose.X().value(),
+                              currentPose.Y().value(),
+                              currentPose.Rotation().Degrees().value());
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "set to:  x %f y %f angle %f",
+                              m_Pose.X().value(),
+                              m_Pose.Y().value(),
+                              m_Pose.Rotation().Degrees().value());
 
     CowLib::CowChassisSpeeds chassisSpeeds
         = m_HolonomicController->Calculate(currentPose, m_Pose, m_MaxVelocity, m_Pose.Rotation().Degrees().value());
@@ -67,11 +77,6 @@ void HoldPositionCommand::Handle(CowRobot *robot)
     //                           chassisSpeeds.vx,
     //                           chassisSpeeds.vy,
     //                           chassisSpeeds.omega);
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "x %f y %f angle %f",
-                              currentPose.X().value(),
-                              currentPose.Y().value(),
-                              currentPose.Rotation().Degrees().value());
 
     // Vision align logic has to go here
 
