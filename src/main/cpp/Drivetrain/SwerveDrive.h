@@ -83,7 +83,7 @@ public:
     {
         ResetConstants();
         ResetEncoders();
-        ResetOdometry();
+        ResetOdometry(frc::Pose2d(0_ft, 0_ft, 0_deg));
     }
 
     void ResetOdometry(frc::Pose2d pose = frc::Pose2d{ 0_m, 0_m, 0_deg });

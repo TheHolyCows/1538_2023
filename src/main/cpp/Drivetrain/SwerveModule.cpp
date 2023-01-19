@@ -151,7 +151,7 @@ void SwerveModule::Handle()
                                                   CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
 
     // I think this is right...
-    m_Position = ((m_DriveMotor->GetPosition() * (360.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
+    m_Position = ((m_DriveMotor->GetPosition() * (1.0 / 2048.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
                   * CONSTANT("WHEEL_CIRCUMFERENCE"));
 
     m_Angle
