@@ -21,6 +21,8 @@ namespace CowLib
         frc::SwerveDrivePoseEstimator<4> *m_PoseEstimator;
         frc::Pose2d m_Pose;
 
+        CowSwerveKinematics *m_Kinematics;
+
         frc::Pose2d CreateWPIPose(double x, double y, double rotation);
         std::array<frc::SwerveModulePosition, 4>
         CreateWPIModulePositions(std::array<CowSwerveModulePosition, 4> modulePositions);

@@ -23,6 +23,8 @@ namespace CowLib
             zeroPositions[i] = frc::SwerveModulePosition{ 0_m, 0_deg };
         }
 
+        m_Kinematics = kinematics;
+
         m_PoseEstimator = new frc::SwerveDrivePoseEstimator<4>(*(kinematics->GetInternalKinematics()),
                                                                frc::Rotation2d(units::degree_t{ gyroAngle }),
                                                                zeroPositions,
@@ -89,6 +91,11 @@ namespace CowLib
         m_PoseEstimator->ResetPosition(frc::Rotation2d(units::degree_t{ gyroAngle }),
                                        CreateWPIModulePositions(modPositions),
                                        pose);
+        // delete m_PoseEstimator;
+        // m_PoseEstimator = new frc::SwerveDrivePoseEstimator<4>(*(m_Kinematics->GetInternalKinematics()),
+        //                                                        frc::Rotation2d(units::degree_t{ gyroAngle }),
+        //                                                        CreateWPIModulePositions(modPositions),
+        //                                                        pose);
 
         m_Pose = m_PoseEstimator->GetEstimatedPosition();
     }
