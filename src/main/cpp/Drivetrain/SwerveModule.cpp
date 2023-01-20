@@ -16,8 +16,6 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
 {
     m_Id = id;
 
-    m_EncoderOffset = encoderOffset;
-
     m_DriveMotor    = new CowLib::CowMotorController(driveMotor);
     m_RotationMotor = new CowLib::CowMotorController(rotationMotor);
     m_Encoder       = new CowLib::CowCANCoder(encoderId);
@@ -30,6 +28,8 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     // init state
     m_Velocity = 0;
     m_Angle    = 0;
+
+    m_EncoderOffset = encoderOffset;
 
     ResetConstants();
     ResetEncoders();
@@ -135,7 +135,11 @@ void SwerveModule::ResetEncoders()
                                                                    CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 
     m_RotationMotor->GetInternalMotor()->SetSelectedSensorPosition(absolutePosition);
-    m_DriveMotor->GetInternalMotor()->SetSelectedSensorPosition(0);
+    auto errCode = m_DriveMotor->GetInternalMotor()->SetSelectedSensorPosition(0);
+    if (errCode != ctre::phoenix::ErrorCode::OKAY)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "err code %d", errCode);
+    }
 }
 
 /**

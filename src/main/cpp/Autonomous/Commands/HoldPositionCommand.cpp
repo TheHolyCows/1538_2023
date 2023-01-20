@@ -83,12 +83,12 @@ void HoldPositionCommand::Handle(CowRobot *robot)
     //                           m_Pose.Y().value(),
     //                           m_Pose.Rotation().Degrees().value());
 
-    double vx = m_XController->Calculate(currentPose.X().convert<units::foot>().value(),
+    double vx    = m_XController->Calculate(currentPose.X().convert<units::foot>().value(),
                                          m_Pose.X().convert<units::foot>().value());
-    double vy = m_YController->Calculate(currentPose.Y().convert<units::foot>().value(),
+    double vy    = m_YController->Calculate(currentPose.Y().convert<units::foot>().value(),
                                          m_Pose.Y().convert<units::foot>().value());
-    double omega
-        = m_YController->Calculate(currentPose.Rotation().Degrees().value(), m_Pose.Rotation().Degrees().value());
+    double omega = m_RotationController->Calculate(currentPose.Rotation().Degrees().value(),
+                                                   m_Pose.Rotation().Degrees().value());
 
     auto chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
 

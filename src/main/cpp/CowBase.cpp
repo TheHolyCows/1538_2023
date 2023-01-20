@@ -38,23 +38,25 @@ void CowBase::RobotInit()
     AutoModes::GetInstance();
 
     CowPigeon::GetInstance()->SetYaw(0);
-
-    m_Bot->GetDrivetrain()->Reset();
 }
 
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
     m_Bot->Reset();
+    printf("DISABLED INIT -------------------\n");
 }
 
 void CowBase::AutonomousInit()
 {
+    m_Bot->GetDrivetrain()->ResetEncoders();
     // m_Bot->GetGyro()->FinalizeCalibration();
     // m_Bot->GetGyro()->ResetAngle();
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
+
+    AutoModes::GetInstance()->NextMode();
 
     m_Bot->SetController(m_AutoController);
     m_Bot->Reset();
