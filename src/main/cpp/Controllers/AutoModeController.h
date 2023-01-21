@@ -14,6 +14,8 @@ private:
     std::deque<RobotCommand*> m_CommandList;
     RobotCommand* m_CurrentCommand = nullptr;
 
+    bool m_Started;
+
 public:
     AutoModeController();
     ~AutoModeController() override;
