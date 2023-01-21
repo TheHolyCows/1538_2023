@@ -22,7 +22,7 @@ void OperatorController::Handle(CowRobot *bot)
             double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
             stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
 
-            double robotOrientedAngle = bot->GetGyro()->GetYaw() + stickAngle;
+            double robotOrientedAngle = bot->GetGyro()->GetYawDegrees() + stickAngle;
 
             // set wheel based on quadrant
             if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
