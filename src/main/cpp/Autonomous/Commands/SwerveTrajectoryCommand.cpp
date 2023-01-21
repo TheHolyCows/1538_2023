@@ -57,6 +57,13 @@ void SwerveTrajectoryCommand::Start(CowRobot *robot)
     if (m_ResetOdometry)
     {
         robot->GetDrivetrain()->ResetOdometry(m_Trajectory.InitialPose());
+
+        auto initPose = m_Trajectory.InitialPose();
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                                  "Initial pose: x %f, y %f, d %f",
+                                  initPose.X().convert<units::foot>().value(),
+                                  initPose.Y().convert<units::foot>().value(),
+                                  initPose.Rotation().Degrees().value());
     }
 
     m_Timer->Reset();
@@ -70,6 +77,16 @@ void SwerveTrajectoryCommand::Handle(CowRobot *robot)
     frc::Trajectory::State targetPose = m_Trajectory.Sample(units::second_t{ m_Timer->Get() });
 
     CowLib::CowChassisSpeeds chassisSpeeds = m_HolonomicController->Calculate(currentPose, targetPose, m_TargetAngle);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "vx: %f, vy: %f, o: %f",
+    //                           chassisSpeeds.vx,
+    //                           chassisSpeeds.vy,
+    //                           chassisSpeeds.omega);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "x %f y %f angle %f",
+                              currentPose.X().value(),
+                              currentPose.Y().value(),
+                              currentPose.Rotation().Degrees().value());
 
     // Vision align logic has to go here
 
@@ -80,12 +97,11 @@ void SwerveTrajectoryCommand::Finish(CowRobot *robot)
 {
     if (m_Stop)
     {
-        robot->GetDrivetrain()->SetVelocity(0, 0, 0, false);
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Stopping swerve trajectory command");
+        robot->GetDrivetrain()->SetVelocity(0, 0, 0, true);
     }
 
     m_Timer->Stop();
-
-    // Do we have to delete stuff here? Worth memory savings? idk
 }
 
 frc::Pose2d SwerveTrajectoryCommand::GetStartingPose()

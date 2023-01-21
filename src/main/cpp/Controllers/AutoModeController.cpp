@@ -6,6 +6,7 @@
 
 AutoModeController::AutoModeController()
 {
+    m_Started = false;
 }
 
 // I'm pretty sure these are all pointers to the instances created in AutoModes.cpp, which handles the deletion.
@@ -26,11 +27,17 @@ void AutoModeController::Start(CowRobot *bot)
     m_CommandList.pop_front();
     m_CurrentCommand->Start(bot);
     std::cout << "Starting command is " << m_CurrentCommand << std::endl;
+    m_Started = true;
 }
 
 // 1678 does all this logic in another thread for some reason... I can't figure out why. I will not regret this.
 void AutoModeController::Handle(CowRobot *bot)
 {
+    if (!m_Started)
+    {
+        return;
+    }
+
     // std::cout << "current command: " << m_CurrentCommand << std::endl;
     // If command is nullptr, we must be done (or not started)
     if (m_CurrentCommand == nullptr)
@@ -73,5 +80,6 @@ void AutoModeController::Handle(CowRobot *bot)
 // Gets called after SetCommandList btw
 void AutoModeController::Reset()
 {
+    m_Started        = false;
     m_CurrentCommand = new NullCommand();
 }

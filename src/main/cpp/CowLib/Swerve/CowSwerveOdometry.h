@@ -3,6 +3,7 @@
 
 #include "./CowSwerveKinematics.h"
 #include "./CowSwerveModulePosition.h"
+#include "./CowSwerveModuleState.h"
 
 #include <algorithm>
 #include <array>
@@ -14,12 +15,13 @@
 
 namespace CowLib
 {
-
     class CowSwerveOdometry
     {
     private:
         frc::SwerveDrivePoseEstimator<4> *m_PoseEstimator;
         frc::Pose2d m_Pose;
+
+        CowSwerveKinematics *m_Kinematics;
 
         frc::Pose2d CreateWPIPose(double x, double y, double rotation);
         std::array<frc::SwerveModulePosition, 4>
@@ -33,8 +35,12 @@ namespace CowLib
                           double initialRotation);
         ~CowSwerveOdometry();
 
-        void Reset(double newX, double newY, double newRotation, double gyroAngle);
-        void Reset(frc::Pose2d pose, double gyroAngle);
+        void Reset(double newX,
+                   double newY,
+                   double newRotation,
+                   double gyroAngle,
+                   std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
+        void Reset(frc::Pose2d pose, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
 
         double GetX();
         double GetY();

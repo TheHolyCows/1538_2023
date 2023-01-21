@@ -49,7 +49,7 @@ bool CowControlBoard::GetLeftDriveStickButton(const int button)
 
 bool CowControlBoard::GetRightDriveStickButton(const int button)
 {
-    return m_LeftDriveStick->GetRawButton(button);
+    return m_RightDriveStick->GetRawButton(button);
 }
 
 bool CowControlBoard::GetOperatorButton(const int button)

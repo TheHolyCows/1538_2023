@@ -28,6 +28,8 @@ CowRobot::CowRobot()
     };
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
+
+    m_Drivetrain->ResetEncoders();
 }
 
 /**
@@ -39,7 +41,7 @@ void CowRobot::Reset()
 
     m_PreviousGyroError = 0;
 
-    m_Drivetrain->Reset();
+    m_Drivetrain->ResetConstants();
 }
 
 /**

@@ -47,7 +47,7 @@ void OperatorController::Handle(CowRobot *bot)
             }
         }
 
-        const double wb = CONSTANT("WHEEL_BASE") / 2.0;
+        const double wb = CONSTANT("WHEEL_BASE");
 
         switch (m_EvasiveSwerveWheel)
         {

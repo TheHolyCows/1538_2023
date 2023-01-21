@@ -19,12 +19,10 @@ AutoModes::AutoModes()
     // }));
 
     // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
-    m_Modes["Test"].push_back(
-        new RaceCommand(new SwerveTrajectoryCommand("Test1", 30, true, true),
-                        { new SeriesCommand({
-                            new WaitCommand(3, false),
-                            new LambdaCommand([](CowRobot *robot) { std::cout << "Hello from lambda" << std::endl; }),
-                        }) }));
+    m_Modes["Wait 5 seconds"].push_back(new LambdaCommand([](CowRobot *robot) { robot->GetDrivetrain()->Reset(); }));
+    m_Modes["Wait 5 seconds"].push_back(new WaitCommand(10, true));
+    m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
+    m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
     // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();
@@ -74,5 +72,4 @@ void AutoModes::NextMode()
     // Display the name of the current auto mode to driver station
     std::string name = GetName();
     std::cout << "Auto mode: " << name << std::endl;
-    // FRC_ReportError(frc::err::Error, "{}", "Auto Mode: " + name);
 }

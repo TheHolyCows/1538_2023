@@ -1,5 +1,5 @@
-#ifndef __SWERVE_TRAJECTORY_COMMAND_H__
-#define __SWERVE_TRAJECTORY_COMMAND_H__
+#ifndef __HOLD_POSITION_COMMAND_H__
+#define __HOLD_POSITION_COMMAND_H__
 
 #include "../../CowLib/CowHolonomicController.h"
 #include "../../CowLib/CowLatch.h"
@@ -15,24 +15,25 @@
 #include <string>
 #include <wpi/fs.h>
 
-class SwerveTrajectoryCommand : public RobotCommand
+class HoldPositionCommand : public RobotCommand
 {
 private:
     CowLib::CowTimer *m_Timer;
-    frc::Trajectory m_Trajectory;
-    CowLib::CowHolonomicController *m_HolonomicController;
+
+    frc2::PIDController *m_XController;
+    frc2::PIDController *m_YController;
+    frc2::PIDController *m_RotationController;
 
     double m_TotalTime;
     bool m_Stop;
-    double m_TargetAngle;
     bool m_ResetOdometry;
+    double m_MaxVelocity;
+
+    frc::Pose2d m_Pose;
 
 public:
-    SwerveTrajectoryCommand(const std::string &trajectoryName,
-                            double targetAngle,
-                            bool stop,
-                            bool resetOdometry = false);
-    ~SwerveTrajectoryCommand() override;
+    HoldPositionCommand(double time, double maxVelocity, bool stopAtEnd, bool resetOdometry = false);
+    ~HoldPositionCommand() override;
 
     bool IsComplete() override;
 
@@ -41,8 +42,6 @@ public:
     void Handle(CowRobot *robot) override;
 
     void Finish(CowRobot *robot) override;
-
-    frc::Pose2d GetStartingPose();
 };
 
-#endif /* __SWERVE_TRAJECTORY_COMMAND_H__ */
+#endif /* __HOLD_POSITION_COMMAND_H__ */

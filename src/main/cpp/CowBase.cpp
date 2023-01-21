@@ -44,20 +44,22 @@ void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
     m_Bot->Reset();
+    printf("DISABLED INIT -------------------\n");
 }
 
 void CowBase::AutonomousInit()
 {
-    // m_Bot->GetGyro()->FinalizeCalibration();
-    // m_Bot->GetGyro()->ResetAngle();
+    m_Bot->GetDrivetrain()->ResetEncoders();
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
 
+    AutoModes::GetInstance()->NextMode();
+
     m_Bot->SetController(m_AutoController);
     m_Bot->Reset();
 
-    std::cout << "Starting auto" << std::endl;
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "start auto mode");
     m_AutoController->Start(m_Bot);
 }
 
@@ -83,13 +85,13 @@ void CowBase::DisabledPeriodic()
         m_Display->DisplayPeriodic();
     }
 
-    if (m_ControlBoard->GetAutoSelectButton())
+    if (m_ControlBoard->GetLeftDriveStickButton(7))
     {
         m_Constants->RestoreData();
 
         // TODO: change back to 7
         // if (m_ControlBoard->GetSteeringButton(7)) {
-        if (m_ControlBoard->GetOperatorButton(7))
+        if (m_ControlBoard->GetLeftDriveStickButton(7))
         {
             m_Bot->Reset();
 
@@ -110,8 +112,6 @@ void CowBase::DisabledPeriodic()
     if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
     {
         CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
-        // printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }
 }

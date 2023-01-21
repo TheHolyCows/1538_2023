@@ -5,6 +5,7 @@
 #include "../CowLib/CowMotorController.h"
 #include "../CowLib/CowPID.h"
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
+#include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveOdometry.h"
 #include "../CowLib/Utility.h"
 #include "../CowPigeon.h"
@@ -80,8 +81,9 @@ public:
 
     void Reset()
     {
-        ResetConstants(); // must be first so odometry is right
+        ResetConstants();
         ResetEncoders();
+        ResetOdometry(frc::Pose2d(0_ft, 0_ft, 0_deg));
     }
 
     void ResetOdometry(frc::Pose2d pose = frc::Pose2d{ 0_m, 0_m, 0_deg });
