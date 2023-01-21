@@ -28,7 +28,7 @@ namespace CowLib
      */
         double DegreesToFalcon(double degrees, double gearRatio)
         {
-            return degrees / (360.0 / (gearRatio * 2048));
+            return degrees * (gearRatio * 2048) / 360.0;
         }
 
         /**

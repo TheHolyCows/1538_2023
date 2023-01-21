@@ -20,9 +20,9 @@ class HoldPositionCommand : public RobotCommand
 private:
     CowLib::CowTimer *m_Timer;
 
-    frc2::PIDController* m_XController;
-    frc2::PIDController* m_YController;
-    frc2::PIDController* m_RotationController;
+    frc2::PIDController *m_XController;
+    frc2::PIDController *m_YController;
+    frc2::PIDController *m_RotationController;
 
     double m_TotalTime;
     bool m_Stop;
@@ -32,7 +32,7 @@ private:
     frc::Pose2d m_Pose;
 
 public:
-    HoldPositionCommand(frc::Pose2d pose, double time, double maxVelocity, bool stopAtEnd, bool resetOdometry = false);
+    HoldPositionCommand(double time, double maxVelocity, bool stopAtEnd, bool resetOdometry = false);
     ~HoldPositionCommand() override;
 
     bool IsComplete() override;

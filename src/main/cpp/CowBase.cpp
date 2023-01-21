@@ -50,8 +50,6 @@ void CowBase::DisabledInit()
 void CowBase::AutonomousInit()
 {
     m_Bot->GetDrivetrain()->ResetEncoders();
-    // m_Bot->GetGyro()->FinalizeCalibration();
-    // m_Bot->GetGyro()->ResetAngle();
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
@@ -61,7 +59,7 @@ void CowBase::AutonomousInit()
     m_Bot->SetController(m_AutoController);
     m_Bot->Reset();
 
-    std::cout << "Starting auto" << std::endl;
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "start auto mode");
     m_AutoController->Start(m_Bot);
 }
 
@@ -114,8 +112,6 @@ void CowBase::DisabledPeriodic()
     if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
     {
         CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
-        // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "gyro angle %f", CowPigeon::GetInstance()->GetYaw());
-        // printf("Gryo angle %f\n", CowPigeon::GetInstance()->GetYaw());
         m_DisabledCount = 1;
     }
 }

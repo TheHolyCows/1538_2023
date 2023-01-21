@@ -27,7 +27,7 @@ void AutoModeController::Start(CowRobot *bot)
     m_CommandList.pop_front();
     m_CurrentCommand->Start(bot);
     std::cout << "Starting command is " << m_CurrentCommand << std::endl;
-    m_Started = false;
+    m_Started = true;
 }
 
 // 1678 does all this logic in another thread for some reason... I can't figure out why. I will not regret this.
@@ -80,6 +80,6 @@ void AutoModeController::Handle(CowRobot *bot)
 // Gets called after SetCommandList btw
 void AutoModeController::Reset()
 {
-    m_Started = false;
+    m_Started        = false;
     m_CurrentCommand = new NullCommand();
 }

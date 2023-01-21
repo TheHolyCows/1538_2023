@@ -1,14 +1,10 @@
 #include "HoldPositionCommand.h"
 
-HoldPositionCommand::HoldPositionCommand(frc::Pose2d pose,
-                                         double time,
-                                         double maxVelocity,
-                                         bool stopAtEnd,
-                                         bool resetOdometry)
+HoldPositionCommand::HoldPositionCommand(double time, double maxVelocity, bool stopAtEnd, bool resetOdometry)
 {
-    m_Timer         = new CowLib::CowTimer();
-    m_Stop          = stopAtEnd;
-    m_Pose          = pose;
+    m_Timer = new CowLib::CowTimer();
+    m_Stop  = stopAtEnd;
+    // m_Pose          = pose;
     m_MaxVelocity   = maxVelocity;
     m_ResetOdometry = resetOdometry;
 
@@ -56,14 +52,16 @@ void HoldPositionCommand::Start(CowRobot *robot)
 {
     if (m_ResetOdometry)
     {
-        robot->GetDrivetrain()->ResetOdometry(m_Pose);
-
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                                  "Initial pose: x %f, y %f, d %f",
-                                  m_Pose.X().convert<units::foot>().value(),
-                                  m_Pose.Y().convert<units::foot>().value(),
-                                  m_Pose.Rotation().Degrees().value());
+        robot->GetDrivetrain()->ResetOdometry(frc::Pose2d{ 0_ft, 0_ft, 0_deg });
     }
+
+    m_Pose = robot->GetDrivetrain()->GetPose();
+
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+                              "Initial pose: x %f, y %f, d %f",
+                              m_Pose.X().convert<units::foot>().value(),
+                              m_Pose.Y().convert<units::foot>().value(),
+                              m_Pose.Rotation().Degrees().value());
 
     m_Timer->Reset();
     m_Timer->Start();
@@ -77,11 +75,6 @@ void HoldPositionCommand::Handle(CowRobot *robot)
                               currentPose.X().value(),
                               currentPose.Y().value(),
                               currentPose.Rotation().Degrees().value());
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-    //                           "set to:  x %f y %f angle %f",
-    //                           m_Pose.X().value(),
-    //                           m_Pose.Y().value(),
-    //                           m_Pose.Rotation().Degrees().value());
 
     double vx    = m_XController->Calculate(currentPose.X().convert<units::foot>().value(),
                                          m_Pose.X().convert<units::foot>().value());
@@ -91,14 +84,6 @@ void HoldPositionCommand::Handle(CowRobot *robot)
                                                    m_Pose.Rotation().Degrees().value());
 
     auto chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
-
-    // CowLib::CowChassisSpeeds chassisSpeeds
-    //     = m_HolonomicController->Calculate(currentPose, m_Pose, m_MaxVelocity, m_Pose.Rotation().Degrees().value());
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-    //                           "vx: %f, vy: %f, o: %f",
-    //                           chassisSpeeds.vx,
-    //                           chassisSpeeds.vy,
-    //                           chassisSpeeds.omega);
 
     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
                               "set to:  x %f y %f angle %f",
