@@ -1,38 +1,38 @@
-//==================================================
-// Copyright (C) 2023 Team 1538 / The Holy Cows
-// Arm.h
-// author: Cole/JT/Constantine
-// created on: 2023-1-14
-//==================================================
+// //==================================================
+// // Copyright (C) 2023 Team 1538 / The Holy Cows
+// // Arm.h
+// // author: Cole/JT/Constantine
+// // created on: 2023-1-14
+// //==================================================
 
-#ifndef SRC_SUBSYSTEMS_ARM_H_
-#define SRC_SUBSYSTEMS_ARM_H_
+// #ifndef SRC_SUBSYSTEMS_ARM_H_
+// #define SRC_SUBSYSTEMS_ARM_H_
 
-#include "../CowConstants.h"
-#include "../CowLib/CowMotorController.h"
+// #include "../CowConstants.h"
+// #include "../CowLib/CowMotorController.h"
 
-#include <iostream>
+// #include <iostream>
 
-class Arm
-{
-private:
-    CowLib::CowMotorController *m_LeftMotor;
-    CowLib::CowMotorController *m_RightMotor;
+// class Arm
+// {
+// private:
+//     CowLib::CowMotorController *m_LeftMotor;
+//     CowLib::CowMotorController *m_RightMotor;
 
-    double m_Position;
+//     double m_Position;
 
-public:
-    Arm(int leftMotor, int rightMotor);
+// public:
+//     Arm(int leftMotor, int rightMotor);
 
-    void SetPosition(double position);
+//     void SetPosition(double position);
 
-    double GetPosition();
+//     double GetPosition();
 
-    void ResetConstants();
+//     void ResetConstants();
 
-    void Handle();
+//     void Handle();
 
-    virtual ~Arm();
-};
+//     virtual ~Arm();
+// };
 
-#endif /* SRC_SUBSYSTEMS_ARM_H_ */
+// #endif /* SRC_SUBSYSTEMS_ARM_H_ */

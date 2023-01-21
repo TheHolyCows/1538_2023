@@ -10,6 +10,7 @@
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveModuleState.h"
 
+#include <ctre/phoenixpro/TalonFX.hpp>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/DataLogManager.h>
 #include <frc/geometry/Rotation2d.h>
@@ -29,6 +30,9 @@ private:
 
     CowLib::CowMotorController *m_DriveMotor;
     CowLib::CowMotorController *m_RotationMotor;
+
+    ctre::phoenixpro::controls::VelocityDutyCycle *m_DriveControlRequest;
+    ctre::phoenixpro::controls::PositionDutyCycle *m_RotationControlRequest;
 
     CowLib::CowCANCoder *m_Encoder;
 

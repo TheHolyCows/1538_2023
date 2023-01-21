@@ -240,14 +240,14 @@ namespace CowLib
             int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
             if (m_RegisteredMotors[debugMotorID] != NULL)
             {
-                double setPoint;
-                double procVar;
-                double P;
-                double I;
-                double D;
-                m_RegisteredMotors[debugMotorID]->GetPIDData(&setPoint, &procVar, &P, &I, &D);
+                // double setPoint;
+                // double procVar;
+                // double P;
+                // double I;
+                // double D;
+                // m_RegisteredMotors[debugMotorID]->GetPIDData(&setPoint, &procVar, &P, &I, &D);
 
-                LogPID(debugMotorID, setPoint, procVar, P, I, D);
+                // LogPID(debugMotorID, setPoint, procVar, P, I, D);
             }
         }
 
@@ -260,13 +260,13 @@ namespace CowLib
             {
                 if (m_RegisteredMotors[m_IdToLog] != NULL)
                 {
-                    logsThisTick--;
-                    double temp;
-                    double encoderCt;
-                    bool isInverted;
-                    m_RegisteredMotors[m_IdToLog]->GetLogData(&temp, &encoderCt, &isInverted);
+                    // logsThisTick--;
+                    // double temp;
+                    // double encoderCt;
+                    // bool isInverted;
+                    // m_RegisteredMotors[m_IdToLog]->GetLogData(&temp, &encoderCt, &isInverted);
 
-                    LogMotor(m_IdToLog, temp, encoderCt);
+                    // LogMotor(m_IdToLog, temp, encoderCt);
                 }
                 m_IdToLog++;
             }

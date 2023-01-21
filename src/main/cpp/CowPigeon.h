@@ -1,7 +1,7 @@
 #ifndef __COW_PIGEON_H__
 #define __COW_PIGEON_H__
 
-#include <ctre/phoenix/sensors/Pigeon2.h>
+#include <ctre/phoenixpro/Pigeon2.hpp>
 
 class CowPigeon
 {
@@ -11,7 +11,7 @@ private:
     CowPigeon();
     ~CowPigeon() = default;
 
-    ctre::phoenix::sensors::Pigeon2 *m_Pigeon;
+    ctre::phoenixpro::hardware::Pigeon2 *m_Pigeon;
 
     bool m_Inverted;
 
@@ -22,17 +22,16 @@ public:
 
     void SetInverted(bool inverted);
 
-    double GetYaw();
-    double GetPitch();
-    double GetRoll();
+    units::degree_t GetYaw();
+    units::degree_t GetPitch();
+    units::degree_t GetRoll();
 
+    double GetYawDegrees();
+    double GetPitchDegrees();
+    double GetRollDegrees();
+
+    void SetYaw(units::degree_t angle);
     void SetYaw(double angle);
-    // void SetPitch(double angle);
-    // void SetRoll(double angle);
-
-    double GetRawYaw();
-    double GetRawPitch();
-    double GetRawRoll();
 };
 
 #endif /* __COW_PIGEON_H__ */

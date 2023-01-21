@@ -1,71 +1,71 @@
-//==================================================
-// Copyright (C) 2022 Team 1538 / The Holy Cows
-// Climber.h
-// author: ssemtner
-// created on: 2022-3-17
-//==================================================
+// //==================================================
+// // Copyright (C) 2022 Team 1538 / The Holy Cows
+// // Climber.h
+// // author: ssemtner
+// // created on: 2022-3-17
+// //==================================================
 
-#ifndef SRC_SUBSYSTEMS_CLIMBER_H_
-#define SRC_SUBSYSTEMS_CLIMBER_H_
+// #ifndef SRC_SUBSYSTEMS_CLIMBER_H_
+// #define SRC_SUBSYSTEMS_CLIMBER_H_
 
-#include "../CowConstants.h"
-#include "../CowLib/CowMotorController.h"
-#include "../CowLib/CowTimer.h"
+// #include "../CowConstants.h"
+// #include "../CowLib/CowMotorController.h"
+// #include "../CowLib/CowTimer.h"
 
-#include <iostream>
+// #include <iostream>
 
-class Climber
-{
-private:
-    CowLib::CowMotorController *m_LeftMotor;
-    CowLib::CowMotorController *m_RightMotor;
+// class Climber
+// {
+// private:
+//     CowLib::CowMotorController *m_LeftMotor;
+//     CowLib::CowMotorController *m_RightMotor;
 
-    double m_LeftPosition;
-    double m_RightPosition;
+//     double m_LeftPosition;
+//     double m_RightPosition;
 
-    int m_State = 0;
-    void ClimberSM(void);
+//     int m_State = 0;
+//     void ClimberSM(void);
 
-    enum CLIMB_STATE
-    {
-        NONE = 0,
-        EXT_BOTH,
-        CLIMB_MID,
-        EXT_LEFT_MID,
-        CLIMB_HIGH,
-        EXT_RIGHT_HIGH,
-        EXT_RIGHT_TRAV,
-        CLIMB_TRAV,
-    };
+//     enum CLIMB_STATE
+//     {
+//         NONE = 0,
+//         EXT_BOTH,
+//         CLIMB_MID,
+//         EXT_LEFT_MID,
+//         CLIMB_HIGH,
+//         EXT_RIGHT_HIGH,
+//         EXT_RIGHT_TRAV,
+//         CLIMB_TRAV,
+//     };
 
-public:
-    Climber(int leftMotor, int rightMotor);
+// public:
+//     Climber(int leftMotor, int rightMotor);
 
-    void SetLeftPosition(double position);
-    void SetRightPosition(double position);
+//     void SetLeftPosition(double position);
+//     void SetRightPosition(double position);
 
-    double GetLeftPosition();
-    double GetRightPosition();
+//     double GetLeftPosition();
+//     double GetRightPosition();
 
-    double GetLeftSetpoint() { return m_LeftPosition; }
+//     double GetLeftSetpoint() { return m_LeftPosition; }
 
-    double GetRightSetpoint() { return m_RightPosition; }
+//     double GetRightSetpoint() { return m_RightPosition; }
 
-    void NextState(void);
-    void PrevState(void);
+//     void NextState(void);
+//     void PrevState(void);
 
-    // bool LeftAtTarget();
-    // bool RightAtTarget();
-    // bool AtTarget()
-    // {
-    //     return LeftAtTarget() && RightAtTarget();
-    // }
+//     // bool LeftAtTarget();
+//     // bool RightAtTarget();
+//     // bool AtTarget()
+//     // {
+//     //     return LeftAtTarget() && RightAtTarget();
+//     // }
 
-    void ResetConstants();
+//     void ResetConstants();
 
-    void handle();
+//     void handle();
 
-    virtual ~Climber();
-};
+//     virtual ~Climber();
+// };
 
-#endif /* SRC_SUBSYSTEMS_CLIMBER_H_ */
+// #endif /* SRC_SUBSYSTEMS_CLIMBER_H_ */
