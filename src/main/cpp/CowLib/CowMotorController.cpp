@@ -1,5 +1,6 @@
 #include "CowMotorController.h"
 
+#include "CowLogger.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 #include "units/current.h"
@@ -10,6 +11,7 @@ namespace CowLib
     CowMotorController::CowMotorController(int id)
     {
         m_Talon = new ctre::phoenixpro::hardware::TalonFX(id, "cowbus");
+        CowLogger::GetInstance()->RegisterMotor(id, this);
     }
 
     CowMotorController::~CowMotorController()
@@ -187,6 +189,11 @@ namespace CowLib
         return m_Talon->SetRotorPosition(units::turn_t{ turns });
     }
 
+    void CowMotorController::SetInverted(bool inverted)
+    {
+        m_Talon->SetInverted(inverted);
+    }
+
     void CowMotorController::SetPID(double p, double i, double d, double f)
     {
         auto config = ctre::phoenixpro::configs::Slot0Configs{};
@@ -207,6 +214,20 @@ namespace CowLib
         config.MotionMagicAcceleration   = acceleration;
 
         ApplyConfig(config);
+    }
+
+    void CowMotorController::GetPIDData(double *setpoint, double *procVar, double *P, double *I, double *D)
+    {
+        *setpoint = -1;
+        *procVar  = GetPosition();
+        *P        = -1;
+        *I        = -1;
+        *D        = -1;
+    }
+
+    void CowMotorController::GetLogData(double *temp, double *encoderCt, bool *isInverted)
+    {
+        *encoderCt = GetPosition();
     }
 
 } // namespace CowLib
