@@ -31,8 +31,11 @@ private:
     CowLib::CowMotorController *m_DriveMotor;
     CowLib::CowMotorController *m_RotationMotor;
 
-    ctre::phoenixpro::controls::DutyCycleOut m_DriveControlRequest{ 0 };
-    ctre::phoenixpro::controls::PositionDutyCycle m_RotationControlRequest{ 0_tr };
+    CowLib::CowMotorController::PercentOutput m_DriveControlRequest;
+    CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
+
+    // ctre::phoenixpro::controls::DutyCycleOut m_DriveControlRequest{ 0 };
+    // ctre::phoenixpro::controls::PositionDutyCycle m_RotationControlRequest{ 0_tr };
 
     CowLib::CowCANCoder *m_Encoder;
 

@@ -5,6 +5,8 @@
 #ifndef __COWLIB_COWMOTORCONTROLLER_H__
 #define __COWLIB_COWMOTORCONTROLLER_H__
 
+#include "ctre/phoenixpro/controls/MotionMagicDutyCycle.hpp"
+
 #include <ctre/phoenixpro/TalonFX.hpp>
 #include <variant>
 
@@ -12,69 +14,93 @@ namespace CowLib
 {
     class CowMotorController
     {
-    public:
-        enum ControlMode
-        {
-            NO_CONTROL_MODE,
-            OUT,
-            POSITION,
-            VELOCITY,
-            MOTION_MAGIC,
-            FOLLOWER
-        };
-
-        enum ControlMethod
-        {
-            NO_CONTROL_METHOD,
-            DUTY_CYCLE,
-            VOLTAGE,
-            TORQUE
-        };
-
     private:
         ctre::phoenixpro::hardware::TalonFX *m_Talon;
-        ctre::phoenixpro::controls::ControlRequest *m_ControlRequest;
-        ControlMode m_ControlMode;
-        ControlMethod m_ControlMethod;
-        double m_Offset;
-
-        ctre::phoenixpro::controls::ControlRequest *TranslateControlMode(ControlMode mode,
-                                                                         ControlMethod method,
-                                                                         double value,
-                                                                         double feedforward     = 0,
-                                                                         bool useFOC            = true,
-                                                                         bool overrideBrakeMode = false);
+        double m_Setpoint;
+        bool m_UseFOC;
+        bool m_OverrideBrakeMode;
 
     public:
+        struct PercentOutput
+        {
+            double PercentOut;
+
+            double GetSetpoint() { return PercentOut; }
+
+            ctre::phoenixpro::controls::DutyCycleOut ToControlRequest() { return { PercentOut }; }
+        };
+
+        struct PositionPercentOutput
+        {
+            double Position;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::PositionDutyCycle ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct VelocityPercentOutput
+        {
+            double Velocity;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Velocity; }
+
+            ctre::phoenixpro::controls::VelocityDutyCycle ToControlRequest()
+            {
+                return { units::turns_per_second_t{ Velocity }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct MotionMagicPercentOutput
+        {
+            double Position;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::MotionMagicDutyCycle ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct Follower
+        {
+            int MasterID;
+            bool Invert = false;
+
+            ctre::phoenixpro::controls::Follower ToControlRequest() { return { MasterID, Invert }; }
+        };
+
         CowMotorController(int id);
+
         ~CowMotorController();
 
-        ctre::phoenixpro::hardware::TalonFX *GetInternalTalon();
+        void Set(std::variant<PositionPercentOutput, PercentOutput> request);
+
+        void UseFOC(bool useFOC);
+        void OverrideBrakeMode(bool overrideBrakeMode);
 
         void ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
                                       ctre::phoenixpro::configs::Slot0Configs,
                                       ctre::phoenixpro::configs::MotionMagicConfigs> config);
-
-        // out, position, velocity, motion magic, follower
-        // position, velocity, torque
-        // ctre::phoenixpro::controls::PositionDutyCycle
-
-        void SetControl(ctre::phoenixpro::controls::ControlRequest &control);
-
-        void SetControlMode(ControlMode mode);
-        void SetControlMethod(ControlMethod method);
 
         double GetPosition();
         double GetVelocity();
 
         int SetSensorPosition(double turns);
 
-        void Set(double value);
-
         void SetPID(double p, double i, double d, double f = 0.0);
         void SetMotionMagic(double velocity, double acceleration);
 
         void SetInverted(bool inverted);
+
+        ctre::phoenixpro::hardware::TalonFX *GetInternalTalon();
 
         void GetPIDData(double *setpoint, double *procVar, double *P, double *I, double *D);
         void GetLogData(double *temp, double *encoderCt, bool *isInverted);

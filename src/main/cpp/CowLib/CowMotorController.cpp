@@ -1,16 +1,17 @@
 #include "CowMotorController.h"
 
 #include "CowLogger.h"
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/current.h"
 
 namespace CowLib
 {
 
     CowMotorController::CowMotorController(int id)
     {
-        m_Talon = new ctre::phoenixpro::hardware::TalonFX(id, "cowbus");
+        m_Talon             = new ctre::phoenixpro::hardware::TalonFX(id, "cowbus");
+        m_Setpoint          = 0;
+        m_UseFOC            = true;
+        m_OverrideBrakeMode = false;
+
         CowLogger::GetInstance()->RegisterMotor(id, this);
     }
 
@@ -19,146 +20,31 @@ namespace CowLib
         delete m_Talon;
     }
 
-    ctre::phoenixpro::hardware::TalonFX *CowMotorController::GetInternalTalon()
+    void CowMotorController::Set(std::variant<PositionPercentOutput, PercentOutput> request)
     {
-        return m_Talon;
+        auto &talon            = m_Talon;
+        double *setpoint       = &m_Setpoint;
+        bool useFOC            = m_UseFOC;
+        bool overrideBrakeMode = m_OverrideBrakeMode;
+        visit(
+            [talon, setpoint, useFOC, overrideBrakeMode](auto &&req)
+            {
+                talon->SetControl(
+                    req.ToControlRequest().WithEnableFOC(useFOC).WithOverrideBrakeDurNeutral(overrideBrakeMode));
+                *setpoint = req.GetSetpoint();
+            },
+            request);
     }
 
-    ctre::phoenixpro::controls::ControlRequest *CowMotorController::TranslateControlMode(ControlMode mode,
-                                                                                         ControlMethod method,
-                                                                                         double value,
-                                                                                         double feedForward,
-                                                                                         bool useFOC,
-                                                                                         bool overrideBrakeMode)
+    void CowMotorController::UseFOC(bool useFOC)
     {
-        switch (mode)
-        {
-        case OUT :
-            if (method == DUTY_CYCLE)
-            {
-                return new ctre::phoenixpro::controls::DutyCycleOut(value, useFOC, overrideBrakeMode);
-            }
-            else if (method == VOLTAGE)
-            {
-                return new ctre::phoenixpro::controls::VoltageOut(units::volt_t{ value }, useFOC, overrideBrakeMode);
-            }
-            else if (method == TORQUE)
-            {
-                return new ctre::phoenixpro::controls::TorqueCurrentFOC(units::ampere_t{ 0_A },
-                                                                        1.0,
-                                                                        0_A,
-                                                                        overrideBrakeMode);
-            }
-            else
-            {
-                return nullptr;
-            }
-
-        case POSITION :
-        {
-            auto position = units::turn_t{ value };
-
-            if (method == DUTY_CYCLE)
-            {
-                return new ctre::phoenixpro::controls::PositionDutyCycle(position, useFOC, 0, 0, overrideBrakeMode);
-            }
-            else if (method == VOLTAGE)
-            {
-                return new ctre::phoenixpro::controls::PositionVoltage(position, useFOC, 0_V, 0, overrideBrakeMode);
-            }
-            else if (method == TORQUE)
-            {
-                return new ctre::phoenixpro::controls::PositionTorqueCurrentFOC(position, 0_A, 0, overrideBrakeMode);
-            }
-            else
-            {
-                return nullptr;
-            }
-        }
-        case VELOCITY :
-        {
-            auto velocity = units::turns_per_second_t{ value };
-
-            if (method == DUTY_CYCLE)
-            {
-                return new ctre::phoenixpro::controls::VelocityDutyCycle(velocity, useFOC, 0, 0, overrideBrakeMode);
-            }
-            else if (method == VOLTAGE)
-            {
-                return new ctre::phoenixpro::controls::VelocityVoltage(velocity, useFOC, 0_V, 0, overrideBrakeMode);
-            }
-            else if (method == TORQUE)
-            {
-                return new ctre::phoenixpro::controls::VelocityTorqueCurrentFOC(velocity, 0_A, 0, overrideBrakeMode);
-            }
-            else
-            {
-                return nullptr;
-            }
-        }
-        case MOTION_MAGIC :
-        {
-            auto position = units::turn_t{ value };
-
-            if (method == DUTY_CYCLE)
-            {
-                return new ctre::phoenixpro::controls::MotionMagicDutyCycle(position, useFOC, 0, 0, overrideBrakeMode);
-            }
-            else if (method == VOLTAGE)
-            {
-                return new ctre::phoenixpro::controls::MotionMagicVoltage(position, useFOC, 0_V, 0, overrideBrakeMode);
-            }
-            else if (method == TORQUE)
-            {
-                return new ctre::phoenixpro::controls::MotionMagicTorqueCurrentFOC(position, 0, 0, overrideBrakeMode);
-            }
-            else
-            {
-                return nullptr;
-            }
-        }
-        case FOLLOWER :
-            return new ctre::phoenixpro::controls::Follower(value, false);
-        case NO_CONTROL_MODE :
-            return nullptr;
-        default :
-            return nullptr;
-        }
+        m_UseFOC = useFOC;
     }
 
-    void CowMotorController::SetControlMode(ControlMode mode)
+    void CowMotorController::OverrideBrakeMode(bool overrideBrakeMode)
     {
-        auto newCtrl = TranslateControlMode(mode, m_ControlMethod, 0, 0, true, false);
-        if (newCtrl == nullptr)
-        {
-            return;
-        }
-
-        m_ControlMode = mode;
-        if (typeid(*m_ControlRequest) != typeid(*newCtrl))
-        {
-            m_ControlRequest = newCtrl;
-        }
-    };
-
-    void CowMotorController::Set(double value)
-    {
-        // switch (m_ControlMethod)
-        // {
-        // case DUTY_CYCLE :)
-        //     break;
-        // case VOLTAGE :
-        //     break;
-        // case TORQUE :
-        //     break;
-        // default :
-        //     break;
-        // }
+        m_OverrideBrakeMode = overrideBrakeMode;
     }
-
-    void CowMotorController::SetControlMethod(ControlMethod method){
-
-    };
 
     void CowMotorController::ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
                                                       ctre::phoenixpro::configs::Slot0Configs,
@@ -167,11 +53,6 @@ namespace CowLib
         auto &configuator = m_Talon->GetConfigurator();
 
         visit([&configuator](auto &&config) { configuator.Apply(config); }, config);
-    }
-
-    void CowMotorController::SetControl(ctre::phoenixpro::controls::ControlRequest &control)
-    {
-        m_Talon->SetControl(control);
     }
 
     double CowMotorController::GetPosition()
@@ -187,11 +68,6 @@ namespace CowLib
     int CowMotorController::SetSensorPosition(double turns)
     {
         return m_Talon->SetRotorPosition(units::turn_t{ turns });
-    }
-
-    void CowMotorController::SetInverted(bool inverted)
-    {
-        m_Talon->SetInverted(inverted);
     }
 
     void CowMotorController::SetPID(double p, double i, double d, double f)
@@ -216,9 +92,19 @@ namespace CowLib
         ApplyConfig(config);
     }
 
+    void CowMotorController::SetInverted(bool inverted)
+    {
+        m_Talon->SetInverted(inverted);
+    }
+
+    ctre::phoenixpro::hardware::TalonFX *CowMotorController::GetInternalTalon()
+    {
+        return m_Talon;
+    }
+
     void CowMotorController::GetPIDData(double *setpoint, double *procVar, double *P, double *I, double *D)
     {
-        *setpoint = -1;
+        *setpoint = m_Setpoint;
         *procVar  = GetPosition();
         *P        = -1;
         *I        = -1;
@@ -227,7 +113,9 @@ namespace CowLib
 
     void CowMotorController::GetLogData(double *temp, double *encoderCt, bool *isInverted)
     {
-        *encoderCt = GetPosition();
+        *temp       = m_Talon->GetDeviceTemp().Refresh().GetValue().value();
+        *encoderCt  = GetPosition();
+        *isInverted = m_Talon->GetInverted();
     }
 
 } // namespace CowLib
