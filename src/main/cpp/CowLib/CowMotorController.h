@@ -36,6 +36,7 @@ namespace CowLib
         ctre::phoenixpro::controls::ControlRequest *m_ControlRequest;
         ControlMode m_ControlMode;
         ControlMethod m_ControlMethod;
+        double m_Offset;
 
         ctre::phoenixpro::controls::ControlRequest *TranslateControlMode(ControlMode mode,
                                                                          ControlMethod method,
@@ -72,6 +73,11 @@ namespace CowLib
 
         void SetPID(double p, double i, double d, double f = 0.0);
         void SetMotionMagic(double velocity, double acceleration);
+
+        void SetInverted(bool inverted);
+
+        void GetPIDData(double *setpoint, double *procVar, double *P, double *I, double *D);
+        void GetLogData(double *temp, double *encoderCt, bool *isInverted);
     };
 } // namespace CowLib
 

@@ -61,7 +61,7 @@ namespace CowLib
     {
         // m_Signals.absolutePosition->Refresh();
         // return m_Signals.absolutePosition->GetValue().value();
-        return m_AbsolutePositionSupplier().value();
+        return m_AbsolutePositionSupplier().value() * 360;
     }
 
     double CowCANCoder::GetVelocity()
