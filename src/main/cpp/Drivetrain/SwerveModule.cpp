@@ -22,13 +22,13 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
 
     auto driveConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
     m_DriveMotor->ApplyConfig(driveConfig);
-    m_DriveControlRequest = ctre::phoenixpro::controls::DutyCycleOut(0.0, true, false);
+    m_DriveControlRequest = { 0 };
 
     auto rotationConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
 
     m_RotationMotor->ApplyConfig(rotationConfig);
     m_RotationMotor->SetInverted(true);
-    m_RotationControlRequest = ctre::phoenixpro::controls::PositionDutyCycle(units::turn_t{ 0 }, true, 0, 0, false);
+    m_RotationControlRequest = { 0 };
 
     // init stat
     m_Velocity = 0;
@@ -98,7 +98,7 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
-    m_DriveControlRequest.Output = percentOutput;
+    m_DriveControlRequest.PercentOut = percentOutput;
     // = units::turns_per_second_t{ CowLib::Conversions::FPSToFalcon(optimized.velocity,
     //                                                               CONSTANT("WHEEL_CIRCUMFERENCE"),
     //                                                               CONSTANT("SWERVE_DRIVE_GEAR_RATIO")) };
@@ -117,7 +117,7 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
     m_PreviousAngle = targetAngle;
 
-    m_RotationControlRequest.Position = units::degree_t{ targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") };
+    m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
 }
 
 /**
@@ -161,8 +161,8 @@ void SwerveModule::ResetEncoders()
  */
 void SwerveModule::Handle()
 {
-    m_DriveMotor->SetControl(m_DriveControlRequest);
-    m_RotationMotor->SetControl(m_RotationControlRequest);
+    m_DriveMotor->Set(m_DriveControlRequest);
+    m_RotationMotor->Set(m_RotationControlRequest);
 
     // printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
 
