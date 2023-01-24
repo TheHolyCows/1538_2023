@@ -117,7 +117,12 @@ void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
                               double centerOfRotationX,
                               double centerOfRotationY)
 {
-    SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative);
+    SetVelocity(chassisSpeeds.vx,
+                chassisSpeeds.vy,
+                chassisSpeeds.omega,
+                isFieldRelative,
+                centerOfRotationX,
+                centerOfRotationY);
 }
 
 /**

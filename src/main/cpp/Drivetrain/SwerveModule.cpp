@@ -1,5 +1,7 @@
 #include "SwerveModule.h"
 
+#include "frc/smartdashboard/SmartDashboard.h"
+
 #include <frc/kinematics/SwerveModuleState.h>
 
 /**
@@ -31,9 +33,10 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     m_RotationControlRequest = { 0 };
 
     // init stat
-    m_Velocity = 0;
-    m_Angle    = 0;
-    m_Position = 0;
+    m_Velocity      = 0;
+    m_Angle         = 0;
+    m_Position      = 0;
+    m_PreviousAngle = 0;
 
     m_EncoderOffset = encoderOffset;
 
@@ -82,10 +85,13 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     // frc::SwerveModuleState::Optimize(wpistate, frc::Rotation2d(units::degree_t{ m_Angle }));
     // auto optimized = CowLib::CowSwerveModuleState::FromWPI(wpistate);
 
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target velocity", optimized.velocity);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " target angle", optimized.angle);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti ang", state.angle);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle to deg", m_Angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " optimized velocity", optimized.velocity);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " optimized angle", optimized.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti angle", state.angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle in deg", m_Angle);
+    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " rotation motor position (turns)",
+                                   m_RotationMotor->GetPosition());
+
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
     //                           "Module %d velocity: %f target angle: %f current angle: %f\n",
     //                           m_Id,
