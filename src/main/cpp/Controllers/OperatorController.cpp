@@ -1,6 +1,7 @@
 #include "OperatorController.h"
 
 #include <iostream>
+#include "math.h"
 
 OperatorController::OperatorController(CowControlBoard *controlboard)
     : m_CB(controlboard)
@@ -79,11 +80,11 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND"))
+    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(pow(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_EXPONENTIAL_SCALING")), CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND"))
+                                      CowLib::Deadband(pow(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_EXPONENTIAL_SCALING")), CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND"))
+                                      CowLib::Deadband(pow(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_EXPONENTIAL_SCALING")), CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
                                       fieldRelative,
                                       centerOfRotationX,
