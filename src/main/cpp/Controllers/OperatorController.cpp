@@ -11,7 +11,7 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
 
     m_EvasiveSwerveWheel = NONE;
 
-    m_ControllerExpFilter = new CowLib::CowExponentialFilter(CONSTANT("STICK_EXPONENTUAL_MODIFIER"));
+    m_ControllerExpFilter = new CowLib::CowExponentialFilter(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 }
 
 void OperatorController::Handle(CowRobot *bot)

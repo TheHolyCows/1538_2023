@@ -8,25 +8,20 @@
 #ifndef __COWLIB_EXPONENTIALFILTER_H__
 #define __COWLIB_EXPONENTIALFILTER_H__
 
-
 namespace CowLib
 {
 
     class CowExponentialFilter
     {
-        public:
-
+    public:
         CowExponentialFilter(double Exponent);
         double Filter(double Input);
-        virtual ~CowExponentialFilter();
+        // virtual ~CowExponentialFilter();
 
-        private:
+    private:
         double m_Exponent;
-
     };
 
+} /* namespace CowLib */
 
-}
-
-#endif
-// namespace CowLib
+#endif /* __COWLIB_EXPONENTIALFILTER_H__ */
