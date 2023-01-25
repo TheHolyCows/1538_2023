@@ -1,6 +1,8 @@
 #include "CowMotorController.h"
 
 #include "CowLogger.h"
+#include "ctre/phoenixpro/configs/Configs.hpp"
+#include "ctre/phoenixpro/signals/SpnEnums.hpp"
 
 namespace CowLib
 {
@@ -48,7 +50,8 @@ namespace CowLib
 
     void CowMotorController::ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
                                                       ctre::phoenixpro::configs::Slot0Configs,
-                                                      ctre::phoenixpro::configs::MotionMagicConfigs> config)
+                                                      ctre::phoenixpro::configs::MotionMagicConfigs,
+                                                      ctre::phoenixpro::configs::MotorOutputConfigs> config)
     {
         auto &configuator = m_Talon->GetConfigurator();
 
@@ -68,6 +71,42 @@ namespace CowLib
     int CowMotorController::SetSensorPosition(double turns)
     {
         return m_Talon->SetRotorPosition(units::turn_t{ turns });
+    }
+
+    void CowMotorController::SetNeutralMode(NeutralMode mode)
+    {
+        auto config = ctre::phoenixpro::configs::MotorOutputConfigs{};
+        m_Talon->GetConfigurator().Refresh(config);
+
+        switch (mode)
+        {
+        case COAST :
+            config.NeutralMode = ctre::phoenixpro::signals::NeutralModeValue::Coast;
+            break;
+        case BRAKE :
+            config.NeutralMode = ctre::phoenixpro::signals::NeutralModeValue::Brake;
+            break;
+        default :
+            break;
+        }
+
+        ApplyConfig(config);
+    }
+
+    CowMotorController::NeutralMode CowMotorController::GetNeutralMode()
+    {
+        auto config = ctre::phoenixpro::configs::MotorOutputConfigs{};
+        m_Talon->GetConfigurator().Refresh(config);
+
+        switch (config.NeutralMode.value)
+        {
+        case ctre::phoenixpro::signals::NeutralModeValue::Coast :
+            return COAST;
+        case ctre::phoenixpro::signals::NeutralModeValue::Brake :
+            return BRAKE;
+        default :
+            return COAST;
+        }
     }
 
     void CowMotorController::SetPID(double p, double i, double d, double f)

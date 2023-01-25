@@ -5,6 +5,7 @@
 #ifndef __COWLIB_COWMOTORCONTROLLER_H__
 #define __COWLIB_COWMOTORCONTROLLER_H__
 
+#include "ctre/phoenixpro/configs/Configs.hpp"
 #include "ctre/phoenixpro/controls/MotionMagicDutyCycle.hpp"
 
 #include <ctre/phoenixpro/TalonFX.hpp>
@@ -77,6 +78,12 @@ namespace CowLib
             ctre::phoenixpro::controls::Follower ToControlRequest() { return { MasterID, Invert }; }
         };
 
+        enum NeutralMode
+        {
+            COAST,
+            BRAKE
+        };
+
         CowMotorController(int id);
 
         ~CowMotorController();
@@ -88,12 +95,16 @@ namespace CowLib
 
         void ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
                                       ctre::phoenixpro::configs::Slot0Configs,
-                                      ctre::phoenixpro::configs::MotionMagicConfigs> config);
+                                      ctre::phoenixpro::configs::MotionMagicConfigs,
+                                      ctre::phoenixpro::configs::MotorOutputConfigs> config);
 
         double GetPosition();
         double GetVelocity();
 
         int SetSensorPosition(double turns);
+
+        void SetNeutralMode(NeutralMode mode);
+        NeutralMode GetNeutralMode();
 
         void SetPID(double p, double i, double d, double f = 0.0);
         void SetMotionMagic(double velocity, double acceleration);
