@@ -9,6 +9,7 @@
 #include "../CowControlBoard.h"
 #include "../CowLib/CowLatch.h"
 #include "../CowLib/CowLib.h"
+#include "../CowLib/CowExponentialFilter.h"
 #include "../CowRobot.h"
 #include "../Declarations.h"
 #include "../Subsystems/Limelight.h"
@@ -40,6 +41,8 @@ private:
     };
 
     Wheel m_EvasiveSwerveWheel;
+
+    CowLib::CowExponentialFilter* m_ControllerExpFilter;
 
 public:
     OperatorController(CowControlBoard *controlboard);
