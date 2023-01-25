@@ -14,6 +14,7 @@
 #include "CowLib/Utility.h"
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
+#include "Subsystems/Arm.h"
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/filter/LinearFilter.h>
@@ -25,6 +26,7 @@ class CowRobot
 public:
     // Drive Motors
     SwerveDrive *m_Drivetrain;
+    Arm *m_Arm;
 
 private:
     int m_DSUpdateCount;

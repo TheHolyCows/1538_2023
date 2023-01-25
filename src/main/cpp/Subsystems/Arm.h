@@ -1,38 +1,43 @@
-// //==================================================
-// // Copyright (C) 2023 Team 1538 / The Holy Cows
-// // Arm.h
-// // author: Cole/JT/Constantine
-// // created on: 2023-1-14
-// //==================================================
+//==================================================
+// Copyright (C) 2023 Team 1538 / The Holy Cows
+// Arm.h
+// author: Cole/JT/Constantine
+// created on: 2023-1-14
+//==================================================
 
-// #ifndef SRC_SUBSYSTEMS_ARM_H_
-// #define SRC_SUBSYSTEMS_ARM_H_
+#ifndef SRC_SUBSYSTEMS_ARM_H_
+#define SRC_SUBSYSTEMS_ARM_H_
 
-// #include "../CowConstants.h"
-// #include "../CowLib/CowMotorController.h"
+#include "../CowConstants.h"
+#include "../CowLib/CowMotorController.h"
 
-// #include <iostream>
+#include <iostream>
 
-// class Arm
-// {
-// private:
-//     CowLib::CowMotorController *m_LeftMotor;
-//     CowLib::CowMotorController *m_RightMotor;
+class Arm
+{
+private:
+    CowLib::CowMotorController *m_RotatorMotor;
+    CowLib::CowMotorController *m_TelescopeMotor;
 
-//     double m_Position;
+    CowLib::CowMotorController::PositionPercentOutput m_RotatorController;
+    CowLib::CowMotorController::PositionPercentOutput m_TelescopeController;
 
-// public:
-//     Arm(int leftMotor, int rightMotor);
+    double m_Position;
 
-//     void SetPosition(double position);
+public:
+    Arm(int rotatorMotor, int telescopeMotor);
 
-//     double GetPosition();
+    void SetRotatorPos(double position);
+    void SetTelescopePos(double position);
 
-//     void ResetConstants();
+    double GetRotatorPos();
+    double GetTelescopePos();
 
-//     void Handle();
+    void ResetConstants();
 
-//     virtual ~Arm();
-// };
+    void Handle();
 
-// #endif /* SRC_SUBSYSTEMS_ARM_H_ */
+    virtual ~Arm();
+};
+
+#endif /* SRC_SUBSYSTEMS_ARM_H_ */
