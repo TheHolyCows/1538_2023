@@ -1,63 +1,76 @@
-// //==================================================
-// // Copyright (C) 2023 Team 1538 / The Holy Cows
-// // Arm.h
-// // author: Cole/JT/Constantine
-// // created on: 2023-1-14
-// //==================================================
+//==================================================
+// Copyright (C) 2023 Team 1538 / The Holy Cows
+// Arm.h
+// author: Cole/JT/Constantine
+// created on: 2023-1-14
+//==================================================
 
-// #include "Arm.h"
+#include "Arm.h"
 
-// Arm::Arm(int leftMotor, int rightMotor)
-// {
-//     m_LeftMotor  = new CowLib::CowMotorController(leftMotor);
-//     m_RightMotor = new CowLib::CowMotorController(rightMotor);
+Arm::Arm(int rotatorMotor, int telescopeMotor)
+{
+    m_RotatorMotor   = new CowLib::CowMotorController(rotatorMotor);
+    m_TelescopeMotor = new CowLib::CowMotorController(telescopeMotor);
 
-//     m_LeftMotor->SetControlMode(CowLib::CowMotorController::POSITION);
-//     m_RightMotor->SetControlMode(CowLib::CowMotorController::POSITION);
+    // no longer works with Phoenix Pro
+    // m_RotatorMotor->SetControlMode(CowLib::CowMotorController::POSITION);
+    // m_TelescopeMotor->SetControlMode(CowLib::CowMotorController::POSITION);
 
-//     m_LeftMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
-//     m_RightMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    // don't think we want the rotator to be in brake mode so we can check max and min
+    // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
-//     // TODO: set one motor to inverted / as a follower
-//     m_RightMotor->GetInternalMotor()->SetSensorPhase(true);
-//     m_RightMotor->GetInternalMotor()->SetSensorPhase(false);
+    // check these
+    // m_RotatorMotor->SetInverted(true);
+    // m_TelescopeMotor->SetInverted(false);
 
-//     m_Position = 0;
+    m_RotatorController.Position   = 0;
+    m_TelescopeController.Position = 0;
 
-//     ResetConstants();
-// }
+    ResetConstants();
+}
 
-// void Arm::SetPosition(double position)
-// {
-//     m_Position = position;
-// }
+void Arm::SetRotatorPos(double position)
+{
+    m_RotatorController.Position = position;
+}
 
-// double Arm::GetPosition()
-// {
-//     return m_RightMotor->GetPosition();
-// }
+void Arm::SetTelescopePos(double position)
+{
+    m_TelescopeController.Position = position;
+}
 
-// void Arm::ResetConstants()
-// {
-//     m_LeftMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"), 1);
-//     m_RightMotor->SetPIDGains(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"), 1);
-// }
+double Arm::GetRotatorPos()
+{
+    return m_RotatorMotor->GetPosition();
+}
 
-// void Arm::Handle()
-// {
-//     if (m_LeftMotor)
-//     {
-//         m_LeftMotor->Set(m_Position);
-//     }
+double Arm::GetTelescopePos()
+{
+    return m_TelescopeMotor->GetPosition();
+}
 
-//     if (m_RightMotor)
-//     {
-//         m_RightMotor->Set(m_Position);
-//     }
-// }
+void Arm::ResetConstants()
+{
+    m_RotatorMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    m_TelescopeMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+}
 
-// Arm::~Arm()
-// {
-//     delete m_LeftMotor;
-//     delete m_RightMotor;
-// }
+void Arm::Handle()
+{
+    if (m_RotatorMotor)
+    {
+        m_RotatorMotor->Set(m_RotatorController);
+    }
+
+    if (m_TelescopeMotor)
+    {
+        m_TelescopeMotor->Set(m_TelescopeController);
+    }
+}
+
+Arm::~Arm()
+{
+    delete m_RotatorMotor;
+    delete m_TelescopeMotor;
+}
