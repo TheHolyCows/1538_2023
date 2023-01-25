@@ -17,8 +17,10 @@ namespace CowLib
         public:
 
         CowExponentialFilter(double Exponent);
+
         double Filter(double Input);
         virtual ~CowExponentialFilter();
+        void ResetConstants();
 
         private:
         double m_Exponent;
