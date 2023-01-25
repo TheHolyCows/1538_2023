@@ -1,70 +1,120 @@
 //==================================================
-// Copyright (C) 2018 Team 1538 / The Holy Cows
+// Copyright (C) 2023 Team 1538 / The Holy Cows
 //==================================================
 
 #ifndef __COWLIB_COWMOTORCONTROLLER_H__
 #define __COWLIB_COWMOTORCONTROLLER_H__
 
-#include "ctre/phoenix/motorcontrol/StatorCurrentLimitConfiguration.h"
+#include "ctre/phoenixpro/configs/Configs.hpp"
+#include "ctre/phoenixpro/controls/MotionMagicDutyCycle.hpp"
 
-#include <ctre/Phoenix.h>
+#include <ctre/phoenixpro/TalonFX.hpp>
+#include <variant>
 
 namespace CowLib
 {
     class CowMotorController
     {
-    public:
-        enum CowNeutralMode
-        {
-            JUMPER,
-            BRAKE,
-            COAST,
-        };
-
-        enum CowControlMode
-        {
-            PERCENTVBUS,
-            CURRENT,
-            SPEED,
-            POSITION,
-            VOLTAGE,
-            FOLLOWER,
-            MOTIONPROFILE,
-            MOTIONMAGIC
-        };
-
-        CowMotorController(int deviceNum);
-        virtual ~CowMotorController();
-
-        void SetClosedLoopError(int error);
-        void SetNeutralMode(CowNeutralMode);
-        enum CowNeutralMode GetNeutralMode();
-        void SetControlMode(CowControlMode);
-        enum CowControlMode GetControlMode();
-        double GetPosition();
-        void SetSensorPosition(double position);
-        void SetPIDGains(double pGain, double iGain, double dGain, double fGain, double peakOutput);
-        void SetMotionMagic(double accel, double velocity);
-        void Set(double);
-        void SetInverted(bool Value);
-        void SetPeakCurrent(int amps, int ms);
-        void SetStatorLimit(double limit, double threshold, double duration);
-        double GetOutputCurrent();
-        TalonFX *GetInternalMotor();
-
-        // logging utility
-        void GetPIDData(double *setPoint, double *procVar, double *P, double *I, double *D);
-        void GetLogData(double *temp, double *encoderCt, bool *isInverted);
-
     private:
-        TalonFX *m_MotorController;
-        int m_DeviceNum;
-        enum CowNeutralMode m_CowNeutralMode;
-        enum CowControlMode m_CowControlMode;
+        ctre::phoenixpro::hardware::TalonFX *m_Talon;
+        double m_Setpoint;
+        bool m_UseFOC;
+        bool m_OverrideBrakeMode;
 
-        double m_SetPoint;
+    public:
+        struct PercentOutput
+        {
+            double PercentOut;
 
-        ControlMode TranslateControlMode(enum CowControlMode);
+            double GetSetpoint() { return PercentOut; }
+
+            ctre::phoenixpro::controls::DutyCycleOut ToControlRequest() { return { PercentOut }; }
+        };
+
+        struct PositionPercentOutput
+        {
+            double Position;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::PositionDutyCycle ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct VelocityPercentOutput
+        {
+            double Velocity;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Velocity; }
+
+            ctre::phoenixpro::controls::VelocityDutyCycle ToControlRequest()
+            {
+                return { units::turns_per_second_t{ Velocity }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct MotionMagicPercentOutput
+        {
+            double Position;
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::MotionMagicDutyCycle ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, FeedForward, 0, false };
+            }
+        };
+
+        struct Follower
+        {
+            int MasterID;
+            bool Invert = false;
+
+            ctre::phoenixpro::controls::Follower ToControlRequest() { return { MasterID, Invert }; }
+        };
+
+        enum NeutralMode
+        {
+            COAST,
+            BRAKE
+        };
+
+        CowMotorController(int id);
+
+        ~CowMotorController();
+
+        void Set(std::variant<PositionPercentOutput, PercentOutput> request);
+
+        void UseFOC(bool useFOC);
+        void OverrideBrakeMode(bool overrideBrakeMode);
+
+        void ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
+                                      ctre::phoenixpro::configs::Slot0Configs,
+                                      ctre::phoenixpro::configs::MotionMagicConfigs,
+                                      ctre::phoenixpro::configs::MotorOutputConfigs> config);
+
+        double GetPosition();
+        double GetVelocity();
+
+        int SetSensorPosition(double turns);
+
+        void SetNeutralMode(NeutralMode mode);
+        NeutralMode GetNeutralMode();
+
+        void SetPID(double p, double i, double d, double f = 0.0);
+        void SetMotionMagic(double velocity, double acceleration);
+
+        void SetInverted(bool inverted);
+
+        ctre::phoenixpro::hardware::TalonFX *GetInternalTalon();
+
+        void GetPIDData(double *setpoint, double *procVar, double *P, double *I, double *D);
+        void GetLogData(double *temp, double *encoderCt, bool *isInverted);
     };
 } // namespace CowLib
 

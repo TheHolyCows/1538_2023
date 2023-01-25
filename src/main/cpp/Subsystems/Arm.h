@@ -16,17 +16,22 @@
 class Arm
 {
 private:
-    CowLib::CowMotorController *m_LeftMotor;
-    CowLib::CowMotorController *m_RightMotor;
+    CowLib::CowMotorController *m_RotatorMotor;
+    CowLib::CowMotorController *m_TelescopeMotor;
+
+    CowLib::CowMotorController::PositionPercentOutput m_RotatorController;
+    CowLib::CowMotorController::PositionPercentOutput m_TelescopeController;
 
     double m_Position;
 
 public:
-    Arm(int leftMotor, int rightMotor);
+    Arm(int rotatorMotor, int telescopeMotor);
 
-    void SetPosition(double position);
+    void SetRotatorPos(double position);
+    void SetTelescopePos(double position);
 
-    double GetPosition();
+    double GetRotatorPos();
+    double GetTelescopePos();
 
     void ResetConstants();
 

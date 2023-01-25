@@ -22,7 +22,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
-    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYaw(), 0, 0, 0);
+    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYawDegrees(), 0, 0, 0);
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -74,7 +74,7 @@ void SwerveDrive::SetVelocity(double vx,
     if (isFieldRelative)
     {
         // How does this know what angle it starts at
-        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetYaw());
+        chassisSpeeds = CowLib::CowChassisSpeeds::FromFieldRelativeSpeeds(vx, vy, omega, m_Gyro->GetYawDegrees());
     }
     else
     {
@@ -117,7 +117,12 @@ void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
                               double centerOfRotationX,
                               double centerOfRotationY)
 {
-    SetVelocity(chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega, isFieldRelative);
+    SetVelocity(chassisSpeeds.vx,
+                chassisSpeeds.vy,
+                chassisSpeeds.omega,
+                isFieldRelative,
+                centerOfRotationX,
+                centerOfRotationY);
 }
 
 /**
@@ -182,7 +187,7 @@ void SwerveDrive::Handle()
                    modulePositions.begin(),
                    [](SwerveModule *module) { return module->GetPosition(); });
 
-    m_Odometry->Update(m_Gyro->GetYaw(), modulePositions);
+    m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
     //                           "odometry pose: x %f, y %f, %fdeg",
