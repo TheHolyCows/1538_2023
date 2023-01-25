@@ -1,5 +1,4 @@
 #include "OperatorController.h"
-
 #include <iostream>
 
 OperatorController::OperatorController(CowControlBoard *controlboard)
@@ -8,6 +7,8 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
     m_TrackingCooldownTimer = 0.0;
 
     m_EvasiveSwerveWheel = NONE;
+
+    m_ControllerExpFilter = new CowLib::CowExponentialFilter(CONSTANT("STICK_EXPONENTUAL_MODIFIER"));
 }
 
 void OperatorController::Handle(CowRobot *bot)
@@ -79,11 +80,14 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND"))
+    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_ControllerExpFilter->Filter(m_CB->GetLeftDriveStickAxis(1))
+                                        , CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND"))
+                                      CowLib::Deadband(m_ControllerExpFilter->Filter(m_CB->GetLeftDriveStickAxis(0))
+                                        , CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND"))
+                                      CowLib::Deadband(m_ControllerExpFilter->Filter(m_CB->GetLeftDriveStickAxis(4))
+                                        , CONSTANT("STICK_DEADBAND"))
                                           * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
                                       fieldRelative,
                                       centerOfRotationX,
