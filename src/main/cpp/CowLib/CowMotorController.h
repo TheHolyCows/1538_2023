@@ -9,6 +9,7 @@
 #include "ctre/phoenixpro/controls/MotionMagicDutyCycle.hpp"
 
 #include <ctre/phoenixpro/TalonFX.hpp>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <variant>
 
 namespace CowLib
@@ -93,10 +94,10 @@ namespace CowLib
         void UseFOC(bool useFOC);
         void OverrideBrakeMode(bool overrideBrakeMode);
 
-        void ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
-                                      ctre::phoenixpro::configs::Slot0Configs,
-                                      ctre::phoenixpro::configs::MotionMagicConfigs,
-                                      ctre::phoenixpro::configs::MotorOutputConfigs> config);
+        int ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
+                                     ctre::phoenixpro::configs::Slot0Configs,
+                                     ctre::phoenixpro::configs::MotionMagicConfigs,
+                                     ctre::phoenixpro::configs::MotorOutputConfigs> config);
 
         double GetPosition();
         double GetVelocity();

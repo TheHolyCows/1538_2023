@@ -19,6 +19,7 @@
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/filter/LinearFilter.h>
 #include <frc/PowerDistribution.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <math.h>
 
 class CowRobot
@@ -27,6 +28,9 @@ public:
     // Drive Motors
     SwerveDrive *m_Drivetrain;
     Arm *m_Arm;
+    CowLib::CowMotorController *m_TestMotor;
+    CowLib::CowTimer *m_Timer;
+    int m_LoopCount;
 
 private:
     int m_DSUpdateCount;
@@ -56,6 +60,8 @@ private:
 
 public:
     CowRobot();
+    ~CowRobot();
+
     void Reset();
     void SetController(GenericController *controller);
     void PrintToDS();

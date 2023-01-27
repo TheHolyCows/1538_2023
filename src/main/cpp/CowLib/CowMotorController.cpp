@@ -48,14 +48,16 @@ namespace CowLib
         m_OverrideBrakeMode = overrideBrakeMode;
     }
 
-    void CowMotorController::ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
-                                                      ctre::phoenixpro::configs::Slot0Configs,
-                                                      ctre::phoenixpro::configs::MotionMagicConfigs,
-                                                      ctre::phoenixpro::configs::MotorOutputConfigs> config)
+    int CowMotorController::ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
+                                                     ctre::phoenixpro::configs::Slot0Configs,
+                                                     ctre::phoenixpro::configs::MotionMagicConfigs,
+                                                     ctre::phoenixpro::configs::MotorOutputConfigs> config)
     {
         auto &configuator = m_Talon->GetConfigurator();
 
-        visit([&configuator](auto &&config) { configuator.Apply(config); }, config);
+        int result = 0;
+        visit([&configuator, &result](auto &&config) { result = configuator.Apply(config); }, config);
+        return result;
     }
 
     double CowMotorController::GetPosition()
@@ -118,7 +120,7 @@ namespace CowLib
         config.kD = d;
         config.kV = f;
 
-        ApplyConfig(config);
+        frc::SmartDashboard::PutNumber("config res value", ApplyConfig(config));
     }
 
     void CowMotorController::SetMotionMagic(double velocity, double acceleration)

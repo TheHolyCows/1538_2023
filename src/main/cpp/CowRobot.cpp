@@ -1,5 +1,8 @@
 #include "CowRobot.h"
 
+#include "CowLib/CowMotorController.h"
+#include "CowLib/CowTimer.h"
+
 CowRobot::CowRobot()
 {
     m_MatchTime     = 0;
@@ -20,18 +23,25 @@ CowRobot::CowRobot()
     // TODO: reset constants needs to reset this
     // fl, fr, bl, br
     // drive motor, angle motor, encoder canId's
-    SwerveDrive::ModuleConstants swerveModuleConstants[4]{
-        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
-    };
+    // SwerveDrive::ModuleConstants swerveModuleConstants[4]{
+    //     SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+    //     SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+    //     SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+    //     SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
+    // };
 
-    m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
+    // m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
-    m_Drivetrain->ResetEncoders();
+    // m_Drivetrain->ResetEncoders();
 
     // m_Arm = new Arm(9, 10);
+
+    m_TestMotor = new CowLib::CowMotorController(1);
+
+    m_Timer = new CowLib::CowTimer();
+    m_Timer->Start();
+
+    m_LoopCount = 0;
 }
 
 /**
@@ -43,7 +53,7 @@ void CowRobot::Reset()
 
     m_PreviousGyroError = 0;
 
-    m_Drivetrain->ResetConstants();
+    // m_Drivetrain->ResetConstants();
 }
 
 /**
@@ -58,7 +68,7 @@ void CowRobot::SetController(GenericController *controller)
 
 void CowRobot::PrintToDS()
 {
-    if (m_DSUpdateCount % 10 == 0)
+    if (m_DSUpdateCount++ % 10 == 0)
     {
         m_DSUpdateCount = 0;
     }
@@ -77,7 +87,7 @@ void CowRobot::Handle()
     }
 
     m_Controller->Handle(this);
-    m_Drivetrain->Handle();
+    // m_Drivetrain->Handle();
 
     CowLib::CowLogger::GetInstance()->Handle();
 
@@ -91,6 +101,13 @@ void CowRobot::Handle()
     m_PrevZ = zVal;
 
     PrintToDS();
+
+    // m_Timer->Reset();
+    // m_TestMotor->SetPID(fmod(0.001 * (double) m_LoopCount, 1), 0, 0);
+    frc::SmartDashboard::PutNumber("gryo yaw", m_Gyro->GetYawDegrees());
+    frc::SmartDashboard::PutNumber("gryo pitch", m_Gyro->GetPitchDegrees());
+    frc::SmartDashboard::PutNumber("gryo roll", m_Gyro->GetRollDegrees());
+    // m_LoopCount++;
 }
 
 void CowRobot::StartTime()

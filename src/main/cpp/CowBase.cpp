@@ -49,7 +49,7 @@ void CowBase::DisabledInit()
 
 void CowBase::AutonomousInit()
 {
-    m_Bot->GetDrivetrain()->ResetEncoders();
+    // m_Bot->GetDrivetrain()->ResetEncoders();
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
