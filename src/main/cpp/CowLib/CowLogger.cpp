@@ -112,7 +112,7 @@ namespace CowLib
         SendLog(&logPacket, sizeof(logPacket));
     }
 
-    void CowLogger::LogGyroAngle(double angle)
+    void CowLogger::LogGyroAngle(double x, double y, double z)
     {
         if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
@@ -122,7 +122,10 @@ namespace CowLib
         CowGyroLog logPacket;
         logPacket.hdr.msgType = CowLogger::GYRO_LOG;
         logPacket.hdr.msgLen  = sizeof(CowGyroLog);
-        logPacket.angle       = angle;
+
+        logPacket.x = x;
+        logPacket.y = y;
+        logPacket.z = z;
 
         SendLog(&logPacket, sizeof(logPacket));
     }

@@ -58,7 +58,7 @@ namespace CowLib
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
         static void LogAutoMode(const char *);
-        static void LogGyroAngle(double);
+        static void LogGyroAngle(double, double, double);
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         void Handle();
@@ -130,7 +130,9 @@ namespace CowLib
         struct CowGyroLog
         {
             CowLogHdr hdr;
-            double angle;
+            double x;
+            double y;
+            double z;
         };
     };
 
