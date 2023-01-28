@@ -20,6 +20,9 @@ Arm::Arm(int rotationMotor, int telescopeMotor)
     // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
+    m_MinAngle = 0;
+    m_MaxAngle = 0;
+
     m_LoopCount = 0;
 
     // check these
@@ -84,6 +87,29 @@ void Arm::Handle()
 
         m_TelescopePosition = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
     }
+}
+
+void Arm::CheckMinMax()
+{
+    m_Angle = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+
+    if (m_Angle < m_MinAngle)
+    {
+        m_MinAngle = m_Angle;
+    }
+
+    if (m_Angle > m_MaxAngle)
+    {
+        m_MaxAngle = m_Angle;
+    }
+}
+
+void Arm::ZeroSensors()
+{
+    double angle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
+
+    m_RotationMotor->SetSensorPosition(
+        CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
 }
 
 Arm::~Arm()
