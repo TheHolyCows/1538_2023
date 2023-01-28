@@ -26,10 +26,14 @@ private:
     double m_TelescopePosition;
     double m_Angle;
 
+    double m_MinAngle;
+    double m_MaxAngle;
+
     int m_LoopCount;
 
 public:
     Arm(int rotationMotor, int telescopeMotor);
+    ~Arm();
 
     void SetAngle(double angle);
     void SetTelescopePosition(double position);
@@ -41,7 +45,8 @@ public:
 
     void Handle();
 
-    virtual ~Arm();
+    void CheckMinMax();
+    void ZeroSensors();
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */
