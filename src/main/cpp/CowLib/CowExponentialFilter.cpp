@@ -1,7 +1,5 @@
 #include "CowExponentialFilter.h"
 
-#include "math.h"
-
 namespace CowLib
 {
 
@@ -15,8 +13,9 @@ namespace CowLib
         input = pow(abs(input), m_Exponent) * input / abs(input);
     }
 
-    // CowExponentialFilter::~CowExponentialFilter()
-    // {
-    // }
+    void CowExponentialFilter::Reset(double newExponent)
+    {
+        m_Exponent = newExponent;
+    }
 
 } /* namespace CowLib */

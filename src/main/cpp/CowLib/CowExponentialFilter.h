@@ -8,6 +8,8 @@
 #ifndef __COWLIB_EXPONENTIALFILTER_H__
 #define __COWLIB_EXPONENTIALFILTER_H__
 
+#include "math.h"
+
 namespace CowLib
 {
 
@@ -15,8 +17,9 @@ namespace CowLib
     {
     public:
         CowExponentialFilter(double Exponent);
+
         double Filter(double Input);
-        // virtual ~CowExponentialFilter();
+        void Reset(double Input);
 
     private:
         double m_Exponent;
