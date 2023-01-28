@@ -59,9 +59,9 @@ void CowRobot::SetController(GenericController *controller)
 
 void CowRobot::PrintToDS()
 {
-    if (m_DSUpdateCount % 10 == 0)
+    if (m_DSUpdateCount++ % 10 == 0)
     {
-        m_DSUpdateCount = 0;
+        m_DSUpdateCount = 1;
     }
 }
 
@@ -80,10 +80,17 @@ void CowRobot::Handle()
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
 
+    // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
-
-    // Log gyro angle (only yaw for now)
-    //CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
+    // log the following every 200 ms
+    if (m_DSUpdateCount % 10 == 0)
+    {
+        // m_DSUpdateCount is reset in PrintToDS
+        CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
+        CowLib::CowLogger::LogPose(m_Drivetrain->GetPose().X().value(),
+                                   m_Drivetrain->GetPose().Y().value(),
+                                   m_Drivetrain->GetPose().Rotation().Degrees().value());
+    }
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());

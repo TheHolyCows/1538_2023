@@ -24,11 +24,10 @@
 class CowRobot
 {
 public:
-    // Drive Motors
+private:
     SwerveDrive *m_Drivetrain;
     Arm *m_Arm;
 
-private:
     int m_DSUpdateCount;
 
     GenericController *m_Controller = nullptr;
