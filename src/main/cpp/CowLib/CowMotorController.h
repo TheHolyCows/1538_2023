@@ -5,9 +5,6 @@
 #ifndef __COWLIB_COWMOTORCONTROLLER_H__
 #define __COWLIB_COWMOTORCONTROLLER_H__
 
-#include "ctre/phoenixpro/configs/Configs.hpp"
-#include "ctre/phoenixpro/controls/MotionMagicDutyCycle.hpp"
-
 #include <ctre/phoenixpro/TalonFX.hpp>
 #include <variant>
 
@@ -24,6 +21,7 @@ namespace CowLib
     public:
         struct PercentOutput
         {
+            // Percent of total motor output (-1 to 1)
             double PercentOut;
 
             double GetSetpoint() { return PercentOut; }
@@ -31,9 +29,41 @@ namespace CowLib
             ctre::phoenixpro::controls::DutyCycleOut ToControlRequest() { return { PercentOut }; }
         };
 
+        struct VoltageOutput
+        {
+            // Voltage to set the motor to
+            double Voltage;
+
+            double GetSetpoint() { return Voltage; }
+
+            ctre::phoenixpro::controls::VoltageOut ToControlRequest() { return { units::volt_t{ Voltage } }; }
+        };
+
+        struct TorqueCurrentOutput
+        {
+            // Motor current in amps
+            double Current;
+
+            // Max absolute output of the motor controller (0 to 1)
+            double MaxOutput = 1;
+
+            // Deadband in amps. Deadband of 1 means the motor will stop quickly when set to 0
+            double Deadband = 1;
+
+            double GetSetpoint() { return Current; }
+
+            ctre::phoenixpro::controls::TorqueCurrentFOC ToControlRequest()
+            {
+                return { units::ampere_t{ Current }, MaxOutput, units::ampere_t{ Deadband }, false };
+            }
+        };
+
         struct PositionPercentOutput
         {
+            // Position in turns
             double Position;
+
+            // Feedforward in percent of total motor output (-1 to 1)
             double FeedForward = 0;
 
             double GetSetpoint() { return Position; }
@@ -44,9 +74,44 @@ namespace CowLib
             }
         };
 
+        struct PositionVoltage
+        {
+            // Position in turns
+            double Position;
+
+            // Feedforward in volts
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::PositionVoltage ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, units::volt_t{ FeedForward }, 0, false };
+            }
+        };
+
+        struct PositionTorqueCurrent
+        {
+            // Position in turns
+            double Position;
+
+            // Feedforward in amps
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::PositionTorqueCurrentFOC ToControlRequest()
+            {
+                return { units::turn_t{ Position }, units::ampere_t{ FeedForward }, 0, false };
+            }
+        };
+
         struct VelocityPercentOutput
         {
+            // Velocity in turns per second
             double Velocity;
+
+            // Feedforward in percent of total motor output (-1 to 1)
             double FeedForward = 0;
 
             double GetSetpoint() { return Velocity; }
@@ -57,9 +122,44 @@ namespace CowLib
             }
         };
 
+        struct VelocityVoltage
+        {
+            // Velocity in turns per second
+            double Velocity;
+
+            // Feedforward in volts
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Velocity; }
+
+            ctre::phoenixpro::controls::VelocityVoltage ToControlRequest()
+            {
+                return { units::turns_per_second_t{ Velocity }, true, units::volt_t{ FeedForward }, 0, false };
+            }
+        };
+
+        struct VelocityTorqueCurrent
+        {
+            // Velocity in turns per second
+            double Velocity;
+
+            // Feedforward in amps
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Velocity; }
+
+            ctre::phoenixpro::controls::VelocityTorqueCurrentFOC ToControlRequest()
+            {
+                return { units::turns_per_second_t{ Velocity }, units::ampere_t{ FeedForward }, 0, false };
+            }
+        };
+
         struct MotionMagicPercentOutput
         {
+            // Position in turns
             double Position;
+
+            // Feedforward in percent of total motor output (-1 to 1)
             double FeedForward = 0;
 
             double GetSetpoint() { return Position; }
@@ -70,12 +170,47 @@ namespace CowLib
             }
         };
 
+        struct MotionMagicVoltage
+        {
+            // Position in turns
+            double Position;
+
+            // Feedforward in volts
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::MotionMagicVoltage ToControlRequest()
+            {
+                return { units::turn_t{ Position }, true, units::volt_t{ FeedForward }, 0, false };
+            }
+        };
+
+        struct MotionMagicTorqueCurrent
+        {
+            // Position in turns
+            double Position;
+
+            // Feedforward in amps
+            double FeedForward = 0;
+
+            double GetSetpoint() { return Position; }
+
+            ctre::phoenixpro::controls::MotionMagicTorqueCurrentFOC ToControlRequest()
+            {
+                return { units::turn_t{ Position }, FeedForward, 0, false };
+            }
+        };
+
         struct Follower
         {
-            int MasterID;
+            // ID of the motor to follow
+            int LeaderID;
+
+            // Whether to invert the motor against the leader
             bool Invert = false;
 
-            ctre::phoenixpro::controls::Follower ToControlRequest() { return { MasterID, Invert }; }
+            ctre::phoenixpro::controls::Follower ToControlRequest() { return { LeaderID, Invert }; }
         };
 
         enum NeutralMode
@@ -88,7 +223,20 @@ namespace CowLib
 
         ~CowMotorController();
 
-        void Set(std::variant<PositionPercentOutput, PercentOutput> request);
+        void Set(std::variant<PercentOutput,
+                              VoltageOutput,
+                              PositionPercentOutput,
+                              PositionVoltage,
+                              VelocityPercentOutput,
+                              VelocityVoltage,
+                              MotionMagicPercentOutput,
+                              MotionMagicVoltage> request);
+
+        void
+        Set(std::variant<TorqueCurrentOutput, PositionTorqueCurrent, VelocityTorqueCurrent, MotionMagicTorqueCurrent>
+                request);
+
+        void Set(Follower request);
 
         void UseFOC(bool useFOC);
         void OverrideBrakeMode(bool overrideBrakeMode);

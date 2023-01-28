@@ -1,12 +1,13 @@
 #include "CowMotorController.h"
 
 #include "CowLogger.h"
-#include "ctre/phoenixpro/configs/Configs.hpp"
-#include "ctre/phoenixpro/signals/SpnEnums.hpp"
 
 namespace CowLib
 {
-
+    /** 
+     * @brief Construct a new Cow Motor Controller
+     * @param id The CAN ID of the motor controller
+     */
     CowMotorController::CowMotorController(int id)
     {
         m_Talon             = new ctre::phoenixpro::hardware::TalonFX(id, "cowbus");
@@ -22,12 +23,24 @@ namespace CowLib
         delete m_Talon;
     }
 
-    void CowMotorController::Set(std::variant<PositionPercentOutput, PercentOutput> request)
+    /**
+     * @brief Set the motor controller with a control request struct
+     * @param request The control request struct
+     */
+    void CowMotorController::Set(std::variant<PercentOutput,
+                                              VoltageOutput,
+                                              PositionPercentOutput,
+                                              PositionVoltage,
+                                              VelocityPercentOutput,
+                                              VelocityVoltage,
+                                              MotionMagicPercentOutput,
+                                              MotionMagicVoltage> request)
     {
         auto &talon            = m_Talon;
         double *setpoint       = &m_Setpoint;
         bool useFOC            = m_UseFOC;
         bool overrideBrakeMode = m_OverrideBrakeMode;
+
         visit(
             [talon, setpoint, useFOC, overrideBrakeMode](auto &&req)
             {
@@ -38,16 +51,48 @@ namespace CowLib
             request);
     }
 
+    // Overload for TorqueControl requests because they always use FOC
+    void CowMotorController::Set(
+        std::variant<TorqueCurrentOutput, PositionTorqueCurrent, VelocityTorqueCurrent, MotionMagicTorqueCurrent>
+            request)
+    {
+        auto &talon      = m_Talon;
+        double *setpoint = &m_Setpoint;
+        visit(
+            [talon, setpoint](auto &&req)
+            {
+                talon->SetControl(req.ToControlRequest());
+                *setpoint = req.GetSetpoint();
+            },
+            request);
+    }
+
+    // Overload for follwer request because it's special
+    void CowMotorController::Set(Follower request)
+    {
+        m_Talon->SetControl(request.ToControlRequest());
+        m_Setpoint = request.LeaderID;
+    }
+
+    /** 
+     * @brief Enables or disables the use of Field Oriented Control, default is true
+     */
     void CowMotorController::UseFOC(bool useFOC)
     {
         m_UseFOC = useFOC;
     }
 
+    /**
+     * @brief If overrided, seting an output of zero forces to motor to brake, default is false
+     */
     void CowMotorController::OverrideBrakeMode(bool overrideBrakeMode)
     {
         m_OverrideBrakeMode = overrideBrakeMode;
     }
 
+    /**
+     * @brief Applies a config to the motor controller
+     */
     void CowMotorController::ApplyConfig(std::variant<ctre::phoenixpro::configs::TalonFXConfiguration,
                                                       ctre::phoenixpro::configs::Slot0Configs,
                                                       ctre::phoenixpro::configs::MotionMagicConfigs,
@@ -58,16 +103,28 @@ namespace CowLib
         visit([&configuator](auto &&config) { configuator.Apply(config); }, config);
     }
 
+    /** 
+     * @brief Gets the current position of the motor
+     * @return The position in turns
+     */
     double CowMotorController::GetPosition()
     {
         return m_Talon->GetPosition().Refresh().GetValue().value();
     }
 
+    /** 
+     * @brief Gets the current velocity of the motor
+     * @return The velocity in turns per second
+     */
     double CowMotorController::GetVelocity()
     {
         return m_Talon->GetVelocity().Refresh().GetValue().value();
     }
 
+    /** 
+     * @brief Sets the current position of the motor to a new value in turns. Used to zero.
+     * @return Status code returned by talon
+     */
     int CowMotorController::SetSensorPosition(double turns)
     {
         return m_Talon->SetRotorPosition(units::turn_t{ turns });
