@@ -7,9 +7,9 @@
 
 #include "Arm.h"
 
-Arm::Arm(int rotatorMotor, int telescopeMotor)
+Arm::Arm(int rotationMotor, int telescopeMotor)
 {
-    m_RotatorMotor   = new CowLib::CowMotorController(rotatorMotor);
+    m_RotationMotor  = new CowLib::CowMotorController(rotationMotor);
     m_TelescopeMotor = new CowLib::CowMotorController(telescopeMotor);
 
     // no longer works with Phoenix Pro
@@ -20,57 +20,74 @@ Arm::Arm(int rotatorMotor, int telescopeMotor)
     // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
+    m_LoopCount = 0;
+
     // check these
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
 
-    m_RotatorController.Position   = 0;
-    m_TelescopeController.Position = 0;
-
     ResetConstants();
 }
 
-void Arm::SetRotatorPos(double position)
+void Arm::SetAngle(double angle)
 {
-    m_RotatorController.Position = position;
+    m_RotationControlRequest.Position
+        = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO"));
 }
 
-void Arm::SetTelescopePos(double position)
+void Arm::SetTelescopePosition(double position)
 {
-    m_TelescopeController.Position = position;
+    // TODO: check this math
+    m_TelescopeControlRequest.Position = position * CONSTANT("TELESCOPE_RATIO");
 }
 
-double Arm::GetRotatorPos()
+double Arm::GetAngle()
 {
-    return m_RotatorMotor->GetPosition();
+    return m_Angle;
 }
 
-double Arm::GetTelescopePos()
+double Arm::GetTelescopePosition()
 {
-    return m_TelescopeMotor->GetPosition();
+    return m_TelescopePosition;
 }
 
 void Arm::ResetConstants()
 {
-    m_RotatorMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
-    m_TelescopeMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    m_RotationMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_P"),
+                             CONSTANT("TELESCOPE_I"),
+                             CONSTANT("TELESCOPE_D"),
+                             CONSTANT("TELESCOPE_F"));
 }
 
 void Arm::Handle()
 {
-    if (m_RotatorMotor)
+    if (m_LoopCount++ % 20 == 0)
     {
-        m_RotatorMotor->Set(m_RotatorController);
+        double p = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * m_TelescopePosition)
+                   + (CONSTANT("ARM_P_ANGLE") * m_Angle);
+
+        m_RotationMotor->SetPID(p, CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    }
+
+    if (m_RotationMotor)
+    {
+        m_RotationMotor->Set(m_RotationControlRequest);
+
+        m_Angle
+            = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
     }
 
     if (m_TelescopeMotor)
     {
-        m_TelescopeMotor->Set(m_TelescopeController);
+        m_TelescopeMotor->Set(m_TelescopeControlRequest);
+
+        m_TelescopePosition = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
     }
 }
 
 Arm::~Arm()
 {
-    delete m_RotatorMotor;
+    delete m_RotationMotor;
     delete m_TelescopeMotor;
 }
