@@ -100,7 +100,7 @@ void CowBase::DisabledPeriodic()
              * iterates over AutoModes
              */
             AutoModes::GetInstance()->NextMode();
-            CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
+            CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         }
     }
     if (m_Bot)
@@ -109,9 +109,10 @@ void CowBase::DisabledPeriodic()
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
+    if (m_DisabledCount++ % 10 == 0) // 200 ms tick rate
     {
-        CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
+        m_Alliance = frc::DriverStation::GetAlliance();
+        CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
     }
 }

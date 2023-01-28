@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <cstdarg>
 #include <errno.h>
+#include <frc/DriverStation.h>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -42,7 +43,8 @@ namespace CowLib
             MOTR_LOG,
             BATT_LOG,
             AUTO_LOG,
-            GYRO_LOG
+            GYRO_LOG,
+            POSE_LOG
         };
 
         enum CowLogLevel : uint16_t
@@ -57,8 +59,9 @@ namespace CowLib
         const static int REGISTERED_MOTORS_MAX = 24;
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
-        static void LogAutoMode(const char *);
-        static void LogGyroAngle(double, double, double);
+        static void LogAutoMode(frc::DriverStation::Alliance, const char *);
+        static void LogGyro(double, double, double);
+        static void LogPose(double, double, double);
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         void Handle();
@@ -124,15 +127,24 @@ namespace CowLib
         struct CowAutoLog
         {
             CowLogHdr hdr;
+            uint16_t alliance;
             char name[32];
         };
 
         struct CowGyroLog
         {
             CowLogHdr hdr;
+            double pitch;
+            double roll;
+            double yaw;
+        };
+
+        struct CowPoseLog
+        {
+            CowLogHdr hdr;
             double x;
             double y;
-            double z;
+            double rot;
         };
     };
 
