@@ -1,9 +1,5 @@
 #include "OperatorController.h"
 
-#include "math.h"
-
-#include <iostream>
-
 OperatorController::OperatorController(CowControlBoard *controlboard)
     : m_CB(controlboard)
 {
@@ -93,4 +89,9 @@ void OperatorController::Handle(CowRobot *bot)
         fieldRelative,
         centerOfRotationX,
         centerOfRotationY);
+}
+
+void OperatorController::ResetConstants()
+{
+    m_ControllerExpFilter->Reset(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 }

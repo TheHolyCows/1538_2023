@@ -14,6 +14,7 @@
 #include "../Declarations.h"
 #include "../Subsystems/Limelight.h"
 
+#include <iostream>
 #include <math.h>
 #include <stdio.h>
 
@@ -47,6 +48,8 @@ private:
 public:
     OperatorController(CowControlBoard *controlboard);
     void Handle(CowRobot *bot);
+
+    void ResetConstants();
 
     double m_TrackingCooldownTimer;
 };
