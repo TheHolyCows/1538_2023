@@ -11,6 +11,7 @@ namespace CowLib
     double CowExponentialFilter::Filter(double input)
     {
         input = pow(abs(input), m_Exponent) * input / abs(input);
+        return input;
     }
 
     void CowExponentialFilter::Reset(double newExponent)
