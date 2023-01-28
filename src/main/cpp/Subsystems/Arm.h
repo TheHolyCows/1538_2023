@@ -9,6 +9,7 @@
 #define SRC_SUBSYSTEMS_ARM_H_
 
 #include "../CowConstants.h"
+#include "../CowLib/Conversions.h"
 #include "../CowLib/CowMotorController.h"
 
 #include <iostream>
@@ -16,22 +17,25 @@
 class Arm
 {
 private:
-    CowLib::CowMotorController *m_RotatorMotor;
+    CowLib::CowMotorController *m_RotationMotor;
     CowLib::CowMotorController *m_TelescopeMotor;
 
-    CowLib::CowMotorController::PositionPercentOutput m_RotatorController;
-    CowLib::CowMotorController::PositionPercentOutput m_TelescopeController;
+    CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest{ 0 };
+    CowLib::CowMotorController::PositionPercentOutput m_TelescopeControlRequest{ 0 };
 
-    double m_Position;
+    double m_TelescopePosition;
+    double m_Angle;
+
+    int m_LoopCount;
 
 public:
-    Arm(int rotatorMotor, int telescopeMotor);
+    Arm(int rotationMotor, int telescopeMotor);
 
-    void SetRotatorPos(double position);
-    void SetTelescopePos(double position);
+    void SetAngle(double angle);
+    void SetTelescopePosition(double position);
 
-    double GetRotatorPos();
-    double GetTelescopePos();
+    double GetAngle();
+    double GetTelescopePosition();
 
     void ResetConstants();
 
