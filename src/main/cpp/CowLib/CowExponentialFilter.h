@@ -20,7 +20,7 @@ namespace CowLib
 
         double Filter(double Input);
         virtual ~CowExponentialFilter();
-        void ResetConstants();
+        void Reset(double Input);
 
         private:
         double m_Exponent;

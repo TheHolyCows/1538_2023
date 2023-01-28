@@ -14,9 +14,9 @@ namespace CowLib
         Input = pow(abs(Input), m_Exponent) * Input/abs(Input);
     }
 
-    void CowExponentialFilter::ResetConstants()
+    void CowExponentialFilter::Reset(double Input)
     {
-        
+        m_Exponent = Input;
     }
 
     CowExponentialFilter::~CowExponentialFilter()
