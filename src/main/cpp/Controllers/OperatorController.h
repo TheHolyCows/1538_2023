@@ -7,12 +7,14 @@
 
 #include "../CowConstants.h"
 #include "../CowControlBoard.h"
+#include "../CowLib/CowExponentialFilter.h"
 #include "../CowLib/CowLatch.h"
 #include "../CowLib/CowLib.h"
 #include "../CowRobot.h"
 #include "../Declarations.h"
 #include "../Subsystems/Limelight.h"
 
+#include <iostream>
 #include <math.h>
 #include <stdio.h>
 
@@ -41,9 +43,13 @@ private:
 
     Wheel m_EvasiveSwerveWheel;
 
+    CowLib::CowExponentialFilter *m_ControllerExpFilter;
+
 public:
     OperatorController(CowControlBoard *controlboard);
     void Handle(CowRobot *bot);
+
+    void ResetConstants();
 
     double m_TrackingCooldownTimer;
 };
