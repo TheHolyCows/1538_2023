@@ -219,6 +219,8 @@ void SwerveDrive::Handle()
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
+    m_Pose = m_Odometry->GetWPIPose();
+
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
     //                           "odometry pose: x %f, y %f, %fdeg",
     //                           m_Odometry->GetX(),
