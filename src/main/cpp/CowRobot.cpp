@@ -87,9 +87,7 @@ void CowRobot::Handle()
     {
         // m_DSUpdateCount is reset in PrintToDS
         CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
-        CowLib::CowLogger::LogPose(m_Drivetrain->GetPose().X().convert<units::foot>().value(),
-                                   m_Drivetrain->GetPose().Y().convert<units::foot>().value(),
-                                   m_Drivetrain->GetPose().Rotation().Degrees().value());
+        CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
     }
 
     // accelerometers

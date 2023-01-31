@@ -126,6 +126,36 @@ void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
 }
 
 /**
+ * @brief Get the Pose X value in feet
+ * 
+ * @return double 
+ */
+double SwerveDrive::GetPoseX()
+{
+    return m_Pose.X().convert<units::foot>().value();
+}
+
+/**
+ * @brief Get the Pose Y value in feet
+ * 
+ * @return double 
+ */
+double SwerveDrive::GetPoseY()
+{
+    return m_Pose.Y().convert<units::foot>().value();
+}
+
+/**
+ * @brief Get the pose rotation value in degrees
+ * 
+ * @return double 
+ */
+double SwerveDrive::GetPoseRot()
+{
+    return m_Pose.Rotation().Degrees().value();
+}
+
+/**
  * @brief Returns current locked state
  *
  * @return Whether drive is locked
