@@ -48,6 +48,9 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
                               id,
                               m_Encoder->GetAbsolutePosition(),
                               m_RotationMotor->GetPosition());
+
+    // m_DriveMotor->GetInternalTalon()->GetSimState().SetSupplyVoltage(12_V);
+    // m_RotationMotor->GetInternalTalon()->GetSimState().SetSupplyVoltage(12_V);
 }
 
 SwerveModule::~SwerveModule()
@@ -105,6 +108,15 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
     m_DriveControlRequest.PercentOut = percentOutput;
+
+    // auto velTPS = CowLib::Conversions::FPSToFalcon(optimized.velocity,
+    //                                                CONSTANT("WHEEL_CIRCUMFERENCE"),
+    //                                                CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
+
+    // m_DriveMotor->GetInternalTalon()->GetSimState().SetRotorVelocity(units::turns_per_second_t{ velTPS });
+    // m_DriveMotor->GetInternalTalon()->GetSimState().SetRawRotorPosition(
+    //     units::turn_t{ m_DriveMotor->GetPosition() + velTPS / 50.0 });
+
     // = units::turns_per_second_t{ CowLib::Conversions::FPSToFalcon(optimized.velocity,
     //                                                               CONSTANT("WHEEL_CIRCUMFERENCE"),
     //                                                               CONSTANT("SWERVE_DRIVE_GEAR_RATIO")) };
@@ -124,6 +136,9 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
     m_PreviousAngle = targetAngle;
 
     m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
+
+    // m_RotationMotor->GetInternalTalon()->GetSimState().SetRawRotorPosition(
+    //     units::turn_t{ CowLib::Conversions::DegreesToFalcon(targetAngle, CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) });
 }
 
 /**
@@ -167,22 +182,28 @@ void SwerveModule::ResetEncoders()
  */
 void SwerveModule::Handle()
 {
-    m_DriveMotor->Set(m_DriveControlRequest);
-    m_RotationMotor->Set(m_RotationControlRequest);
+    // m_DriveMotor->Set(m_DriveControlRequest);
+    // m_RotationMotor->Set(m_RotationControlRequest);
 
     // printf("Module %d abs enc angle: %f\n", m_Id, m_Encoder->GetAbsolutePosition());
 
-    // Update current positions once per loop
-    m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetVelocity(),
-                                                  CONSTANT("WHEEL_CIRCUMFERENCE"),
-                                                  CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
+    // // Update current positions once per loop
+    // m_Velocity = CowLib::Conversions::FalconToFPS(m_DriveMotor->GetVelocity(),
+    //                                               CONSTANT("WHEEL_CIRCUMFERENCE"),
+    //                                               CONSTANT("SWERVE_DRIVE_GEAR_RATIO"));
 
-    // I think this is right...
-    m_Position = ((m_DriveMotor->GetPosition() * (1.0 / 1.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
-                  * CONSTANT("WHEEL_CIRCUMFERENCE"));
+    // // I think this is right...
+    // m_Position = ((m_DriveMotor->GetPosition() * (1.0 / 1.0) / CONSTANT("SWERVE_DRIVE_GEAR_RATIO"))
+    //               * CONSTANT("WHEEL_CIRCUMFERENCE"));
 
-    m_Angle
-        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
+    // m_Angle
+    //     = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
+
+    // SIM VALUES
+    m_Angle    = CowLib::Conversions::FalconToDegrees(m_RotationControlRequest.Position,
+                                                   CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
+    m_Velocity = m_DriveControlRequest.PercentOut * CONSTANT("SWERVE_MAX_SPEED");
+    m_Position += m_Velocity / 50.0;
 }
 
 /**

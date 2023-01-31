@@ -1,5 +1,10 @@
 #include "SwerveDrive.h"
 
+#include "frc/geometry/Pose2d.h"
+#include "frc/kinematics/SwerveModuleState.h"
+#include "units/angle.h"
+#include "units/angular_velocity.h"
+
 /**
  * @brief Construct a new SwerveDrive object
  *
@@ -31,6 +36,8 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
     // m_VisionPIDController->SetInputRange(-180, 180);
 
     Reset();
+
+    frc::SmartDashboard::PutData("Field", &m_Field);
 }
 
 SwerveDrive::~SwerveDrive()
@@ -81,7 +88,23 @@ void SwerveDrive::SetVelocity(double vx,
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
+    auto tmp      = chassisSpeeds;
+    chassisSpeeds = m_PrevChassisSpeeds;
+
+    auto robot_pose_vel = frc::Pose2d(units::foot_t{ chassisSpeeds.vx * 0.02 },
+                                      units::foot_t{ chassisSpeeds.vy * 0.02 },
+                                      frc::Rotation2d(units::degree_t{ chassisSpeeds.omega * 0.02 }));
+
+    frc::Twist2d twist_vel = frc::Pose2d{ 0_ft, 0_ft, 0_deg }.Log(robot_pose_vel);
+
+    auto updated_chassis_speeds = CowLib::CowChassisSpeeds{ twist_vel.dx.convert<units::foot>().value() / 0.02,
+                                                            twist_vel.dy.convert<units::foot>().value() / 0.02,
+                                                            twist_vel.dtheta.convert<units::degree>().value() / 0.02 };
+
+    auto moduleStates
+        = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
+
+    m_PrevChassisSpeeds = tmp;
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
@@ -217,9 +240,25 @@ void SwerveDrive::Handle()
                    modulePositions.begin(),
                    [](SwerveModule *module) { return module->GetPosition(); });
 
+    // m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
+
+    // SIM
+    std::array<frc::SwerveModuleState, 4> moduleStates{};
+    std::transform(m_Modules.begin(),
+                   m_Modules.end(),
+                   moduleStates.begin(),
+                   [](SwerveModule *module) { return module->GetState().ToWPI(); });
+    double gyroAngle = m_Kinematics->GetInternalKinematics()
+                           ->ToChassisSpeeds(moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3])
+                           .omega.convert<units::degrees_per_second>()
+                           .value()
+                       + m_Gyro->GetYawDegrees();
+    m_Gyro->GetInternalPigeon()->GetSimState().SetRawYaw(units::degree_t{ gyroAngle });
+
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
     m_Pose = m_Odometry->GetWPIPose();
+    m_Field.SetRobotPose(m_Pose);
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
     //                           "odometry pose: x %f, y %f, %fdeg",

@@ -65,3 +65,8 @@ void CowPigeon::SetYaw(double angle)
 {
     SetYaw(units::degree_t{ angle });
 }
+
+ctre::phoenixpro::hardware::Pigeon2 *CowPigeon::GetInternalPigeon()
+{
+    return m_Pigeon;
+}

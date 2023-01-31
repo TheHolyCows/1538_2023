@@ -32,6 +32,8 @@ public:
 
     void SetYaw(units::degree_t angle);
     void SetYaw(double angle);
+
+    ctre::phoenixpro::hardware::Pigeon2 *GetInternalPigeon();
 };
 
 #endif /* __COW_PIGEON_H__ */

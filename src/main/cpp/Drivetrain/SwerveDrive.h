@@ -18,6 +18,7 @@
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <iostream>
 #include <memory>
@@ -38,9 +39,13 @@ private:
 
     bool m_Locked;
 
+    CowLib::CowChassisSpeeds m_PrevChassisSpeeds{ 0, 0, 0 };
+
     double m_PreviousRotationError = 0;
     double m_PreviousXError        = 0;
     double m_PreviousYError        = 0;
+
+    frc::Field2d m_Field;
 
     // CowLib::CowPID* m_VisionPIDController;
 
