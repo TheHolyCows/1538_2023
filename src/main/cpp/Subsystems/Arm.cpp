@@ -45,12 +45,12 @@ void Arm::SetTelescopePosition(double position)
     m_TelescopeControlRequest.Position = position * CONSTANT("TELESCOPE_RATIO");
 }
 
-double Arm::GetAngle()
+double Arm::GetAngle() const
 {
     return m_Angle;
 }
 
-double Arm::GetTelescopePosition()
+double Arm::GetTelescopePosition() const
 {
     return m_TelescopePosition;
 }

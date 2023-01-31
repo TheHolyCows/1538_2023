@@ -18,6 +18,19 @@
 class Arm
 {
 private:
+    /**
+     * @brief Will return a safe arm position
+     * 
+     * @param angle 
+     * @return double 
+     */
+    void setSafeArmPosition(const double angle) const;
+
+    void setSafeAngle(const double position) const;
+
+    bool doesSafePositionExist(const double angle);
+    bool doesSafeAngleExist(const double pos) const;
+
     std::unique_ptr<CowLib::CowMotorController> m_RotationMotor;
     std::unique_ptr<CowLib::CowMotorController> m_TelescopeMotor;
 
@@ -83,7 +96,22 @@ public:
 
     void Handle();
 
+    /**
+     * @brief Will set the minimum or maximum angle depending on the current position
+     * Will be called periodically. 
+     * 
+     * Current disabled!
+     * 
+     */
     void CheckMinMax();
+
+    /**
+     * @brief Will set the angle of the arm to its zero position, which is the midpoint between
+     * the set minimum and maximum angles of the arm.
+     * 
+     * This method assumes that the min and max angles are set correctly.
+     * 
+     */
     void ZeroSensors();
 };
 
