@@ -20,6 +20,7 @@ Arm::Arm(int rotationMotor, int telescopeMotor)
     // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
+    m_Angle    = 0;
     m_MinAngle = 0;
     m_MaxAngle = 0;
 
