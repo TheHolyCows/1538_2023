@@ -3,7 +3,11 @@
 
 #include "../../CowLib/CowTimer.h"
 #include "../../CowRobot.h"
+#include "frc/controller/PIDController.h"
 #include "RobotCommand.h"
+#include "units/angle.h"
+
+#include <frc/controller/ProfiledPIDController.h>
 
 class ChargeStationBalanceCommand : public RobotCommand
 {
@@ -11,6 +15,10 @@ private:
     double m_Timeout;
 
     CowLib::CowTimer *m_Timer;
+
+    bool m_StartedDrivingUp;
+
+    frc2::PIDController *m_PIDController;
 
 public:
     ChargeStationBalanceCommand(double timeout);
