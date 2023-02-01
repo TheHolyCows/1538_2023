@@ -1,7 +1,9 @@
 #include "SwerveDrive.h"
 
 #include "frc/geometry/Pose2d.h"
+#include "frc/geometry/Rotation2d.h"
 #include "frc/kinematics/SwerveModuleState.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 #include "units/angle.h"
 #include "units/angular_velocity.h"
 
@@ -92,11 +94,34 @@ void SwerveDrive::SetVelocity(double vx,
                                       units::foot_t{ m_PrevChassisSpeeds.vy * 0.02 },
                                       frc::Rotation2d(units::degree_t{ m_PrevChassisSpeeds.omega * 0.02 }));
 
-    frc::Twist2d twist_vel = frc::Pose2d{ 0_ft, 0_ft, 0_deg }.Log(robot_pose_vel);
+    // frc::Twist2d twist_vel = frc::Pose2d{ 0_ft, 0_ft, 0_deg }.Log(robot_pose_vel);
+
+    double dtheta        = robot_pose_vel.Rotation().Radians().value();
+    double half_dtheta   = 0.5 * dtheta;
+    double cos_minus_one = robot_pose_vel.Rotation().Cos() - 1.0;
+    double halftheta_by_tan_of_halfdtheta;
+    if (fabs(cos_minus_one) < 0.000000001)
+    {
+        halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
+    }
+    else
+    {
+        halftheta_by_tan_of_halfdtheta = -(half_dtheta * robot_pose_vel.Rotation().Sin()) / cos_minus_one;
+    }
+    frc::Translation2d translation_part
+        = robot_pose_vel.Translation().RotateBy(frc::Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
+    auto twist_vel = frc::Twist2d{ translation_part.X(), translation_part.Y(), units::radian_t{ dtheta } };
 
     auto updated_chassis_speeds = CowLib::CowChassisSpeeds{ twist_vel.dx.convert<units::foot>().value() / 0.02,
                                                             twist_vel.dy.convert<units::foot>().value() / 0.02,
                                                             twist_vel.dtheta.convert<units::degree>().value() / 0.02 };
+
+    frc::SmartDashboard::PutNumber("vx new", updated_chassis_speeds.vx);
+    frc::SmartDashboard::PutNumber("vy new", updated_chassis_speeds.vy);
+    frc::SmartDashboard::PutNumber("omega new", updated_chassis_speeds.omega);
+    frc::SmartDashboard::PutNumber("vx old", chassisSpeeds.vx);
+    frc::SmartDashboard::PutNumber("vy old", chassisSpeeds.vy);
+    frc::SmartDashboard::PutNumber("omega old", chassisSpeeds.omega);
 
     auto moduleStates
         = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
