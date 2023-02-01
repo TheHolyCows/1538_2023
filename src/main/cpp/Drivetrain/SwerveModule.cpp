@@ -25,6 +25,7 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     auto driveConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
     m_DriveMotor->ApplyConfig(driveConfig);
     m_DriveControlRequest = { 0 };
+    m_DriveMotor->OverrideBrakeMode(true);
 
     auto rotationConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
 
