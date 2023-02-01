@@ -21,7 +21,7 @@ AutoModes::AutoModes()
     // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
     // m_Modes["Wait 5 seconds"].push_back(new LambdaCommand([](CowRobot *robot) { robot->GetDrivetrain()->Reset(); }));
     // m_Modes["Wait 5 seconds"].push_back(new WaitCommand(10, true));
-    m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 90, true, true));
+    m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 5, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
     // std::cout << "Complete AutoModes constructor" << std::endl;
 

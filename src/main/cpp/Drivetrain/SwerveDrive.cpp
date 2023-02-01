@@ -88,12 +88,9 @@ void SwerveDrive::SetVelocity(double vx,
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto tmp      = chassisSpeeds;
-    chassisSpeeds = m_PrevChassisSpeeds;
-
-    auto robot_pose_vel = frc::Pose2d(units::foot_t{ chassisSpeeds.vx * 0.02 },
-                                      units::foot_t{ chassisSpeeds.vy * 0.02 },
-                                      frc::Rotation2d(units::degree_t{ chassisSpeeds.omega * 0.02 }));
+    auto robot_pose_vel = frc::Pose2d(units::foot_t{ m_PrevChassisSpeeds.vx * 0.02 },
+                                      units::foot_t{ m_PrevChassisSpeeds.vy * 0.02 },
+                                      frc::Rotation2d(units::degree_t{ m_PrevChassisSpeeds.omega * 0.02 }));
 
     frc::Twist2d twist_vel = frc::Pose2d{ 0_ft, 0_ft, 0_deg }.Log(robot_pose_vel);
 
@@ -104,7 +101,7 @@ void SwerveDrive::SetVelocity(double vx,
     auto moduleStates
         = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
 
-    m_PrevChassisSpeeds = tmp;
+    m_PrevChassisSpeeds = chassisSpeeds;
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
@@ -252,10 +249,10 @@ void SwerveDrive::Handle()
                            ->ToChassisSpeeds(moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3])
                            .omega.convert<units::degrees_per_second>()
                            .value()
-                       + m_Gyro->GetYawDegrees();
-    m_Gyro->GetInternalPigeon()->GetSimState().SetRawYaw(units::degree_t{ gyroAngle });
+                       + m_Pose.Rotation().Degrees().value();
+    m_Gyro->GetInternalPigeon()->SetYaw(units::degree_t{ gyroAngle });
 
-    m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
+    m_Odometry->Update(gyroAngle, modulePositions);
 
     m_Pose = m_Odometry->GetWPIPose();
     m_Field.SetRobotPose(m_Pose);

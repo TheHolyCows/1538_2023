@@ -135,7 +135,8 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 
     m_PreviousAngle = targetAngle;
 
-    m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
+    // m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
+    m_Angle = targetAngle;
 
     // m_RotationMotor->GetInternalTalon()->GetSimState().SetRawRotorPosition(
     //     units::turn_t{ CowLib::Conversions::DegreesToFalcon(targetAngle, CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) });
@@ -200,8 +201,8 @@ void SwerveModule::Handle()
     //     = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
 
     // SIM VALUES
-    m_Angle    = CowLib::Conversions::FalconToDegrees(m_RotationControlRequest.Position,
-                                                   CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
+    // m_Angle    = CowLib::Conversions::FalconToDegrees(m_RotationControlRequest.Position,
+    //                                                CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
     m_Velocity = m_DriveControlRequest.PercentOut * CONSTANT("SWERVE_MAX_SPEED");
     m_Position += m_Velocity / 50.0;
 }
