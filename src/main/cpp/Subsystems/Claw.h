@@ -19,6 +19,9 @@ class Claw
 private:
     CowLib::CowMotorController *m_WristMotor;
     CowLib::CowMotorController *m_IntakeMotor;
+
+    CowLib::CowMotorController::PositionPercentOutput m_WristControlRequest{ 0 };
+    CowLib::CowMotorController::VelocityTorqueCurrent m_IntakeControlRequest{ 0 };
     frc::Solenoid *m_Solenoid;
 
     double m_WristPosition;

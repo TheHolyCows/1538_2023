@@ -6,20 +6,15 @@
 //==================================================
 
 #include "Claw.h"
+#include "../CowLib/Conversions.h"
 
 Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 {
     m_WristMotor = new CowLib::CowMotorController(wristMotor);
     m_IntakeMotor = new CowLib::CowMotorController(intakeMotor);
 
-    m_WristMotor->SetControlMode(CowLib::CowMotorController::POSITION);
-    m_IntakeMotor->SetControlMode(CowLib::CowMotorController::SPEED);
-
     m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_IntakeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
-
-    m_WristMotor->GetInternalMotor()->SetSensorPhase(false);
-    m_IntakeMotor->GetInternalMotor()->SetSensorPhase(false);
 
     m_Solenoid = new frc::Solenoid(frc::PneumaticsModuleType::CTREPCM, solenoidChannel);
 
@@ -33,7 +28,8 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
 void Claw::SetWristPosition(double position)
 {
-    m_WristPosition = position;
+    m_WristControlRequest.Position = position * CONSTANT("ARM_WRIST_RATIO");
+
 }
 
 double Claw::GetWristPosition()
@@ -41,9 +37,9 @@ double Claw::GetWristPosition()
     return m_WristMotor->GetPosition();
 }
 
-void Claw::SetIntakeSpeed(double speed)
+void Claw::SetIntakeSpeed(double velocity)
 {
-    m_IntakeSpeed = speed;
+    m_IntakeControlRequest.Velocity = velocity * CONSTANT("ARM_INTAKE_RATIO");
 }
 
 void Claw::SetOpen(bool open)
@@ -53,19 +49,20 @@ void Claw::SetOpen(bool open)
 
 void Claw::ResetConstants()
 {
-    m_WristMotor->SetPIDGains(CONSTANT("CLAW_P"), CONSTANT("CLAW_I"), CONSTANT("CLAW_D"), CONSTANT("CLAW_F"), 1);
+    m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
+    m_IntakeMotor->SetPID(CONSTANT("INTAKE_P"), CONSTANT("INTAKE_I"), CONSTANT("INTAKE_D"), CONSTANT("INTAKE_F"));
 }
 
 void Claw::Handle()
 {
     if(m_IntakeMotor)
     {
-        m_IntakeMotor->Set(m_IntakeSpeed);
+        m_IntakeMotor->Set(m_IntakeControlRequest);
     }
 
     if(m_WristMotor)
     {
-        m_WristMotor->Set(m_WristPosition);
+        m_WristMotor->Set(m_WristControlRequest);
     }
 }
 
