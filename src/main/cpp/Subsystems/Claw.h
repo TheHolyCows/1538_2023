@@ -36,7 +36,7 @@ public:
 
     double GetWristPosition();
 
-    void SetIntakeSpeed(double speed);
+    void SetIntakeSpeed(double percent);
 
     void SetOpen(bool open);
 

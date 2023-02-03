@@ -37,9 +37,9 @@ double Claw::GetWristPosition()
     return m_WristMotor->GetPosition();
 }
 
-void Claw::SetIntakeSpeed(double velocity)
+void Claw::SetIntakeSpeed(double percent)
 {
-    m_IntakeControlRequest.Velocity = velocity * CONSTANT("ARM_INTAKE_RATIO");
+    m_IntakeControlRequest.PercentOut = percent * CONSTANT("ARM_INTAKE_RATIO");
 }
 
 void Claw::SetOpen(bool open)
