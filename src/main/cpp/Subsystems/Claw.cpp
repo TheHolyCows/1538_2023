@@ -19,7 +19,7 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
     m_Solenoid = new frc::Solenoid(frc::PneumaticsModuleType::CTREPCM, solenoidChannel);
 
     m_WristPosition = 0;
-    m_IntakeSpeed = 0;
+    m_IntakePercent = 0;
 
     m_Open = false;
 
@@ -40,6 +40,12 @@ double Claw::GetWristPosition()
 void Claw::SetIntakeSpeed(double percent)
 {
     m_IntakeControlRequest.PercentOut = percent * CONSTANT("ARM_INTAKE_RATIO");
+    m_IntakePercent = percent;
+}
+
+double Claw::GetIntakeSpeed()
+{
+    return m_IntakeMotor->GetVelocity();
 }
 
 void Claw::SetOpen(bool open)

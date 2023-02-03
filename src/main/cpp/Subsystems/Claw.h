@@ -25,7 +25,7 @@ private:
     frc::Solenoid *m_Solenoid;
 
     double m_WristPosition;
-    double m_IntakeSpeed;
+    double m_IntakePercent;
 
     bool m_Open;
 
@@ -37,6 +37,8 @@ public:
     double GetWristPosition();
 
     void SetIntakeSpeed(double percent);
+
+    double GetIntakeSpeed();
 
     void SetOpen(bool open);
 
