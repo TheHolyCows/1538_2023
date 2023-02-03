@@ -29,6 +29,8 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
+    m_SetpointGenerator = new CowLib::CowSwerveSetpointGenerator(m_Kinematics);
+
     m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYawDegrees(), 0, 0, 0);
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
@@ -46,6 +48,7 @@ SwerveDrive::~SwerveDrive()
 {
     delete m_Odometry;
     delete m_Kinematics;
+    delete m_SetpointGenerator;
 
     for (auto module : m_Modules)
     {
@@ -90,9 +93,9 @@ void SwerveDrive::SetVelocity(double vx,
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto robot_pose_vel = frc::Pose2d(units::foot_t{ m_PrevChassisSpeeds.vx * 0.02 },
-                                      units::foot_t{ m_PrevChassisSpeeds.vy * 0.02 },
-                                      frc::Rotation2d(units::degree_t{ m_PrevChassisSpeeds.omega * 0.02 }));
+    auto robot_pose_vel = frc::Pose2d(units::foot_t{ chassisSpeeds.vx * 0.02 },
+                                      units::foot_t{ chassisSpeeds.vy * 0.02 },
+                                      frc::Rotation2d(units::degree_t{ chassisSpeeds.omega * 0.02 }));
 
     // frc::Twist2d twist_vel = frc::Pose2d{ 0_ft, 0_ft, 0_deg }.Log(robot_pose_vel);
 
@@ -116,6 +119,14 @@ void SwerveDrive::SetVelocity(double vx,
                                                             twist_vel.dy.convert<units::foot>().value() / 0.02,
                                                             twist_vel.dtheta.convert<units::degree>().value() / 0.02 };
 
+    auto setpoint = m_SetpointGenerator->GenerateSetpoint(
+        { CONSTANT("SWERVE_MAX_SPEED"), CONSTANT("MAX_ACCEL"), CONSTANT("SWERVE_MAX_ANGULAR_VELOCITY") },
+        m_PrevSetpoint,
+        updated_chassis_speeds,
+        0.02);
+
+    m_PrevSetpoint = setpoint;
+
     frc::SmartDashboard::PutNumber("vx new", updated_chassis_speeds.vx);
     frc::SmartDashboard::PutNumber("vy new", updated_chassis_speeds.vy);
     frc::SmartDashboard::PutNumber("omega new", updated_chassis_speeds.omega);
@@ -123,10 +134,12 @@ void SwerveDrive::SetVelocity(double vx,
     frc::SmartDashboard::PutNumber("vy old", chassisSpeeds.vy);
     frc::SmartDashboard::PutNumber("omega old", chassisSpeeds.omega);
 
-    auto moduleStates
-        = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
+    // auto moduleStates
+    //     = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
 
-    m_PrevChassisSpeeds = chassisSpeeds;
+    auto moduleStates = setpoint.moduleStates;
+
+    m_PrevChassisSpeeds = setpoint.chassisSpeeds;
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)

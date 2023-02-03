@@ -21,7 +21,7 @@ namespace CowLib
     private:
         frc::SwerveDriveKinematics<4> *m_Kinematics;
 
-        std::array<frc::SwerveModuleState, 4> m_WPIModuleStates{};
+        std::array<frc::Translation2d, 4> m_ModulePositions{};
 
     public:
         CowSwerveKinematics(double wheelBase);
@@ -31,6 +31,10 @@ namespace CowLib
 
         std::array<CowSwerveModuleState, 4>
         CalculateModuleStates(CowChassisSpeeds &chassisSpeeds, double centerOfRotationX, double centerOfRotationY);
+
+        CowChassisSpeeds CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates);
+
+        std::array<frc::Translation2d, 4> GetModulePositions();
 
         frc::SwerveDriveKinematics<4> *GetInternalKinematics();
     };

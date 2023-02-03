@@ -1,5 +1,10 @@
 #include "CowSwerveKinematics.h"
 
+#include "CowChassisSpeeds.h"
+#include "frc/geometry/Rotation2d.h"
+
+#include <array>
+
 namespace CowLib
 {
 
@@ -12,10 +17,12 @@ namespace CowLib
         auto p = units::foot_t{ wheelBase / 2.0 };
         auto n = units::foot_t{ wheelBase / -2.0 };
 
-        m_Kinematics = new frc::SwerveDriveKinematics<4>(frc::Translation2d{ p, p },
-                                                         frc::Translation2d{ p, n },
-                                                         frc::Translation2d{ n, p },
-                                                         frc::Translation2d{ n, n });
+        m_ModulePositions = { frc::Translation2d{ p, p },
+                              frc::Translation2d{ p, n },
+                              frc::Translation2d{ n, p },
+                              frc::Translation2d{ n, n } };
+
+        m_Kinematics = new frc::SwerveDriveKinematics<4>(m_ModulePositions);
     }
 
     CowSwerveKinematics::~CowSwerveKinematics()
@@ -72,6 +79,19 @@ namespace CowLib
         }
 
         return convertedStates;
+    }
+
+    CowChassisSpeeds CowSwerveKinematics::CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates)
+    {
+        return CowChassisSpeeds::FromWPI(m_Kinematics->ToChassisSpeeds(moduleStates[0].ToWPI(),
+                                                                       moduleStates[1].ToWPI(),
+                                                                       moduleStates[2].ToWPI(),
+                                                                       moduleStates[3].ToWPI()));
+    }
+
+    std::array<frc::Translation2d, 4> CowSwerveKinematics::GetModulePositions()
+    {
+        return m_ModulePositions;
     }
 
     /**

@@ -7,6 +7,7 @@
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveOdometry.h"
+#include "../CowLib/Swerve/CowSwerveSetpointGenerator.h"
 #include "../CowLib/Utility.h"
 #include "../CowPigeon.h"
 #include "SwerveModule.h"
@@ -36,6 +37,7 @@ private:
 
     CowLib::CowSwerveKinematics *m_Kinematics;
     CowLib::CowSwerveOdometry *m_Odometry;
+    CowLib::CowSwerveSetpointGenerator *m_SetpointGenerator;
 
     bool m_Locked;
 
@@ -46,6 +48,8 @@ private:
     double m_PreviousYError        = 0;
 
     frc::Field2d m_Field;
+
+    CowLib::CowSwerveSetpointGenerator::SwerveSetpoint m_PrevSetpoint{};
 
     // CowLib::CowPID* m_VisionPIDController;
 
