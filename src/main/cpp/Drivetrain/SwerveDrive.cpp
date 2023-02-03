@@ -139,8 +139,6 @@ void SwerveDrive::SetVelocity(double vx,
 
     auto moduleStates = setpoint.moduleStates;
 
-    m_PrevChassisSpeeds = setpoint.chassisSpeeds;
-
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
     {
@@ -155,7 +153,7 @@ void SwerveDrive::SetVelocity(double vx,
     }
 
     // Just in case
-    CowLib::CowSwerveKinematics::DesaturateSpeeds(&moduleStates, CONSTANT("SWERVE_MAX_SPEED"));
+    // CowLib::CowSwerveKinematics::DesaturateSpeeds(&moduleStates, CONSTANT("SWERVE_MAX_SPEED"));
 
     for (auto module : m_Modules)
     {

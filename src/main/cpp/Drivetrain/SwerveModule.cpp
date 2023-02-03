@@ -82,7 +82,8 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
  */
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
 {
-    CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    // CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
+    auto optimized = state;
     // auto wpistate
     //     = frc::SwerveModuleState{ units::feet_per_second_t{ state.velocity }, units::degree_t{ state.angle } };
     // frc::SwerveModuleState::Optimize(wpistate, frc::Rotation2d(units::degree_t{ m_Angle }));

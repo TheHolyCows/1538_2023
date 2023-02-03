@@ -26,8 +26,6 @@ namespace CowLib
                                                  CowChassisSpeeds desiredState,
                                                  double dt)
     {
-        auto modulePositions = m_Kinematics->GetModulePositions();
-
         auto desiredModuleStates = m_Kinematics->CalculateModuleStates(desiredState, 0, 0);
 
         CowSwerveKinematics::DesaturateSpeeds(&desiredModuleStates, limits.maxDriveVelocity);
@@ -259,21 +257,43 @@ namespace CowLib
         return fabs(previousToGoal.Degrees().value()) > 90.0;
     }
 
-    double CowSwerveSetpointGenerator::UnwrapAngle(double ref, double angle)
+    double CowSwerveSetpointGenerator::UnwrapAngle(double scopeReference, double newAngle)
     {
-        double diff = angle - ref;
-        if (diff > 180)
+        double lowerBound;
+        double upperBound;
+        double lowerOffset = std::fmod(scopeReference, 360);
+
+        if (lowerOffset >= 0)
         {
-            return angle - 360;
-        }
-        else if (diff < -180)
-        {
-            return angle + 360;
+            lowerBound = scopeReference - lowerOffset;
+            upperBound = scopeReference + (360 - lowerOffset);
         }
         else
         {
-            return angle;
+            upperBound = scopeReference - lowerOffset;
+            lowerBound = scopeReference - (360 + lowerOffset);
         }
+
+        while (newAngle < lowerBound)
+        {
+            newAngle += 360;
+        }
+
+        while (newAngle > upperBound)
+        {
+            newAngle -= 360;
+        }
+
+        if (newAngle - scopeReference > 180)
+        {
+            newAngle -= 360;
+        }
+        else if (newAngle - scopeReference < -180)
+        {
+            newAngle += 360;
+        }
+
+        return newAngle;
     }
 
     /**
