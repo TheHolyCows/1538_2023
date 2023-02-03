@@ -22,14 +22,9 @@ SwerveModule::SwerveModule(int id, int driveMotor, int rotationMotor, int encode
     m_RotationMotor = new CowLib::CowMotorController(rotationMotor);
     m_Encoder       = new CowLib::CowCANCoder(encoderId);
 
-    auto driveConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
-    m_DriveMotor->ApplyConfig(driveConfig);
     m_DriveControlRequest = { 0 };
     m_DriveMotor->OverrideBrakeMode(true);
 
-    auto rotationConfig = ctre::phoenixpro::configs::TalonFXConfiguration{};
-
-    m_RotationMotor->ApplyConfig(rotationConfig);
     m_RotationMotor->SetInverted(true);
     m_RotationControlRequest = { 0 };
 
