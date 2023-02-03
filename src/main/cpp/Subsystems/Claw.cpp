@@ -50,7 +50,6 @@ void Claw::SetOpen(bool open)
 void Claw::ResetConstants()
 {
     m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
-    m_IntakeMotor->SetPID(CONSTANT("INTAKE_P"), CONSTANT("INTAKE_I"), CONSTANT("INTAKE_D"), CONSTANT("INTAKE_F"));
 }
 
 void Claw::Handle()
