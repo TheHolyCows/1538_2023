@@ -1,8 +1,5 @@
 #include "CowSwerveKinematics.h"
 
-#include "CowChassisSpeeds.h"
-#include "frc/geometry/Rotation2d.h"
-
 #include <array>
 
 namespace CowLib
@@ -22,12 +19,22 @@ namespace CowLib
                               frc::Translation2d{ n, p },
                               frc::Translation2d{ n, n } };
 
-        m_Kinematics = new frc::SwerveDriveKinematics<4>(m_ModulePositions);
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            // clang-format off
+            m_InverseKinematics.template block<2, 3>(i * 2, 0) <<
+                1, 0, (-m_ModulePositions[i].Y()).value(),
+                0, 1, (+m_ModulePositions[i].X()).value();
+            // clang-format on
+        }
+
+        m_ForwardKinematics = m_InverseKinematics.householderQr();
+
+        m_ModuleStates = {};
     }
 
     CowSwerveKinematics::~CowSwerveKinematics()
     {
-        delete m_Kinematics;
     }
 
     /**
@@ -37,21 +44,21 @@ namespace CowLib
  */
     void CowSwerveKinematics::DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *moduleStates, double maxSpeed)
     {
-        auto &states = *moduleStates;
+        // auto &states = *moduleStates;
 
-        auto highestModuleSpeed
-            = std::max_element(states.begin(),
-                               states.end(),
-                               [](const auto &a, const auto &b) { return fabs(a.velocity) < fabs(b.velocity); })
-                  ->velocity;
+        // auto highestModuleSpeed
+        //     = std::max_element(states.begin(),
+        //                        states.end(),
+        //                        [](const auto &a, const auto &b) { return fabs(a.velocity) < fabs(b.velocity); })
+        //           ->velocity;
 
-        if (highestModuleSpeed > maxSpeed)
-        {
-            for (auto &module : states)
-            {
-                module.velocity = module.velocity / highestModuleSpeed * maxSpeed;
-            }
-        }
+        // if (highestModuleSpeed > maxSpeed)
+        // {
+        //     for (auto &module : states)
+        //     {
+        //         module.velocity = module.velocity / highestModuleSpeed * maxSpeed;
+        //     }
+        // }
     }
 
     /**
@@ -63,30 +70,30 @@ namespace CowLib
                                                                                    double centerOfRotationX,
                                                                                    double centerOfRotationY)
     {
-        frc::Translation2d centerOfRotation
-            = frc::Translation2d(units::foot_t{ centerOfRotationX }, units::foot_t{ centerOfRotationY });
+        // frc::Translation2d centerOfRotation
+        //     = frc::Translation2d(units::foot_t{ centerOfRotationX }, units::foot_t{ centerOfRotationY });
 
-        auto moduleStates = m_Kinematics->ToSwerveModuleStates(chassisSpeeds.ToWPI(), centerOfRotation);
+        // auto moduleStates = m_Kinematics->ToSwerveModuleStates(chassisSpeeds.ToWPI(), centerOfRotation);
 
-        std::array<CowSwerveModuleState, 4> convertedStates{};
+        // std::array<CowSwerveModuleState, 4> convertedStates{};
 
-        for (int i = 0; i < 4; i++)
-        {
-            double velocity = moduleStates[i].speed.convert<units::feet_per_second>().value();
-            double angle    = moduleStates[i].angle.Degrees().value();
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     double velocity = moduleStates[i].speed.convert<units::feet_per_second>().value();
+        //     double angle    = moduleStates[i].angle.Degrees().value();
 
-            convertedStates[i] = CowSwerveModuleState{ velocity, angle };
-        }
+        //     convertedStates[i] = CowSwerveModuleState{ velocity, angle };
+        // }
 
-        return convertedStates;
+        // return convertedStates;
     }
 
     CowChassisSpeeds CowSwerveKinematics::CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates)
     {
-        return CowChassisSpeeds::FromWPI(m_Kinematics->ToChassisSpeeds(moduleStates[0].ToWPI(),
-                                                                       moduleStates[1].ToWPI(),
-                                                                       moduleStates[2].ToWPI(),
-                                                                       moduleStates[3].ToWPI()));
+        // return CowChassisSpeeds::FromWPI(m_Kinematics->ToChassisSpeeds(moduleStates[0].ToWPI(),
+        //                                                                moduleStates[1].ToWPI(),
+        //                                                                moduleStates[2].ToWPI(),
+        //                                                                moduleStates[3].ToWPI()));
     }
 
     std::array<frc::Translation2d, 4> CowSwerveKinematics::GetModulePositions()
@@ -100,7 +107,7 @@ namespace CowLib
  */
     frc::SwerveDriveKinematics<4> *CowSwerveKinematics::GetInternalKinematics()
     {
-        return m_Kinematics;
+        // return m_Kinematics;
     }
 
 } // namespace CowLib

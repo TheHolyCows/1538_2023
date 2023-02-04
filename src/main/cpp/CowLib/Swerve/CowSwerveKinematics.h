@@ -1,12 +1,14 @@
 #ifndef __COWLIB_COWSWERVEKINEMATICS_H__
 #define __COWLIB_COWSWERVEKINEMATICS_H__
 
-#include "./CowChassisSpeeds.h"
-#include "./CowSwerveModuleState.h"
+#include "CowChassisSpeeds.h"
+#include "CowSwerveModuleState.h"
+#include "Eigen/QR"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <frc/EigenCore.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
@@ -19,12 +21,19 @@ namespace CowLib
     class CowSwerveKinematics
     {
     private:
-        frc::SwerveDriveKinematics<4> *m_Kinematics;
+        static constexpr int NUM_MODULES = 4;
 
-        std::array<frc::Translation2d, 4> m_ModulePositions{};
+        mutable frc::Matrixd<NUM_MODULES * 2, 3> m_InverseKinematics;
+        Eigen::HouseholderQR<frc::Matrixd<NUM_MODULES * 2, 3>> m_ForwardKinematics;
+
+        frc::Translation2d m_PreviousCenterOfRotation;
+
+        std::array<frc::Translation2d, NUM_MODULES> m_ModulePositions;
+
+        std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates;
 
     public:
-        CowSwerveKinematics(double wheelBase);
+        explicit CowSwerveKinematics(double wheelBase);
         ~CowSwerveKinematics();
 
         static void DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *states, double maxSpeed);
