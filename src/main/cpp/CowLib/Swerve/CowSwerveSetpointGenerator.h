@@ -47,12 +47,17 @@ namespace CowLib
                                 double maxDeviation,
                                 int maxIterations);
 
-        double FindDriveMaxS(double x0, double y0, double f0, double x1, double y1, double f1, double maxVelStep, int maxIterations);
+        double FindDriveMaxS(double x0,
+                             double y0,
+                             double f0,
+                             double x1,
+                             double y1,
+                             double f1,
+                             double maxVelStep,
+                             int maxIterations);
 
         double SinDegrees(double angle);
         double CosDegrees(double angle);
-
-        bool EpsilonEquals(double a, double b);
 
         template<typename T> int sgn(T val) { return (T(0) < val) - (val < T(0)); }
 

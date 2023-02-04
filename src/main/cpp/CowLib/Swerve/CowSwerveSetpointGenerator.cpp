@@ -1,5 +1,6 @@
 #include "CowSwerveSetpointGenerator.h"
 
+#include "../Utility.h"
 #include "CowChassisSpeeds.h"
 #include "CowSwerveKinematics.h"
 #include "units/angle.h"
@@ -389,12 +390,6 @@ namespace CowLib
     double CowSwerveSetpointGenerator::CosDegrees(double angle)
     {
         return cos(angle * M_PI / 180.0);
-    }
-
-    bool CowSwerveSetpointGenerator::EpsilonEquals(double a, double b)
-    {
-        constexpr double epsilon = 1e-9;
-        return fabs(a - b) < epsilon;
     }
 
 } // namespace CowLib

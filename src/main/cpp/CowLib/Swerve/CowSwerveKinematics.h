@@ -1,6 +1,7 @@
 #ifndef __COWLIB_COWSWERVEKINEMATICS_H__
 #define __COWLIB_COWSWERVEKINEMATICS_H__
 
+#include "../Geometry/Rotation2d.h"
 #include "../Geometry/Translation2d.h"
 #include "CowChassisSpeeds.h"
 #include "CowSwerveModuleState.h"
@@ -17,8 +18,6 @@
 
 namespace CowLib
 {
-
-    // Custom eventually, rn just wrapper for wpilib
     class CowSwerveKinematics
     {
     private:
@@ -32,6 +31,7 @@ namespace CowLib
         std::array<Translation2d, NUM_MODULES> m_ModulePositions;
 
         mutable std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates{};
+        mutable std::array<Rotation2d, 4> m_ModuleRotations{};
 
     public:
         explicit CowSwerveKinematics(double wheelBase);
@@ -50,7 +50,9 @@ namespace CowLib
 
         CowChassisSpeeds CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates);
 
-        std::array<frc::Translation2d, 4> GetModulePositions();
+        CowChassisSpeeds CalculuateChassisSpeedsWithWheelConstraints(std::array<CowSwerveModuleState, 4> &moduleStates);
+
+        std::array<Translation2d, 4> GetModulePositions();
 
         frc::SwerveDriveKinematics<4> *GetInternalKinematics();
     };

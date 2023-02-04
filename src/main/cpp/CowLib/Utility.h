@@ -8,6 +8,7 @@
 #include "../Declarations.h"
 
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 #include <stdarg.h>
 
@@ -15,6 +16,17 @@
 
 namespace CowLib
 {
+    template<typename T> int sgn(T val)
+    {
+        return (T(0) < val) - (val < T(0));
+    }
+
+    inline bool EpsilonEquals(double a, double b)
+    {
+        constexpr double epsilon = 1e-9;
+        return fabs(a - b) < epsilon;
+    }
+
     double LimitMix(double value, double maxValue);
     double LimitMix(double value);
     double AnalogInScale(double oldx, double center);

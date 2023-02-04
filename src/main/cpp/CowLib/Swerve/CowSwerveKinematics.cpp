@@ -1,14 +1,16 @@
 #include "CowSwerveKinematics.h"
 
+#include "frc/EigenCore.h"
+
 #include <array>
 
 namespace CowLib
 {
 
     /**
- * @brief Creates a new CowSwerveKinematics object
- * @param wheelBase distance between the center of each swerve module on one edge
- */
+    * @brief Creates a new CowSwerveKinematics object
+    * @param wheelBase distance between the center of each swerve module on one edge
+    */
     CowSwerveKinematics::CowSwerveKinematics(double wheelBase)
     {
         auto p = wheelBase / 2.0;
@@ -30,6 +32,10 @@ namespace CowLib
 
         m_ModuleStates
             = { CowSwerveModuleState(), CowSwerveModuleState(), CowSwerveModuleState(), CowSwerveModuleState() };
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            m_ModuleRotations[i] = Rotation2d(m_ModulePositions[i].X(), m_ModulePositions[i].Y(), true);
+        }
         m_PreviousCenterOfRotation = Translation2d();
     }
 
@@ -38,10 +44,10 @@ namespace CowLib
     }
 
     /**
- * @brief Re-normalizes wheel speeds if any individual speed is above maxSpeed
- * @param moduleStates Reference to std::array of CowSwerveModuleStates (mutated)
- * @param maxSpeed Maximum attainable speed (feet per second)
- */
+    * @brief Re-normalizes wheel speeds if any individual speed is above maxSpeed
+    * @param moduleStates Reference to std::array of CowSwerveModuleStates (mutated)
+    * @param maxSpeed Maximum attainable speed (feet per second)
+    */
     void CowSwerveKinematics::DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *moduleStates, double maxSpeed)
     {
         // auto &states = *moduleStates;
@@ -62,10 +68,10 @@ namespace CowLib
     }
 
     /**
- * @brief Uses WPILib kinematics to calculate module states from chassisSpeeds
- * @param chassisSpeeds CowChassisSpeeds struct
- * @return std::array of 4 CowSwerveModuleStates
- */
+    * @brief Uses WPILib kinematics to calculate module states from chassisSpeeds
+    * @param chassisSpeeds CowChassisSpeeds struct
+    * @return std::array of 4 CowSwerveModuleStates
+    */
     std::array<CowSwerveModuleState, 4>
     CowSwerveKinematics::CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds,
                                                const Translation2d centerOfRotation) const
@@ -80,75 +86,99 @@ namespace CowLib
             return m_ModuleStates;
         }
 
-        // // We have a new center of rotation. We need to compute the matrix again.
-        // if (m_PreviousCenterOfRotation != centerOfRotation)
-        // {
-        //     for (int i = 0; i < NUM_MODULES; i++)
-        //     {
-        //         // clang-format off
-        //         m_InverseKinematics.template block<2, 3>(i * 2, 0) =
-        //             frc::Matrixd<2, 3>{
-        //             {1, 0, (-m_ModulePositions[i].Y() + centerOfRotation.Y())},
-        //             {0, 1, (+m_ModulePositions[i].X() - centerOfRotation.X())}};
-        //         // clang-format on
-        //     }
-        //     m_PreviousCenterOfRotation = centerOfRotation;
-        // }
+        // We have a new center of rotation. We need to compute the matrix again.
+        if (m_PreviousCenterOfRotation != centerOfRotation)
+        {
+            for (int i = 0; i < NUM_MODULES; i++)
+            {
+                // clang-format off
+                m_InverseKinematics.template block<2, 3>(i * 2, 0) =
+                    frc::Matrixd<2, 3>{
+                    {1, 0, (-m_ModulePositions[i].Y() + centerOfRotation.Y())},
+                    {0, 1, (+m_ModulePositions[i].X() - centerOfRotation.X())}};
+                // clang-format on
+            }
+            m_PreviousCenterOfRotation = centerOfRotation;
+        }
 
-        // Eigen::Vector3d chassisSpeedsVector{ chassisSpeeds.vx.value(),
-        //                                      chassisSpeeds.vy.value(),
-        //                                      chassisSpeeds.omega.value() };
+        Eigen::Vector3d chassisSpeedsVector{ chassisSpeeds.vx, chassisSpeeds.vy, chassisSpeeds.omega };
 
-        // Matrixd<NumModules * 2, 1> moduleStateMatrix = m_inverseKinematics * chassisSpeedsVector;
+        frc::Matrixd<NUM_MODULES * 2, 1> moduleStateMatrix = m_InverseKinematics * chassisSpeedsVector;
 
-        // for (size_t i = 0; i < NumModules; i++)
-        // {
-        //     units::meters_per_second_t x{ moduleStateMatrix(i * 2, 0) };
-        //     units::meters_per_second_t y{ moduleStateMatrix(i * 2 + 1, 0) };
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            double vx = moduleStateMatrix(i * 2, 0);
+            double vy = moduleStateMatrix(i * 2 + 1, 0);
 
-        //     auto speed = units::math::hypot(x, y);
-        //     Rotation2d rotation{ x.value(), y.value() };
+            auto speed    = std::hypot(vx, vy);
+            auto rotation = Rotation2d(vx, vy, true);
 
-        //     m_moduleStates[i] = { speed, rotation };
-        // }
+            m_ModuleStates[i] = { speed, rotation.GetDegrees() };
+        }
 
-        // return m_moduleStates;
-
-        // frc::Translation2d centerOfRotation
-        //     = frc::Translation2d(units::foot_t{ centerOfRotationX }, units::foot_t{ centerOfRotationY });
-
-        // auto moduleStates = m_Kinematics->ToSwerveModuleStates(chassisSpeeds.ToWPI(), centerOfRotation);
-
-        // std::array<CowSwerveModuleState, 4> convertedStates{};
-
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     double velocity = moduleStates[i].speed.convert<units::feet_per_second>().value();
-        //     double angle    = moduleStates[i].angle.Degrees().value();
-
-        //     convertedStates[i] = CowSwerveModuleState{ velocity, angle };
-        // }
-
-        // return convertedStates;
+        return m_ModuleStates;
     }
 
     CowChassisSpeeds CowSwerveKinematics::CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates)
     {
-        // return CowChassisSpeeds::FromWPI(m_Kinematics->ToChassisSpeeds(moduleStates[0].ToWPI(),
-        //                                                                moduleStates[1].ToWPI(),
-        //                                                                moduleStates[2].ToWPI(),
-        //                                                                moduleStates[3].ToWPI()));
+        frc::Matrixd<NUM_MODULES * 2, 1> moduleStateMatrix;
+
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            CowSwerveModuleState module     = moduleStates[i];
+            moduleStateMatrix(i * 2, 0)     = module.velocity * module.angle;
+            moduleStateMatrix(i * 2 + 1, 0) = module.velocity * module.angle;
+        }
+
+        Eigen::Vector3d chassisSpeedsVector = m_ForwardKinematics.solve(moduleStateMatrix);
+
+        return { chassisSpeedsVector(0), chassisSpeedsVector(1), chassisSpeedsVector(2) };
     }
 
-    std::array<frc::Translation2d, 4> CowSwerveKinematics::GetModulePositions()
+    CowChassisSpeeds
+    CowSwerveKinematics::CalculuateChassisSpeedsWithWheelConstraints(std::array<CowSwerveModuleState, 4> &moduleStates)
     {
-        // return m_ModulePositions;
+        frc::Matrixd<NUM_MODULES * 2, 3> constraintsMatrix;
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            auto module      = moduleStates[i];
+            Rotation2d angle = Rotation2d(module.angle, true);
+
+            auto beta = angle.RotateBy(m_ModuleRotations[i].Inverse()).RotateBy(Rotation2d::FromDegrees(90));
+
+            constraintsMatrix(i * 2, 0) = angle.Cos();
+            constraintsMatrix(i * 2, 1) = angle.Sin();
+            constraintsMatrix(i * 2, 2) = -m_ModulePositions[i].Norm() * beta.Sin();
+
+            constraintsMatrix(i * 2 + 1, 0) = -angle.Sin();
+            constraintsMatrix(i * 2 + 1, 1) = angle.Cos();
+            constraintsMatrix(i * 2 + 1, 2) = m_ModulePositions[i].Norm() * beta.Sin();
+        }
+
+        auto psuedoInv = constraintsMatrix.completeOrthogonalDecomposition().pseudoInverse();
+        //  var psuedoInv = constraintsMatrix.pseudoInverse();
+
+        frc::Matrixd<NUM_MODULES * 2, 1> enforcedConstraints;
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            enforcedConstraints(i * 2, 0)     = moduleStates[i].velocity;
+            enforcedConstraints(i * 2 + 1, 0) = 0;
+        }
+
+        auto chassisSpeedsVector = psuedoInv * enforcedConstraints;
+
+        return { chassisSpeedsVector(0), chassisSpeedsVector(1), chassisSpeedsVector(2) };
+    }
+
+    std::array<Translation2d, 4> CowSwerveKinematics::GetModulePositions()
+    {
+        return m_ModulePositions;
     }
 
     /**
- * @brief Retrieves the internal kinematics instance
- * @return WPILib SwerveDriveKinematics
- */
+    * @brief Retrieves the internal kinematics instance
+    * @return WPILib SwerveDriveKinematics
+    */
     frc::SwerveDriveKinematics<4> *CowSwerveKinematics::GetInternalKinematics()
     {
         // return m_Kinematics;
