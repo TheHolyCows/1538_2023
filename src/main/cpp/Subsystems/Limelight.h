@@ -9,12 +9,15 @@
 #define __LIMELIGHT_H__
 
 #include "../CowConstants.h"
+#include "../CowLib/CowLogger.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 #include <frc/filter/MedianFilter.h>
+#include <frc/geometry/Pose2d.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
+#include <vector>
 
 class Limelight
 {
@@ -27,20 +30,23 @@ public:
         LIMELIGHT_VISUAL
     };
 
-    void SetMode(LimelightMode);
-    bool GetValidTargets(void);
-    float GetTargetXPos(void);
-    void ClearXFilter(void);
-    float GetTargetYPos(void);
-    void ClearYFilter(void);
+    void SetPipeline(int);
+    frc::Pose2d GetPose(void);
 
-    bool TargetCentered(void);
+    // void SetMode(LimelightMode);
+    // bool GetValidTargets(void);
+    // float GetTargetXPos(void);
+    // void ClearXFilter(void);
+    // float GetTargetYPos(void);
+    // void ClearYFilter(void);
 
-    int CalcHoodPos(void);
-    float CalcYPercent(void);
-    float CalcNewPid(void);
+    // bool TargetCentered(void);
 
-    void ResetPID(void);
+    // int CalcHoodPos(void);
+    // float CalcYPercent(void);
+    // float CalcNewPid(void);
+
+    // void ResetPID(void);
 
 private:
     std::shared_ptr<nt::NetworkTable> m_Limelight;

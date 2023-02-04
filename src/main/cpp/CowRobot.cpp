@@ -30,6 +30,8 @@ CowRobot::CowRobot()
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
     m_Drivetrain->ResetEncoders();
+
+    m_Limelight = new Limelight("limelight");
 }
 
 /**

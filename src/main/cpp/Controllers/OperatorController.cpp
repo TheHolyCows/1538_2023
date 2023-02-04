@@ -15,6 +15,12 @@ void OperatorController::Handle(CowRobot *bot)
     double centerOfRotationX = 0;
     double centerOfRotationY = 0;
 
+    // limelight testing
+    if (m_CB->GetLeftDriveStickButton(5))
+    {
+        bot->m_Limelight->GetPose();
+    }
+
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
     {
         if (m_EvasiveSwerveWheel == NONE)
