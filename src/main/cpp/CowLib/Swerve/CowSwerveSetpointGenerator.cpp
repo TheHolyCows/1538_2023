@@ -2,11 +2,11 @@
 
 #include "CowChassisSpeeds.h"
 #include "CowSwerveKinematics.h"
-#include "frc/geometry/Rotation2d.h"
 #include "units/angle.h"
 
 #include <array>
 #include <cmath>
+#include <frc/geometry/Rotation2d.h>
 #include <optional>
 
 namespace CowLib

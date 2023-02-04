@@ -1,6 +1,7 @@
 #ifndef __COWLIB_COWSWERVEKINEMATICS_H__
 #define __COWLIB_COWSWERVEKINEMATICS_H__
 
+#include "../Geometry/Translation2d.h"
 #include "CowChassisSpeeds.h"
 #include "CowSwerveModuleState.h"
 #include "Eigen/QR"
@@ -26,11 +27,11 @@ namespace CowLib
         mutable frc::Matrixd<NUM_MODULES * 2, 3> m_InverseKinematics;
         Eigen::HouseholderQR<frc::Matrixd<NUM_MODULES * 2, 3>> m_ForwardKinematics;
 
-        frc::Translation2d m_PreviousCenterOfRotation;
+        Translation2d m_PreviousCenterOfRotation;
 
-        std::array<frc::Translation2d, NUM_MODULES> m_ModulePositions;
+        std::array<Translation2d, NUM_MODULES> m_ModulePositions;
 
-        std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates;
+        mutable std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates{};
 
     public:
         explicit CowSwerveKinematics(double wheelBase);
@@ -38,8 +39,14 @@ namespace CowLib
 
         static void DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *states, double maxSpeed);
 
+        std::array<CowSwerveModuleState, 4> CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds,
+                                                                  const Translation2d centerOfRotation) const;
+
         std::array<CowSwerveModuleState, 4>
-        CalculateModuleStates(CowChassisSpeeds &chassisSpeeds, double centerOfRotationX, double centerOfRotationY);
+        CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds, const double corx, const double cory) const
+        {
+            return CalculateModuleStates(chassisSpeeds, Translation2d(corx, cory));
+        }
 
         CowChassisSpeeds CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates);
 
