@@ -15,6 +15,8 @@ namespace CowLib
         m_UseFOC            = true;
         m_OverrideBrakeMode = false;
 
+        ApplyConfig(ctre::phoenixpro::configs::TalonFXConfiguration{});
+
         CowLogger::GetInstance()->RegisterMotor(id, this);
     }
 
