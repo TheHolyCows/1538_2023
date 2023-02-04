@@ -1,17 +1,19 @@
-// //==================================================
-// // Copyright (C) 2022 Team 1538 / The Holy Cows
-// // Limelight.cpp
-// // author: jon-bassi
-// // created on: 2022-2-28
-// //==================================================
+// ==================================================
+// Copyright (C) 2022 Team 1538 / The Holy Cows
+// Limelight.cpp
+// author: jon-bassi
+// created on: 2022-2-28
+// ==================================================
 
-// #include "Limelight.h"
+#include "Limelight.h"
 
 Limelight::Limelight(std::string hostname)
     : m_XFilter(CONSTANT("X_FILTER_SIZE")),
       m_YFilter(CONSTANT("Y_FILTER_SIZE"))
 {
     m_Limelight = nt::NetworkTableInstance::GetDefault().GetTable(hostname);
+
+    m_Limelight->PutNumber("pipeline", 1);
 
     // ResetPID();
 
@@ -22,7 +24,7 @@ frc::Pose2d Limelight::GetPose()
 {
     std::vector<double> poseVector;
     constexpr double defaultVal[]{ 0, 0, 0, 0, 0, 0 };
-    poseVector = m_Limelight->GetNumberArray("botpose2d", std::span{ defaultVal });
+    poseVector = m_Limelight->GetNumberArray("botpose", std::span{ defaultVal });
     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
                               "limelight translation: %f, %f, %f\nlimelight rotation: %f, %f, %f",
                               poseVector[0],
@@ -31,6 +33,10 @@ frc::Pose2d Limelight::GetPose()
                               poseVector[3],
                               poseVector[4],
                               poseVector[5]);
+    frc::Translation2d curTranslation
+        = frc::Translation2d(units::meter_t(poseVector[0]), units::meter_t(poseVector[1]));
+    frc::Rotation2d curRotation = frc::Rotation2d(units::degree_t(poseVector[5]));
+    return frc::Pose2d(curTranslation, curRotation);
 }
 
 // void Limelight::SetMode(LimelightMode mode)

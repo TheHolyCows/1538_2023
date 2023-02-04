@@ -14,6 +14,7 @@
 #include "../Declarations.h"
 #include "../Subsystems/Limelight.h"
 
+#include <frc/geometry/Pose2d.h>
 #include <iostream>
 #include <math.h>
 #include <stdio.h>

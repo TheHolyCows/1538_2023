@@ -18,7 +18,8 @@ void OperatorController::Handle(CowRobot *bot)
     // limelight testing
     if (m_CB->GetLeftDriveStickButton(5))
     {
-        bot->m_Limelight->GetPose();
+        frc::Pose2d curPose = bot->m_Limelight->GetPose();
+        CowLib::CowLogger::LogPose(curPose.X().value(), curPose.Y().value(), curPose.Rotation().Degrees().value());
     }
 
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)

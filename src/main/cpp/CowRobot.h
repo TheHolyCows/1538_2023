@@ -30,7 +30,6 @@ public:
     Limelight *m_Limelight;
 
 private:
-    SwerveDrive *m_Drivetrain;
     Arm *m_Arm;
 
     int m_DSUpdateCount;
