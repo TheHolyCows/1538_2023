@@ -1,9 +1,11 @@
 #ifndef __COWLIB_COW_SWERVE_ODOMETRY_H__
 #define __COWLIB_COW_SWERVE_ODOMETRY_H__
 
+#include "../Geometry/Pose2d.h"
 #include "./CowSwerveKinematics.h"
 #include "./CowSwerveModulePosition.h"
 #include "./CowSwerveModuleState.h"
+#include "CowChassisSpeeds.h"
 
 #include <algorithm>
 #include <array>
@@ -18,35 +20,38 @@ namespace CowLib
     class CowSwerveOdometry
     {
     private:
-        frc::SwerveDrivePoseEstimator<4> *m_PoseEstimator;
-        frc::Pose2d m_Pose;
-
         CowSwerveKinematics *m_Kinematics;
 
-        frc::Pose2d CreateWPIPose(double x, double y, double rotation);
-        std::array<frc::SwerveModulePosition, 4>
-        CreateWPIModulePositions(std::array<CowSwerveModulePosition, 4> modulePositions);
+        Pose2d m_Pose;
+
+        CowChassisSpeeds m_ChassisSpeeds;
+
+        double m_PreviousTime = -1;
+
+        Rotation2d m_PreviousAngle;
+        std::array<double, 4> m_PreviousDistances;
 
     public:
-        CowSwerveOdometry(CowSwerveKinematics *kinematics,
-                          double gyroAngle,
-                          double initialX,
-                          double initialY,
-                          double initialRotation);
+        CowSwerveOdometry(CowSwerveKinematics *kinematics, Pose2d initialPose, std::array<double, 4> previousDistances);
+
+        CowSwerveOdometry(CowSwerveKinematics *kinematics, Pose2d initialPose);
+
+        CowSwerveOdometry(CowSwerveKinematics *kinematics);
+
         ~CowSwerveOdometry();
 
-        void Reset(double newX,
-                   double newY,
-                   double newRotation,
-                   double gyroAngle,
-                   std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
-        void Reset(frc::Pose2d pose, double gyroAngle, std::array<CowLib::CowSwerveModulePosition, 4> modPositions);
+        void Reset(Pose2d pose);
+        void Reset(Pose2d pose, std::array<double, 4> previousDistances);
 
-        double GetX();
-        double GetY();
-        double GetRotation();
+        Pose2d GetPose() const;
 
-        frc::Pose2d GetWPIPose();
+        frc::Pose2d GetWPIPose() { return frc::Pose2d(); }
+
+        CowChassisSpeeds GetChassisSpeeds() const;
+
+        Pose2d UpdateWithWheelConstraints(double currentTime,
+                                          Rotation2d gyroAngle,
+                                          std::array<CowSwerveModuleState, 4> moduleStates);
 
         void Update(double gyroAngle, std::array<CowSwerveModulePosition, 4> modulePositions);
 

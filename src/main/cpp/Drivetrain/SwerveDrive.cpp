@@ -31,7 +31,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_SetpointGenerator = new CowLib::CowSwerveSetpointGenerator(m_Kinematics);
 
-    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYawDegrees(), 0, 0, 0);
+    // m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, CowLib::Pose2d());
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -46,7 +46,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
 SwerveDrive::~SwerveDrive()
 {
-    delete m_Odometry;
+    // delete m_Odometry;
     delete m_Kinematics;
     delete m_SetpointGenerator;
 
@@ -134,10 +134,9 @@ void SwerveDrive::SetVelocity(double vx,
     frc::SmartDashboard::PutNumber("vy old", chassisSpeeds.vy);
     frc::SmartDashboard::PutNumber("omega old", chassisSpeeds.omega);
 
-    // auto moduleStates
-    //     = m_Kinematics->CalculateModuleStates(updated_chassis_speeds, centerOfRotationX, centerOfRotationY);
+    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, 0, 0);
 
-    auto moduleStates = setpoint.moduleStates;
+    //auto moduleStates = setpoint.moduleStates;
 
     // This just overwrites for now. Maybe fix?
     if (m_Locked)
@@ -256,7 +255,7 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
         modulePositions[module->GetId()] = module->GetPosition();
     }
 
-    m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
+    // m_Odometry->Reset(pose);
     m_Gyro->SetYaw(pose.Rotation().Degrees().value());
 }
 
@@ -288,9 +287,9 @@ void SwerveDrive::Handle()
                        + m_Pose.Rotation().Degrees().value();
     m_Gyro->GetInternalPigeon()->SetYaw(units::degree_t{ gyroAngle });
 
-    m_Odometry->Update(gyroAngle, modulePositions);
+    // m_Odometry->Update(gyroAngle, modulePositions);
 
-    m_Pose = m_Odometry->GetWPIPose();
+    // m_Pose = m_Odometry->GetWPIPose();
     m_Field.SetRobotPose(m_Pose);
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,

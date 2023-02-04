@@ -91,12 +91,12 @@ namespace CowLib
         {
             for (int i = 0; i < NUM_MODULES; i++)
             {
-                // clang-format off
-                m_InverseKinematics.template block<2, 3>(i * 2, 0) =
-                    frc::Matrixd<2, 3>{
-                    {1, 0, (-m_ModulePositions[i].Y() + centerOfRotation.Y())},
-                    {0, 1, (+m_ModulePositions[i].X() - centerOfRotation.X())}};
-                // clang-format on
+                m_InverseKinematics(i * 2, 0)     = 1;
+                m_InverseKinematics(i * 2, 1)     = 0;
+                m_InverseKinematics(i * 2, 2)     = -m_ModulePositions[i].Y() + centerOfRotation.Y();
+                m_InverseKinematics(i * 2 + 1, 0) = 0;
+                m_InverseKinematics(i * 2 + 1, 1) = 1;
+                m_InverseKinematics(i * 2 + 1, 2) = m_ModulePositions[i].X() - centerOfRotation.X();
             }
             m_PreviousCenterOfRotation = centerOfRotation;
         }

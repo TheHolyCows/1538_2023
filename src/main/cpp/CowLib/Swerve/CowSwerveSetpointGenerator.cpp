@@ -228,6 +228,11 @@ namespace CowLib
                                               previousSetpoint.chassisSpeeds.omega + minS * dtheta };
 
         auto returnStates = m_Kinematics->CalculateModuleStates(returnSpeeds, 0, 0);
+                std::cout << "ret states 1: " << returnStates[0].angle << " " << returnStates[0].velocity
+                  << " 2:" << returnStates[1].angle << " " << returnStates[1].velocity << " 3:" << returnStates[2].angle
+                  << " " << returnStates[2].velocity << " 4:" << returnStates[3].angle << " "
+                  << returnStates[3].velocity << std::endl;
+
 
         for (int i = 0; i < 4; ++i)
         {

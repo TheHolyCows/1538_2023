@@ -81,7 +81,8 @@ public:
 
     // void SetVisionAlignVelocity(double x, double y, double rotation, bool isFieldRelative = true);
 
-    frc::Pose2d GetPose() { return m_Odometry->GetWPIPose(); }
+    // frc::Pose2d GetPose() { return m_Odometry->GetWPIPose(); }
+    frc::Pose2d GetPose() { return frc::Pose2d(); }
 
     double GetPoseX();
     double GetPoseY();
