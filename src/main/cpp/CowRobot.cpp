@@ -32,6 +32,7 @@ CowRobot::CowRobot()
     m_Drivetrain->ResetEncoders();
 
     m_Limelight = new Limelight("limelight");
+    // m_Arm = new Arm(9, 10);
 }
 
 /**
@@ -44,6 +45,7 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->ResetConstants();
+    // m_Controller->ResetConstants(); error
 }
 
 /**
@@ -58,9 +60,9 @@ void CowRobot::SetController(GenericController *controller)
 
 void CowRobot::PrintToDS()
 {
-    if (m_DSUpdateCount % 10 == 0)
+    if (m_DSUpdateCount++ % 10 == 0)
     {
-        m_DSUpdateCount = 0;
+        m_DSUpdateCount = 1;
     }
 }
 
@@ -79,10 +81,15 @@ void CowRobot::Handle()
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
 
+    // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
-
-    // Log gyro angle (only yaw for now)
-    //CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
+    // log the following every 200 ms
+    if (m_DSUpdateCount % 10 == 0)
+    {
+        // m_DSUpdateCount is reset in PrintToDS
+        CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
+        CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
+    }
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());

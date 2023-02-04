@@ -14,6 +14,7 @@
 #include "CowLib/Utility.h"
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
+#include "Subsystems/Arm.h"
 #include "Subsystems/Limelight.h"
 
 #include <frc/BuiltInAccelerometer.h>
@@ -29,6 +30,9 @@ public:
     Limelight *m_Limelight;
 
 private:
+    SwerveDrive *m_Drivetrain;
+    Arm *m_Arm;
+
     int m_DSUpdateCount;
 
     GenericController *m_Controller = nullptr;

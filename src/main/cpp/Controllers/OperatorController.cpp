@@ -1,13 +1,13 @@
 #include "OperatorController.h"
 
-#include <iostream>
-
 OperatorController::OperatorController(CowControlBoard *controlboard)
     : m_CB(controlboard)
 {
     m_TrackingCooldownTimer = 0.0;
 
     m_EvasiveSwerveWheel = NONE;
+
+    m_ControllerExpFilter = new CowLib::CowExponentialFilter(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 }
 
 void OperatorController::Handle(CowRobot *bot)
@@ -28,7 +28,7 @@ void OperatorController::Handle(CowRobot *bot)
             double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
             stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
 
-            double robotOrientedAngle = bot->GetGyro()->GetYaw() + stickAngle;
+            double robotOrientedAngle = bot->GetGyro()->GetYawDegrees() + stickAngle;
 
             // set wheel based on quadrant
             if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
@@ -85,13 +85,19 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
-                                      fieldRelative,
-                                      centerOfRotationX,
-                                      centerOfRotationY);
+    bot->GetDrivetrain()->SetVelocity(
+        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
+            * CONSTANT("DESIRED_MAX_SPEED") * -1,
+        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
+            * CONSTANT("DESIRED_MAX_SPEED") * -1,
+        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
+            * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
+        fieldRelative,
+        centerOfRotationX,
+        centerOfRotationY);
+}
+
+void OperatorController::ResetConstants()
+{
+    m_ControllerExpFilter->Reset(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 }

@@ -16,7 +16,7 @@ namespace CowLib
      */
         double FalconToDegrees(double counts, double gearRatio)
         {
-            return counts * (360.0 / (gearRatio * 2048.0));
+            return counts * (360.0 / (gearRatio * 1));
         }
 
         /**
@@ -28,7 +28,7 @@ namespace CowLib
      */
         double DegreesToFalcon(double degrees, double gearRatio)
         {
-            return degrees * (gearRatio * 2048) / 360.0;
+            return degrees * (gearRatio) / 360.0;
         }
 
         /**
@@ -40,7 +40,7 @@ namespace CowLib
      */
         double FalconToRPM(double velocityCounts, double gearRatio)
         {
-            double motorRPM = velocityCounts * (600.0 / 2048.0);
+            double motorRPM = velocityCounts * (600.0 / 1.0);
 
             return motorRPM / gearRatio;
         }
@@ -56,7 +56,7 @@ namespace CowLib
         {
             double motorRPM = rpm * gearRatio;
 
-            return motorRPM * (2048.0 / 600.0);
+            return motorRPM * (1.0 / 600.0);
         }
 
         /**

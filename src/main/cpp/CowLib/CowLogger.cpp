@@ -99,11 +99,13 @@ namespace CowLib
      * called on every auto mode selection button press and every 50ms in disabled periodic
      * @param name - name of current auto mode
      */
-    void CowLogger::LogAutoMode(const char *name)
+    void CowLogger::LogAutoMode(frc::DriverStation::Alliance alliance, const char *name)
     {
         CowAutoLog logPacket;
         logPacket.hdr.msgType = CowLogger::AUTO_LOG;
         logPacket.hdr.msgLen  = sizeof(logPacket);
+
+        logPacket.alliance = alliance;
 
         // sub 1 from len to allow space for '\0'
         memset(logPacket.name, 0x0, sizeof(logPacket.name));
@@ -112,7 +114,16 @@ namespace CowLib
         SendLog(&logPacket, sizeof(logPacket));
     }
 
-    void CowLogger::LogGyroAngle(double angle)
+    /**
+     * CowLogger::LogAutoMode
+     * log the gyro from the robot, these values are relative to the starting orientation
+     * of the bot
+     * this can be reset by auto mode
+     * @param pitch - pitch of the bot (in degrees)
+     * @param roll - roll of the bot (in degrees)
+     * @param yaw - yaw of the bot (in degrees)
+    */
+    void CowLogger::LogGyro(double pitch, double roll, double yaw)
     {
         if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
@@ -122,7 +133,37 @@ namespace CowLib
         CowGyroLog logPacket;
         logPacket.hdr.msgType = CowLogger::GYRO_LOG;
         logPacket.hdr.msgLen  = sizeof(CowGyroLog);
-        logPacket.angle       = angle;
+
+        logPacket.pitch = pitch;
+        logPacket.roll  = roll;
+        logPacket.yaw   = yaw;
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    /**
+     * CowLogger::LogPose
+     * log the current Pose of the robot
+     * this is analogous to the current position of the bot on the field
+     * this can be reset by auto mode
+     * @param x - x position of the bot on the field (forwards and back for field oriented)
+     * @param y - y position of the bot on the field (left and right for field oriented)
+     * @param rot - yaw of the bot
+    */
+    void CowLogger::LogPose(double x, double y, double rot)
+    {
+        if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
+        {
+            return;
+        }
+
+        CowPoseLog logPacket;
+        logPacket.hdr.msgType = CowLogger::POSE_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowPoseLog);
+
+        logPacket.x   = x;
+        logPacket.y   = y;
+        logPacket.rot = rot;
 
         SendLog(&logPacket, sizeof(logPacket));
     }
@@ -219,7 +260,7 @@ namespace CowLib
     /**
      * CowLogger::Handle
      * handler to be called every cycle for logging within CowRobot, strictly used
-     * to log registered motors in , therefore, this function can safely
+     * to log registered motors, therefore, this function can safely
      * be removed from production code
      */
     void CowLogger::Handle()
@@ -251,7 +292,7 @@ namespace CowLib
             }
         }
 
-        if (m_TickCount++ % 20 == 0) // 200 miliseconds
+        if (m_TickCount++ % 10 == 0) // 200 miliseconds
         {
             m_TickCount = 1;
 

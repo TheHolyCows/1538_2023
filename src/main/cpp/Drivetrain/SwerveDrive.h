@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <array>
+#include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
 #include <frc/geometry/Translation2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
@@ -72,6 +73,10 @@ public:
     // void SetVisionAlignVelocity(double x, double y, double rotation, bool isFieldRelative = true);
 
     frc::Pose2d GetPose() { return m_Odometry->GetWPIPose(); }
+
+    double GetPoseX();
+    double GetPoseY();
+    double GetPoseRot();
 
     bool GetLocked() const;
     void SetLocked(bool isLocked);

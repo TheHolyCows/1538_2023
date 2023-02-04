@@ -14,6 +14,7 @@
 #include "CowLib/CowLib.h"
 #include "CowLib/CowLogger.h"
 
+#include <frc/DriverStation.h>
 #include <frc/TimedRobot.h>
 #include <iostream>
 
@@ -28,6 +29,8 @@ private:
     CowDisplay *m_Display;
 
     int m_DisabledCount = 0;
+
+    frc::DriverStation::Alliance m_Alliance = frc::DriverStation::Alliance::kInvalid;
 
 public:
     CowBase();
