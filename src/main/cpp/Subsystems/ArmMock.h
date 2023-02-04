@@ -23,10 +23,7 @@ public:
      * with the values defined in the CowConstants
      * 
      */
-    void ResetConstants() override
-    {
-        CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, "Resetting Arm Constants");
-    }
+    void ResetConstants() override { CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Resetting Arm Constants"); }
 
     /**
      * @brief Will set the motors to their specified values
@@ -35,7 +32,7 @@ public:
     void Handle() override
     {
         // Maybe don't log here since this is called so often
-        // CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, "Handling Arm Code");
+        // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Handling Arm Code");
     }
 
     /**
@@ -43,7 +40,7 @@ public:
      * Will be called periodically. 
      * 
      */
-    void CheckMinMax() override { CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, "Checking MinMax"); }
+    void CheckMinMax() override { CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Checking MinMax"); }
 
     /**
      * @brief Will set the angle of the arm to its zero position, which is the midpoint between
@@ -52,7 +49,7 @@ public:
      * This method assumes that the min and max angles are set correctly.
      * 
      */
-    void ZeroSensors() override { CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, "Zeroing Sensors"); }
+    void ZeroSensors() override { CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Zeroing Sensors"); }
 
 private:
     /**
@@ -64,7 +61,7 @@ private:
     {
         std::stringstream ss;
         ss << "Setting Arm Angle to: " << angle << " degrees";
-        CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, ss.str().c_str());
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, ss.str().c_str());
     }
 
     /**
@@ -76,7 +73,7 @@ private:
     {
         std::stringstream ss;
         ss << "Setting Arm Pos to: " << pos << " degrees";
-        CowLib::CowLogger::LogMsg(CowLib::CowLogLevel::LOG_DBG, ss.str().c_str());
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, ss.str().c_str());
     }
 };
 
