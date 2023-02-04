@@ -11,37 +11,33 @@
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowMotorController.h"
+#include "ArmInterface.h"
 
 #include <iostream>
 #include <memory>
 
-class Arm
+class Arm : public ArmInterface
 {
 private:
     /**
-     * @brief Will return a safe arm position
+     * @brief Will rotate the arm to the specified angle
      * 
-     * @param angle 
-     * @return double 
+     * @param angle The desired angle in degrees to rotate to
      */
-    void setSafeArmPosition(const double angle) const;
+    void SetArmAngle(const double angle) override;
 
-    void setSafeAngle(const double position) const;
-
-    bool doesSafePositionExist(const double angle);
-    bool doesSafeAngleExist(const double pos) const;
+    /**
+     * @brief Will set the telescoping position of the arm
+     * 
+     * @param position The desired position of the arm in inches
+     */
+    void SetArmPosition(const double pos) override;
 
     std::unique_ptr<CowLib::CowMotorController> m_RotationMotor;
     std::unique_ptr<CowLib::CowMotorController> m_TelescopeMotor;
 
     CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
     CowLib::CowMotorController::PositionPercentOutput m_TelescopeControlRequest;
-
-    double m_TelescopePosition;
-    double m_Angle;
-
-    double m_MinAngle;
-    double m_MaxAngle;
 
     int m_LoopCount;
 
@@ -52,7 +48,7 @@ public:
      * @param rotationMotor The id of the motor to control the rotation of the arm
      * @param telescopeMotor The id of the motor to control telescoping of the arm
      */
-    Arm(int rotationMotor, int telescopeMotor);
+    Arm(const int rotationMotor, const int telescopeMotor);
 
     /**
      * @brief Default destructor
@@ -61,49 +57,24 @@ public:
     ~Arm() = default;
 
     /**
-     * @brief Will rotate the arm to the specified angle
+     * @brief Will reset the PID values for both rotation and telescope motors
+     * with the values defined in the CowConstants
      * 
-     * @param angle The desired angle in degrees to rotate to
      */
-    void SetAngle(double angle);
+    void ResetConstants() override;
 
     /**
-     * @brief Will set the telescoping position of the arm
-     * 
-     * @param position The desired position of the arm in inches
-     */
-    void SetTelescopePosition(double position);
-
-    /**
-     * @brief Will return the current angle of the arm
-     * 
-     * @return double The current angle of the arm in degrees 
-     */
-    double GetAngle() const;
-
-    /**
-     * @brief Will get the telescoping
-     * 
-     * @return double The desired telescoping position of the arm in inches
-     */
-    double GetTelescopePosition() const;
-
-    /**
-     * @brief 
+     * @brief Will set the motors to their specified values
      * 
      */
-    void ResetConstants();
-
-    void Handle();
+    void Handle() override;
 
     /**
      * @brief Will set the minimum or maximum angle depending on the current position
      * Will be called periodically. 
      * 
-     * Current disabled!
-     * 
      */
-    void CheckMinMax();
+    void CheckMinMax() override;
 
     /**
      * @brief Will set the angle of the arm to its zero position, which is the midpoint between
@@ -112,7 +83,7 @@ public:
      * This method assumes that the min and max angles are set correctly.
      * 
      */
-    void ZeroSensors();
+    void ZeroSensors() override;
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */

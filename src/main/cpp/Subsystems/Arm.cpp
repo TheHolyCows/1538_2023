@@ -7,17 +7,21 @@
 
 #include "Arm.h"
 
+#include "ArmMock.h"
+
 Arm::Arm(int rotationMotor, int telescopeMotor)
-    : m_RotationMotor(new CowLib::CowMotorController(rotationMotor)),
-      m_TelescopeMotor(new CowLib::CowMotorController(telescopeMotor)),
-      m_RotationControlRequest({ 0 }),
-      m_TelescopeControlRequest({ 0 }),
-      m_TelescopePosition(0),
-      m_Angle(0),
-      m_MinAngle(0),
-      m_MaxAngle(0),
-      m_LoopCount(0)
 {
+    // Set ArmInterface Members
+    m_MinAngle = 0;
+    m_MaxAngle = 0;
+    m_MinPos   = 0;
+    m_MaxPos   = 0;
+
+    m_RotationMotor.reset(new CowLib::CowMotorController(rotationMotor));
+    m_TelescopeMotor.reset(new CowLib::CowMotorController(telescopeMotor));
+    m_RotationControlRequest  = { 0 };
+    m_TelescopeControlRequest = { 0 };
+    m_LoopCount               = 0;
     // no longer works with Phoenix Pro
     // m_RotatorMotor->SetControlMode(CowLib::CowMotorController::POSITION);
     // m_TelescopeMotor->SetControlMode(CowLib::CowMotorController::POSITION);
@@ -33,26 +37,16 @@ Arm::Arm(int rotationMotor, int telescopeMotor)
     ResetConstants();
 }
 
-void Arm::SetAngle(double angle)
+void Arm::SetArmAngle(double angle)
 {
     m_RotationControlRequest.Position
         = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO"));
 }
 
-void Arm::SetTelescopePosition(double position)
+void Arm::SetArmPosition(double position)
 {
     // TODO: check this math
     m_TelescopeControlRequest.Position = position * CONSTANT("TELESCOPE_RATIO");
-}
-
-double Arm::GetAngle() const
-{
-    return m_Angle;
-}
-
-double Arm::GetTelescopePosition() const
-{
-    return m_TelescopePosition;
 }
 
 void Arm::ResetConstants()
@@ -68,8 +62,8 @@ void Arm::Handle()
 {
     if (m_LoopCount++ % 20 == 0)
     {
-        double p = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * m_TelescopePosition)
-                   + (CONSTANT("ARM_P_ANGLE") * m_Angle);
+        double p = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * m_CurrentConfig.pos)
+                   + (CONSTANT("ARM_P_ANGLE") * m_CurrentConfig.angle);
 
         m_RotationMotor->SetPID(p, CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
     }
@@ -78,7 +72,7 @@ void Arm::Handle()
     {
         m_RotationMotor->Set(m_RotationControlRequest);
 
-        m_Angle
+        m_CurrentConfig.angle
             = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
     }
 
@@ -86,22 +80,23 @@ void Arm::Handle()
     {
         m_TelescopeMotor->Set(m_TelescopeControlRequest);
 
-        m_TelescopePosition = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
+        m_CurrentConfig.pos = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
     }
 }
 
 void Arm::CheckMinMax()
 {
-    m_Angle = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    m_CurrentConfig.angle
+        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
 
-    if (m_Angle < m_MinAngle)
+    if (m_CurrentConfig.angle < m_MinAngle)
     {
-        m_MinAngle = m_Angle;
+        m_MinAngle = m_CurrentConfig.angle;
     }
 
-    if (m_Angle > m_MaxAngle)
+    if (m_CurrentConfig.angle > m_MaxAngle)
     {
-        m_MaxAngle = m_Angle;
+        m_MaxAngle = m_CurrentConfig.angle;
     }
 }
 
