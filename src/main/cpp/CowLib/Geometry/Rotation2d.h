@@ -35,7 +35,7 @@ namespace CowLib
         mutable double m_SinAngle = NaN;
         mutable double m_Degrees  = NaN;
 
-        constexpr Rotation2d(double x, double y, double degrees)
+        Rotation2d(double x, double y, double degrees)
         {
             m_CosAngle = x;
             m_SinAngle = y;
@@ -56,70 +56,25 @@ namespace CowLib
         }
 
     public:
-        constexpr static Rotation2d identity() { return Rotation2d(); }
+        static Rotation2d identity() { return Rotation2d(); }
 
         Rotation2d operator=(const Rotation2d &other) const;
 
-        constexpr Rotation2d() { Rotation2d(1.0, 0.0, 0.0); }
+        Rotation2d() { Rotation2d(1.0, 0.0, 0.0); }
 
-        constexpr Rotation2d(double degrees, bool normalize)
-        {
-            if (normalize)
-            {
-                degrees = WrapDegrees(degrees);
-            }
+        Rotation2d(double degrees, bool normalize);
 
-            m_Degrees = degrees;
-        }
+        Rotation2d(double x, double y, bool normalize);
 
-        constexpr Rotation2d(double x, double y, bool normalize)
-        {
-            if (normalize)
-            {
-                // From trig, we know that sin^2 + cos^2 == 1, but as we do math on this object
-                // we might accumulate rounding errors.
-                // Normalizing forces us to re-scale the sin and cos to reset rounding errors.
-                double magnitude = std::hypot(x, y);
-                if (magnitude > 1E-9)
-                {
-                    m_SinAngle = y / magnitude;
-                    m_CosAngle = x / magnitude;
-                }
-                else
-                {
-                    m_SinAngle = 0.0;
-                    m_CosAngle = 1.0;
-                }
-            }
-            else
-            {
-                m_CosAngle = x;
-                m_SinAngle = y;
-            }
-        }
+        Rotation2d(const Rotation2d &other);
 
-        constexpr Rotation2d(const Rotation2d &other)
-        {
-            m_CosAngle = other.m_CosAngle;
-            m_SinAngle = other.m_SinAngle;
-            m_Degrees  = other.m_Degrees;
-        }
-
-        constexpr Rotation2d(const frc::Rotation2d &other)
-        {
-            m_CosAngle = other.Cos();
-            m_SinAngle = other.Sin();
-            m_Degrees  = other.Degrees().value();
-        }
+        Rotation2d(const frc::Rotation2d &other);
 
         Rotation2d(const Translation2d direction, bool normalize);
 
-        constexpr static Rotation2d FromRadians(double angle_radians)
-        {
-            return FromDegrees(angle_radians * 180.0 / M_PI);
-        }
+        static Rotation2d FromRadians(double angle_radians) { return FromDegrees(angle_radians * 180.0 / M_PI); }
 
-        constexpr static Rotation2d FromDegrees(double angle_degrees) { return Rotation2d(angle_degrees, true); }
+        static Rotation2d FromDegrees(double angle_degrees) { return Rotation2d(angle_degrees, true); }
 
         double Cos() const;
 

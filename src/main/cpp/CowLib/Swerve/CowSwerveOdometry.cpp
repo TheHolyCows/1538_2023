@@ -1,6 +1,8 @@
 #include "./CowSwerveOdometry.h"
 
 #include "CowSwerveModuleState.h"
+#include "frc/Timer.h"
+#include "units/time.h"
 #include "wpi/timestamp.h"
 
 #include <cmath>
@@ -56,12 +58,12 @@ namespace CowLib
                                                          Rotation2d gyroAngle,
                                                          std::array<CowSwerveModuleState, 4> moduleStates)
     {
-        return Pose2d();
         double period  = m_PreviousTime >= 0 ? currentTime - m_PreviousTime : 0.0;
         m_PreviousTime = currentTime;
 
         auto angle        = gyroAngle;
         auto chassisState = m_Kinematics->CalculuateChassisSpeedsWithWheelConstraints(moduleStates);
+        return Pose2d();
 
         auto idealStates = m_Kinematics->CalculateModuleStates(chassisState);
 
@@ -87,6 +89,8 @@ namespace CowLib
 
         m_ChassisSpeeds = chassisState;
 
+        printf("prev pose: %s\nnew componenet %s \n", m_Pose.ToString().c_str(), newPose.ToString().c_str());
+
         m_Pose          = Pose2d(m_Pose.GetX() + newPose.GetX(), m_Pose.GetY() + newPose.GetY(), angle);
         m_PreviousAngle = angle;
 
@@ -95,7 +99,9 @@ namespace CowLib
 
     Pose2d CowSwerveOdometry::Update(double gyroAngle, std::array<CowSwerveModuleState, 4> moduleStates)
     {
-        return UpdateWithWheelConstraints(WPI_Now() * 1.0e-6, Rotation2d::FromDegrees(gyroAngle), moduleStates);
+        return UpdateWithWheelConstraints(frc::Timer::GetFPGATimestamp().value(),
+                                          Rotation2d::FromDegrees(gyroAngle),
+                                          moduleStates);
     }
 
 } // namespace CowLib

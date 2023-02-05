@@ -4,6 +4,56 @@
 
 namespace CowLib
 {
+    Rotation2d::Rotation2d(double degrees, bool normalize)
+    {
+        if (normalize)
+        {
+            degrees = WrapDegrees(degrees);
+        }
+
+        m_Degrees = degrees;
+    }
+
+    Rotation2d::Rotation2d(double x, double y, bool normalize)
+    {
+        if (normalize)
+        {
+            // From trig, we know that sin^2 + cos^2 == 1, but as we do math on this object
+            // we might accumulate rounding errors.
+            // Normalizing forces us to re-scale the sin and cos to reset rounding errors.
+            double magnitude = std::hypot(x, y);
+            if (magnitude > 1E-9)
+            {
+                m_SinAngle = y / magnitude;
+                m_CosAngle = x / magnitude;
+            }
+            else
+            {
+                m_SinAngle = 0.0;
+                m_CosAngle = 1.0;
+            }
+        }
+        else
+        {
+            m_CosAngle = x;
+            m_SinAngle = y;
+        }
+    }
+
+    Rotation2d::Rotation2d(const Rotation2d &other)
+    {
+        m_CosAngle = other.m_CosAngle;
+        m_SinAngle = other.m_SinAngle;
+        m_Degrees  = other.m_Degrees;
+    }
+
+    Rotation2d::Rotation2d(const frc::Rotation2d &other)
+    {
+        m_CosAngle = other.Cos();
+        m_SinAngle = other.Sin();
+        m_Degrees  = other.Degrees().value();
+    }
+
     Rotation2d::Rotation2d(const Translation2d direction, bool normalize)
     {
         Rotation2d(direction.X(), direction.Y(), normalize);
@@ -149,11 +199,13 @@ namespace CowLib
     {
         if (HasTrig())
         {
+            printf("Inverse trig\n");
             return Rotation2d(m_CosAngle, -m_SinAngle, false);
         }
         else
         {
-            return FromDegrees(-GetDegrees());
+            printf("Inverse degrees\n");
+            return Rotation2d::FromDegrees(-GetDegrees());
         }
     }
 

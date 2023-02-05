@@ -1,6 +1,7 @@
 #ifndef __COWLIB_COW_SWERVE_ODOMETRY_H__
 #define __COWLIB_COW_SWERVE_ODOMETRY_H__
 
+#include "../CowTimer.h"
 #include "../Geometry/Pose2d.h"
 #include "./CowSwerveKinematics.h"
 #include "./CowSwerveModulePosition.h"

@@ -1,8 +1,11 @@
 #include "CowSwerveKinematics.h"
 
+#include "CowChassisSpeeds.h"
+#include "Eigen/src/QR/HouseholderQR.h"
 #include "frc/EigenCore.h"
 
 #include <array>
+#include <cstdio>
 
 namespace CowLib
 {
@@ -13,11 +16,20 @@ namespace CowLib
     */
     CowSwerveKinematics::CowSwerveKinematics(double wheelBase)
     {
-        auto p = wheelBase / 2.0;
-        auto n = wheelBase / -2.0;
+        double p = wheelBase / 2.0;
+        double n = wheelBase / -2.0;
+        printf("Wheelbase: %f, %f, %f, %f\n", wheelBase, p, n, 0);
 
-        m_ModulePositions
-            = { Translation2d{ p, p }, Translation2d{ p, n }, Translation2d{ n, p }, Translation2d{ n, n } };
+        m_ModulePositions[0] = Translation2d(p, p);
+        m_ModulePositions[1] = Translation2d(p, n);
+        m_ModulePositions[2] = Translation2d(n, p);
+        m_ModulePositions[3] = Translation2d(n, n);
+
+        for (int i = 0; i < NUM_MODULES; i++)
+        {
+            auto pos = m_ModulePositions[i];
+            printf("Module %d: %f, %f\n", i, pos.X(), pos.Y());
+        }
 
         for (int i = 0; i < NUM_MODULES; i++)
         {
@@ -35,6 +47,7 @@ namespace CowLib
         for (int i = 0; i < NUM_MODULES; i++)
         {
             m_ModuleRotations[i] = Rotation2d(m_ModulePositions[i].X(), m_ModulePositions[i].Y(), true);
+            printf("Module %d: %f, %f\n", i, m_ModuleRotations[i].GetDegrees(), m_ModulePositions[i].X());
         }
         m_PreviousCenterOfRotation = Translation2d();
     }
@@ -144,17 +157,21 @@ namespace CowLib
         {
             auto module      = moduleStates[i];
             Rotation2d angle = Rotation2d(module.angle, true);
+            auto a           = Rotation2d::FromDegrees(90);
+            auto inv         = Rotation2d::FromDegrees(m_ModuleRotations[i].GetDegrees());
+            // auto beta
+            //     = angle.RotateBy(Rotation2d(m_ModuleRotations[i]).Inverse()).RotateBy(Rotation2d::FromDegrees(90));
 
-            auto beta = angle.RotateBy(m_ModuleRotations[i].Inverse()).RotateBy(Rotation2d::FromDegrees(90));
+            // constraintsMatrix(i * 2, 0) = angle.Cos();
+            // constraintsMatrix(i * 2, 1) = angle.Sin();
+            // constraintsMatrix(i * 2, 2) = -m_ModulePositions[i].Norm() * beta.Sin();
 
-            constraintsMatrix(i * 2, 0) = angle.Cos();
-            constraintsMatrix(i * 2, 1) = angle.Sin();
-            constraintsMatrix(i * 2, 2) = -m_ModulePositions[i].Norm() * beta.Sin();
-
-            constraintsMatrix(i * 2 + 1, 0) = -angle.Sin();
-            constraintsMatrix(i * 2 + 1, 1) = angle.Cos();
-            constraintsMatrix(i * 2 + 1, 2) = m_ModulePositions[i].Norm() * beta.Sin();
+            // constraintsMatrix(i * 2 + 1, 0) = -angle.Sin();
+            // constraintsMatrix(i * 2 + 1, 1) = angle.Cos();
+            // constraintsMatrix(i * 2 + 1, 2) = m_ModulePositions[i].Norm() * beta.Sin();
         }
+        printf("end for\n");
+        return CowChassisSpeeds{ 0, 0, 0 };
 
         auto psuedoInv = constraintsMatrix.completeOrthogonalDecomposition().pseudoInverse();
         //  var psuedoInv = constraintsMatrix.pseudoInverse();

@@ -272,6 +272,8 @@ void SwerveDrive::Handle()
                    moduleStates.begin(),
                    [](SwerveModule *module) { return module->GetState(); });
 
+    // printf("Mod 0 state pos: %f, vel: %f", moduleStates[0].position, moduleStates[0].velocity);
+
     // m_Odometry->Update(m_Gyro->GetYawDegrees(), moduleStates);
 
     // SIM
@@ -280,12 +282,15 @@ void SwerveDrive::Handle()
     //                m_Modules.end(),
     //                moduleStates.begin(),
     //                [](SwerveModule *module) { return module->GetState().ToWPI(); });
-    double gyroAngle = m_Kinematics->CalculuateChassisSpeedsWithWheelConstraints({moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3]})
+    double gyroAngle = m_Kinematics
+                           ->CalculuateChassisSpeedsWithWheelConstraints(
+                               { moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3] })
                            .omega
                        + m_Pose.GetRotation().GetDegrees();
     m_Gyro->GetInternalPigeon()->SetYaw(units::degree_t{ gyroAngle });
 
     m_Pose = m_Odometry->Update(gyroAngle, moduleStates);
+    printf("POSE %f %f %f\n", m_Pose.GetX(), m_Pose.GetY(), m_Pose.GetRotation().GetDegrees());
 
     // m_Pose = m_Odometry->GetWPIPose();
     m_Field.SetRobotPose(frc::Pose2d{ units::foot_t{ m_Pose.GetX() },

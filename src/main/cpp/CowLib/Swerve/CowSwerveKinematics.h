@@ -51,7 +51,8 @@ namespace CowLib
 
         CowChassisSpeeds CalculateChassisSpeeds(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
-        CowChassisSpeeds CalculuateChassisSpeedsWithWheelConstraints(const std::array<CowSwerveModuleState, 4> &moduleStates);
+        CowChassisSpeeds
+        CalculuateChassisSpeedsWithWheelConstraints(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
         std::array<Translation2d, 4> GetModulePositions();
 

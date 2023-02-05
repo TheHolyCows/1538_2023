@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <frc/geometry/Pose2d.h>
+#include <string>
 
 namespace CowLib
 {
@@ -70,6 +71,12 @@ namespace CowLib
         double GetX() const { return m_X; }
 
         double GetY() const { return m_Y; }
+
+        std::string ToString() const
+        {
+            return "X: " + std::to_string(m_X) + " Y: " + std::to_string(m_Y)
+                   + " Rotation: " + std::to_string(m_Rotation.GetDegrees());
+        }
 
         Rotation2d GetRotation() const { return m_Rotation; }
     };

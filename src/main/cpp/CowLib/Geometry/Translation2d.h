@@ -1,6 +1,8 @@
 #ifndef __COWLIB_GEOMETRY_TRANSLATION2D_H__
 #define __COWLIB_GEOMETRY_TRANSLATION2D_H__
 
+#include "stdio.h"
+
 #include <cmath>
 #include <frc/geometry/Translation2d.h>
 
@@ -20,27 +22,29 @@ namespace CowLib
     public:
         static const Translation2d Identity();
 
-        constexpr Translation2d() = default;
+        Translation2d() = default;
 
-        constexpr Translation2d(double x, double y)
+        Translation2d(double x, double y)
         {
+            printf("Translation2d(double x, double y) %f %f\n", x, y);
             m_X = x;
             m_Y = y;
+            printf("Translation2d(double x, double y) %f %f\n", m_X, m_Y);
         }
 
-        constexpr Translation2d(const Translation2d &start, const Translation2d &end)
+        Translation2d(const Translation2d &start, const Translation2d &end)
         {
             m_X = end.m_X - start.m_X;
             m_Y = end.m_Y - start.m_Y;
         }
 
-        constexpr Translation2d(const frc::Translation2d &other)
+        Translation2d(const frc::Translation2d &other)
         {
             m_X = other.X().convert<units::foot>().value();
             m_Y = other.Y().convert<units::foot>().value();
         }
 
-        constexpr Translation2d(const Translation2d &other)
+        Translation2d(const Translation2d &other)
         {
             m_X = other.m_X;
             m_Y = other.m_Y;
