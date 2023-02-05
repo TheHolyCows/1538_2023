@@ -119,7 +119,8 @@ namespace CowLib
         return m_ModuleStates;
     }
 
-    CowChassisSpeeds CowSwerveKinematics::CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates)
+    CowChassisSpeeds
+    CowSwerveKinematics::CalculateChassisSpeeds(const std::array<CowSwerveModuleState, 4> &moduleStates)
     {
         frc::Matrixd<NUM_MODULES * 2, 1> moduleStateMatrix;
 
@@ -135,8 +136,8 @@ namespace CowLib
         return { chassisSpeedsVector(0), chassisSpeedsVector(1), chassisSpeedsVector(2) };
     }
 
-    CowChassisSpeeds
-    CowSwerveKinematics::CalculuateChassisSpeedsWithWheelConstraints(std::array<CowSwerveModuleState, 4> &moduleStates)
+    CowChassisSpeeds CowSwerveKinematics::CalculuateChassisSpeedsWithWheelConstraints(
+        const std::array<CowSwerveModuleState, 4> &moduleStates)
     {
         frc::Matrixd<NUM_MODULES * 2, 3> constraintsMatrix;
         for (int i = 0; i < NUM_MODULES; i++)

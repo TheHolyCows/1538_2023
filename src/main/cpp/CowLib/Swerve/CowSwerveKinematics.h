@@ -40,7 +40,8 @@ namespace CowLib
         static void DesaturateSpeeds(std::array<CowSwerveModuleState, 4> *states, double maxSpeed);
 
         std::array<CowSwerveModuleState, 4> CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds,
-                                                                  const Translation2d centerOfRotation) const;
+                                                                  const Translation2d centerOfRotation
+                                                                  = Translation2d()) const;
 
         std::array<CowSwerveModuleState, 4>
         CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds, const double corx, const double cory) const
@@ -48,9 +49,9 @@ namespace CowLib
             return CalculateModuleStates(chassisSpeeds, Translation2d(corx, cory));
         }
 
-        CowChassisSpeeds CalculateChassisSpeeds(std::array<CowSwerveModuleState, 4> &moduleStates);
+        CowChassisSpeeds CalculateChassisSpeeds(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
-        CowChassisSpeeds CalculuateChassisSpeedsWithWheelConstraints(std::array<CowSwerveModuleState, 4> &moduleStates);
+        CowChassisSpeeds CalculuateChassisSpeedsWithWheelConstraints(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
         std::array<Translation2d, 4> GetModulePositions();
 

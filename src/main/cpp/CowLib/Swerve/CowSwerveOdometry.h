@@ -38,7 +38,7 @@ namespace CowLib
 
         CowSwerveOdometry(CowSwerveKinematics *kinematics);
 
-        ~CowSwerveOdometry();
+        ~CowSwerveOdometry() = default;
 
         void Reset(Pose2d pose);
         void Reset(Pose2d pose, std::array<double, 4> previousDistances);
@@ -53,7 +53,7 @@ namespace CowLib
                                           Rotation2d gyroAngle,
                                           std::array<CowSwerveModuleState, 4> moduleStates);
 
-        void Update(double gyroAngle, std::array<CowSwerveModulePosition, 4> modulePositions);
+        Pose2d Update(double gyroAngle, std::array<CowSwerveModuleState, 4> moduleStates);
 
         frc::SwerveDrivePoseEstimator<4> *GetInternalPoseEstimator();
     };

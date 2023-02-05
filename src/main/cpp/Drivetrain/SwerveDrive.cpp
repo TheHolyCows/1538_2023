@@ -31,7 +31,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_SetpointGenerator = new CowLib::CowSwerveSetpointGenerator(m_Kinematics);
 
-    // m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, CowLib::Pose2d());
+    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, CowLib::Pose2d());
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -46,7 +46,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
 SwerveDrive::~SwerveDrive()
 {
-    // delete m_Odometry;
+    delete m_Odometry;
     delete m_Kinematics;
     delete m_SetpointGenerator;
 
@@ -187,7 +187,7 @@ void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
  */
 double SwerveDrive::GetPoseX()
 {
-    return m_Pose.X().convert<units::foot>().value();
+    return m_Pose.GetX();
 }
 
 /**
@@ -197,7 +197,7 @@ double SwerveDrive::GetPoseX()
  */
 double SwerveDrive::GetPoseY()
 {
-    return m_Pose.Y().convert<units::foot>().value();
+    return m_Pose.GetY();
 }
 
 /**
@@ -207,7 +207,7 @@ double SwerveDrive::GetPoseY()
  */
 double SwerveDrive::GetPoseRot()
 {
-    return m_Pose.Rotation().Degrees().value();
+    return m_Pose.GetRotation().GetDegrees();
 }
 
 /**
@@ -247,7 +247,7 @@ void SwerveDrive::ResetEncoders()
     }
 }
 
-void SwerveDrive::ResetOdometry(frc::Pose2d pose)
+void SwerveDrive::ResetOdometry(CowLib::Pose2d pose)
 {
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions;
     for (auto module : m_Modules)
@@ -255,8 +255,8 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
         modulePositions[module->GetId()] = module->GetPosition();
     }
 
-    // m_Odometry->Reset(pose);
-    m_Gyro->SetYaw(pose.Rotation().Degrees().value());
+    m_Odometry->Reset(pose);
+    m_Gyro->SetYaw(pose.GetRotation().GetDegrees());
 }
 
 void SwerveDrive::Handle()
@@ -266,31 +266,31 @@ void SwerveDrive::Handle()
         module->Handle();
     }
 
-    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
-    std::transform(m_Modules.begin(),
-                   m_Modules.end(),
-                   modulePositions.begin(),
-                   [](SwerveModule *module) { return module->GetPosition(); });
-
-    // m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
-
-    // SIM
-    std::array<frc::SwerveModuleState, 4> moduleStates{};
+    std::array<CowLib::CowSwerveModuleState, 4> moduleStates{};
     std::transform(m_Modules.begin(),
                    m_Modules.end(),
                    moduleStates.begin(),
-                   [](SwerveModule *module) { return module->GetState().ToWPI(); });
-    double gyroAngle = m_Kinematics->GetInternalKinematics()
-                           ->ToChassisSpeeds(moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3])
-                           .omega.convert<units::degrees_per_second>()
-                           .value()
-                       + m_Pose.Rotation().Degrees().value();
+                   [](SwerveModule *module) { return module->GetState(); });
+
+    // m_Odometry->Update(m_Gyro->GetYawDegrees(), moduleStates);
+
+    // SIM
+    // std::array<frc::SwerveModuleState, 4> moduleStates{};
+    // std::transform(m_Modules.begin(),
+    //                m_Modules.end(),
+    //                moduleStates.begin(),
+    //                [](SwerveModule *module) { return module->GetState().ToWPI(); });
+    double gyroAngle = m_Kinematics->CalculuateChassisSpeedsWithWheelConstraints({moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3]})
+                           .omega
+                       + m_Pose.GetRotation().GetDegrees();
     m_Gyro->GetInternalPigeon()->SetYaw(units::degree_t{ gyroAngle });
 
-    // m_Odometry->Update(gyroAngle, modulePositions);
+    m_Pose = m_Odometry->Update(gyroAngle, moduleStates);
 
     // m_Pose = m_Odometry->GetWPIPose();
-    m_Field.SetRobotPose(m_Pose);
+    m_Field.SetRobotPose(frc::Pose2d{ units::foot_t{ m_Pose.GetX() },
+                                      units::foot_t{ m_Pose.GetY() },
+                                      units::degree_t{ m_Pose.GetRotation().GetDegrees() } });
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
     //                           "odometry pose: x %f, y %f, %fdeg",
@@ -299,5 +299,5 @@ void SwerveDrive::Handle()
     //                           m_Odometry->GetRotation());
 
     // frc::SmartDashboard::PutNumberArray("odometry pose (x, y, deg)",
-    //                                     { m_Odometry->GetX(), m_Odometry->GetY(), m_Odometry->GetRotation() });
+    //                                     { m_Pose.GetX(), m_Pose.GetY(), m_Pose.GetRotation().GetDegrees() });
 }

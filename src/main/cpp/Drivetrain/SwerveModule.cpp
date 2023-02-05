@@ -68,7 +68,7 @@ SwerveModule::~SwerveModule()
  */
 CowLib::CowSwerveModuleState SwerveModule::GetState()
 {
-    return CowLib::CowSwerveModuleState{ m_Velocity, m_Angle };
+    return CowLib::CowSwerveModuleState{ m_Velocity, m_Angle, m_Position };
 }
 
 CowLib::CowSwerveModulePosition SwerveModule::GetPosition()

@@ -1,5 +1,10 @@
 #include "./CowSwerveOdometry.h"
 
+#include "CowSwerveModuleState.h"
+#include "wpi/timestamp.h"
+
+#include <cmath>
+
 namespace CowLib
 {
 
@@ -52,53 +57,45 @@ namespace CowLib
                                                          std::array<CowSwerveModuleState, 4> moduleStates)
     {
         return Pose2d();
-        // double period = m_prevTimeSeconds >= 0 ? currentTimeSeconds - m_prevTimeSeconds : 0.0;
-        // // System.out.println("Time: " + currentTimeSeconds);
-        // m_prevTimeSeconds = currentTimeSeconds;
+        double period  = m_PreviousTime >= 0 ? currentTime - m_PreviousTime : 0.0;
+        m_PreviousTime = currentTime;
 
-        // var angle        = gyroAngle;
-        // var chassisState = m_kinematics.toChasisSpeedWheelConstraints(moduleStates);
+        auto angle        = gyroAngle;
+        auto chassisState = m_Kinematics->CalculuateChassisSpeedsWithWheelConstraints(moduleStates);
 
-        // var idealStates = m_kinematics.toSwerveModuleStates(chassisState);
+        auto idealStates = m_Kinematics->CalculateModuleStates(chassisState);
 
-        // // Project along ideal angles.
-        // double average = 0.0;
-        // for (int i = 0; i < moduleStates.length; ++i)
-        // {
-        //     double ratio = moduleStates[i].angle.rotateBy(idealStates[i].angle.inverse()).cos()
-        //                    * (moduleStates[i].distanceMeters - m_previousDistances[i])
-        //                    / (idealStates[i].speedMetersPerSecond * period);
-        //     if (Double.isNaN(ratio) || Double.isInfinite(ratio) || Math.abs(idealStates[i].speedMetersPerSecond) < 0.01)
-        //     {
-        //         ratio = 1.0;
-        //     }
-        //     average                = average + ratio;
-        //     m_previousDistances[i] = moduleStates[i].distanceMeters;
-        // }
-        // average = average / 4.0;
+        double average = 0.0;
+        for (int i = 0; i < (int) moduleStates.size(); i++)
+        {
+            double ratio = Rotation2d::FromDegrees(moduleStates[i].angle - idealStates[i].angle).Cos()
+                           * (moduleStates[i].position - m_PreviousDistances[i]) / (idealStates[i].velocity * period);
 
-        // // System.out.println(chassisState);
-        // SmartDashboard.putNumber("average", average);
+            if (std::isnan(ratio) || std::isinf(ratio) || fabs(idealStates[i].velocity) < 0.01)
+            {
+                ratio = 1.0;
+            }
 
-        // var newPose = Pose2d.exp(new Twist2d(chassisState.vxMetersPerSecond * period * average,
-        //                                      chassisState.vyMetersPerSecond * period * average,
-        //                                      chassisState.omegaRadiansPerSecond * period * average));
-        // // System.out.println("Translation: " + newPose);
-        // m_velocity = chassisState;
-        // // m_velocity.omegaRadiansPerSecond =
-        // // m_previousAngle.inverse().rotateBy(gyroAngle).getRadians() / period;
-        // m_poseMeters    = new Pose2d(m_poseMeters.transformBy(newPose).getTranslation(), angle);
-        // m_previousAngle = angle;
-        // m_field2d.setRobotPose(m_poseMeters.getTranslation().x(),
-        //                        m_poseMeters.getTranslation().y(),
-        //                        new edu.wpi.first.math.geometry.Rotation2d(m_poseMeters.getRotation().getDegrees()));
+            average                = average + ratio;
+            m_PreviousDistances[i] = moduleStates[i].position;
+        }
+        average /= 4.0;
 
-        // return m_poseMeters;
+        auto newPose = Pose2d::Exp(Twist2d(chassisState.vx * period * average,
+                                           chassisState.vy * period * average,
+                                           chassisState.omega * period * average));
+
+        m_ChassisSpeeds = chassisState;
+
+        m_Pose          = Pose2d(m_Pose.GetX() + newPose.GetX(), m_Pose.GetY() + newPose.GetY(), angle);
+        m_PreviousAngle = angle;
+
+        return m_Pose;
     }
 
-    void CowSwerveOdometry::Update(double gyroAngle, std::array<CowSwerveModulePosition, 4> modulePositions)
+    Pose2d CowSwerveOdometry::Update(double gyroAngle, std::array<CowSwerveModuleState, 4> moduleStates)
     {
-        return;
+        return UpdateWithWheelConstraints(WPI_Now() * 1.0e-6, Rotation2d::FromDegrees(gyroAngle), moduleStates);
     }
 
 } // namespace CowLib

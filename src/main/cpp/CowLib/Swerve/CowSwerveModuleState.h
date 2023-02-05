@@ -10,6 +10,7 @@ namespace CowLib {
 struct CowSwerveModuleState {
     double velocity;
     double angle;
+    double position = 0;
 
     static CowSwerveModuleState FromWPI(frc::SwerveModuleState state)
     {

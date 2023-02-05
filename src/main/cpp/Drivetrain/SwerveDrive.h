@@ -31,7 +31,7 @@ private:
 
     frc::Rotation2d m_Angle = frc::Rotation2d{ 0_deg };
 
-    frc::Pose2d m_Pose{ 0_m, 0_m, 0_deg };
+    CowLib::Pose2d m_Pose{};
 
     CowPigeon *m_Gyro;
 
@@ -98,10 +98,10 @@ public:
     {
         ResetConstants();
         ResetEncoders();
-        ResetOdometry(frc::Pose2d(0_ft, 0_ft, 0_deg));
+        ResetOdometry(CowLib::Pose2d());
     }
 
-    void ResetOdometry(frc::Pose2d pose = frc::Pose2d{ 0_m, 0_m, 0_deg });
+    void ResetOdometry(CowLib::Pose2d pose);
 
     void Handle();
 };

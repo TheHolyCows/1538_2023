@@ -56,7 +56,7 @@ void SwerveTrajectoryCommand::Start(CowRobot *robot)
 {
     if (m_ResetOdometry)
     {
-        robot->GetDrivetrain()->ResetOdometry(m_Trajectory.InitialPose());
+        robot->GetDrivetrain()->ResetOdometry(CowLib::Pose2d(m_Trajectory.InitialPose()));
 
         auto initPose = m_Trajectory.InitialPose();
         // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
