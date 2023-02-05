@@ -65,9 +65,11 @@ namespace CowLib
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         void Handle();
+        void Reset();
 
     private:
         CowLogger();
+        void ResetConstants();
         static int SendLog(void *, size_t);
         static void LogPID(uint32_t, double, double, double, double, double);
         static void LogMotor(uint32_t, double, double);
@@ -80,8 +82,10 @@ namespace CowLib
 
         uint32_t m_IdToLog;
 
-        const char *m_LogServerIP = "10.15.38.233";
-        uint16_t m_LogServerPort  = 5810;
+        // 10.15.38.00
+        const uint32_t m_LogServerSubnet = 0x0a0f2600;
+        uint16_t m_LogServerPort;
+        uint32_t m_LogServerIP;
 
         // assuming we don't have more than 24 motors ever
         CowLib::CowMotorController *m_RegisteredMotors[REGISTERED_MOTORS_MAX];
