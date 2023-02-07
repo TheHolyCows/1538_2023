@@ -41,7 +41,7 @@ namespace CowLib
 
         std::array<CowSwerveModuleState, 4> CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds,
                                                                   const Translation2d centerOfRotation
-                                                                  = Translation2d()) const;
+                                                                  = Translation2d(0, 0)) const;
 
         std::array<CowSwerveModuleState, 4>
         CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds, const double corx, const double cory) const
