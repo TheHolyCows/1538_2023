@@ -52,6 +52,8 @@ public:
      */
     virtual void ResetConstants() = 0;
 
+    virtual void SetClawHeight(const double height) { m_ClawHeight = height; }
+
     /**
      * @brief Will set the motors to their specified values
      * 
