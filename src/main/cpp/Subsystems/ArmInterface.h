@@ -52,6 +52,8 @@ public:
      */
     virtual void ResetConstants() = 0;
 
+    virtual void SetClawHeight(const double height) { m_ClawHeight = height; }
+
     /**
      * @brief Will set the motors to their specified values
      * 
@@ -116,6 +118,8 @@ protected:
 
     // The Height of the rotation motor relative to the ground
     double m_ArmHeight;
+    // The height of the claw
+    double m_ClawHeight;
 
 private:
     /**
