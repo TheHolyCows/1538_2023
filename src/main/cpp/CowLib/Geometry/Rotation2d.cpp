@@ -61,20 +61,21 @@ namespace CowLib
 
     bool Rotation2d::HasTrig() const
     {
-        return !std::isnan(m_SinAngle) && !std::isnan(m_CosAngle);
+        printf("Has trig func: sin: %f, cos: %f\n", *m_SinAngle, *m_CosAngle);
+        return m_SinAngle.has_value() && m_CosAngle.has_value();
     }
 
     bool Rotation2d::HasDegrees() const
     {
-        return !std::isnan(m_Degrees);
+        return m_Degrees.has_value();
     }
 
     void Rotation2d::EnsureTrigComputed() const
     {
         if (!HasTrig())
         {
-            m_SinAngle = sin(m_Degrees * M_PI / 180.0);
-            m_CosAngle = cos(m_Degrees * M_PI / 180.0);
+            m_SinAngle = sin(*m_Degrees * M_PI / 180.0);
+            m_CosAngle = cos(*m_Degrees * M_PI / 180.0);
         }
     }
 
@@ -82,26 +83,26 @@ namespace CowLib
     {
         if (!HasDegrees())
         {
-            m_Degrees = atan2(m_SinAngle, m_CosAngle) * 180.0 / M_PI;
+            m_Degrees = atan2(*m_SinAngle, *m_CosAngle) * 180.0 / M_PI;
         }
     }
 
     double Rotation2d::Cos() const
     {
         EnsureTrigComputed();
-        return m_CosAngle;
+        return *m_CosAngle;
     }
 
     double Rotation2d::Sin() const
     {
         EnsureTrigComputed();
-        return m_SinAngle;
+        return *m_SinAngle;
     }
 
     double Rotation2d::Tan() const
     {
         EnsureTrigComputed();
-        if (fabs(m_CosAngle) < 1E-9)
+        if (fabs(*m_CosAngle) < 1E-9)
         {
             if (m_SinAngle >= 0.0)
             {
@@ -112,20 +113,20 @@ namespace CowLib
                 return std::numeric_limits<double>::min();
             }
         }
-        return m_SinAngle / m_CosAngle;
+        return *m_SinAngle / *m_CosAngle;
     }
 
     double Rotation2d::GetDegrees() const
     {
         EnsureDegreesComputed();
-        return m_Degrees;
+        return *m_Degrees;
     }
 
     Rotation2d Rotation2d::NearestPole() const
     {
         double pole_sin = 0.0;
         double pole_cos = 0.0;
-        if (fabs(m_CosAngle) > fabs(m_SinAngle))
+        if (fabs(*m_CosAngle) > fabs(*m_SinAngle))
         {
             pole_cos = CowLib::sgn(m_CosAngle);
             pole_sin = 0.0;
@@ -145,7 +146,7 @@ namespace CowLib
 
     Rotation2d Rotation2d::operator-() const
     {
-        return Rotation2d(-m_Degrees, true);
+        return Rotation2d(-*m_Degrees, true);
     }
 
     Rotation2d Rotation2d::operator-(const Rotation2d &other) const
@@ -156,7 +157,7 @@ namespace CowLib
 
     Rotation2d Rotation2d::operator*(double scalar) const
     {
-        return Rotation2d(m_Degrees * scalar, true);
+        return Rotation2d(*m_Degrees * scalar, true);
     }
 
     // Rotation2d Rotation2d::operator=(const Rotation2d &other) const
@@ -168,8 +169,8 @@ namespace CowLib
     {
         if (HasTrig() && other.HasTrig())
         {
-            return Rotation2d(m_CosAngle * other.m_CosAngle - m_SinAngle * other.m_SinAngle,
-                              m_CosAngle * other.m_SinAngle + m_SinAngle * other.m_CosAngle,
+            return Rotation2d(*m_CosAngle * (*other.m_CosAngle) - *m_SinAngle * (*other.m_SinAngle),
+                              *m_CosAngle * (*other.m_SinAngle) + *m_SinAngle * (*other.m_CosAngle),
                               true);
         }
         else
@@ -180,14 +181,14 @@ namespace CowLib
 
     Rotation2d Rotation2d::Mirror() const
     {
-        return FromDegrees(-m_Degrees);
+        return FromDegrees(-*m_Degrees);
     }
 
     Rotation2d Rotation2d::Normal() const
     {
         if (HasTrig())
         {
-            return Rotation2d(-m_SinAngle, m_CosAngle, false);
+            return Rotation2d(-*m_SinAngle, *m_CosAngle, false);
         }
         else
         {
@@ -197,10 +198,11 @@ namespace CowLib
 
     Rotation2d Rotation2d::Inverse() const
     {
+        printf("Inverse start\n");
         if (HasTrig())
         {
             printf("Inverse trig\n");
-            return Rotation2d(m_CosAngle, -m_SinAngle, false);
+            return Rotation2d(*m_CosAngle, -*m_SinAngle, false);
         }
         else
         {
@@ -213,7 +215,7 @@ namespace CowLib
     {
         if (HasTrig())
         {
-            return Rotation2d(-m_CosAngle, -m_SinAngle, false);
+            return Rotation2d(-*m_CosAngle, -*m_SinAngle, false);
         }
         else
         {
@@ -225,25 +227,25 @@ namespace CowLib
     {
         if (HasDegrees() && other.HasDegrees())
         {
-            return EpsilonEquals(m_Degrees, other.m_Degrees)
-                   || EpsilonEquals(m_Degrees, WrapDegrees(other.m_Degrees + 180.0));
+            return EpsilonEquals(*m_Degrees, *other.m_Degrees)
+                   || EpsilonEquals(*m_Degrees, WrapDegrees(*other.m_Degrees + 180.0));
         }
         else if (HasTrig() && other.HasTrig())
         {
-            return EpsilonEquals(m_SinAngle, other.m_SinAngle) && EpsilonEquals(m_CosAngle, other.m_CosAngle);
+            return EpsilonEquals(*m_SinAngle, *other.m_SinAngle) && EpsilonEquals(*m_CosAngle, *other.m_CosAngle);
         }
         else
         {
             // Use public, checked version.
             return EpsilonEquals(GetDegrees(), other.GetDegrees())
-                   || EpsilonEquals(m_Degrees, WrapDegrees(other.m_Degrees + 180));
+                   || EpsilonEquals(*m_Degrees, WrapDegrees(*other.m_Degrees + 180));
         }
     }
 
     Translation2d Rotation2d::ToTranslation() const
     {
         EnsureTrigComputed();
-        return Translation2d(m_CosAngle, m_SinAngle);
+        return Translation2d(*m_CosAngle, *m_SinAngle);
     }
 
     Rotation2d Rotation2d::Interpolate(const Rotation2d &other, double x) const

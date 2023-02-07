@@ -6,6 +6,7 @@
 #include <cmath>
 #include <frc/geometry/Rotation2d.h>
 #include <limits>
+#include <optional>
 
 namespace CowLib
 {
@@ -20,8 +21,6 @@ namespace CowLib
     class Rotation2d
     {
     private:
-        static constexpr double NaN = std::numeric_limits<double>::quiet_NaN();
-
         bool HasTrig() const;
 
         bool HasDegrees() const;
@@ -31,9 +30,9 @@ namespace CowLib
         void EnsureDegreesComputed() const;
 
     protected:
-        mutable double m_CosAngle = NaN;
-        mutable double m_SinAngle = NaN;
-        mutable double m_Degrees  = NaN;
+        mutable std::optional<double> m_CosAngle;
+        mutable std::optional<double> m_SinAngle;
+        mutable std::optional<double> m_Degrees;
 
         Rotation2d(double x, double y, double degrees)
         {
