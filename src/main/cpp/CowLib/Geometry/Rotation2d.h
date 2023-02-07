@@ -58,7 +58,7 @@ namespace CowLib
     public:
         static Rotation2d identity() { return Rotation2d(); }
 
-        Rotation2d operator=(const Rotation2d &other) const;
+        // Rotation2d operator=(const Rotation2d &other) const;
 
         Rotation2d() { Rotation2d(1.0, 0.0, 0.0); }
 
@@ -66,7 +66,7 @@ namespace CowLib
 
         Rotation2d(double x, double y, bool normalize);
 
-        Rotation2d(const Rotation2d &other);
+        // Rotation2d(const Rotation2d &other);
 
         Rotation2d(const frc::Rotation2d &other);
 

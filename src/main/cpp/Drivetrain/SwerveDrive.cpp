@@ -282,11 +282,12 @@ void SwerveDrive::Handle()
     //                m_Modules.end(),
     //                moduleStates.begin(),
     //                [](SwerveModule *module) { return module->GetState().ToWPI(); });
-    double gyroAngle = m_Kinematics
-                           ->CalculuateChassisSpeedsWithWheelConstraints(
-                               { moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3] })
-                           .omega
-                       + m_Pose.GetRotation().GetDegrees();
+    // double gyroAngle = m_Kinematics
+    //                        ->CalculateChassisSpeedsWithWheelConstraints(
+    //                            { moduleStates[0], moduleStates[1], moduleStates[2], moduleStates[3] })
+    //                        .omega
+    //                    + m_Pose.GetRotation().GetDegrees();
+    double gyroAngle = m_Kinematics->CalculateChassisSpeeds(moduleStates).omega + m_Pose.GetRotation().GetDegrees();
     m_Gyro->GetInternalPigeon()->SetYaw(units::degree_t{ gyroAngle });
 
     m_Pose = m_Odometry->Update(gyroAngle, moduleStates);

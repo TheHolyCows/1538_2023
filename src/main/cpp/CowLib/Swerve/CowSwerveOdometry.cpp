@@ -1,5 +1,6 @@
 #include "./CowSwerveOdometry.h"
 
+#include "CowChassisSpeeds.h"
 #include "CowSwerveModuleState.h"
 #include "frc/Timer.h"
 #include "units/time.h"
@@ -61,8 +62,10 @@ namespace CowLib
         double period  = m_PreviousTime >= 0 ? currentTime - m_PreviousTime : 0.0;
         m_PreviousTime = currentTime;
 
-        auto angle        = gyroAngle;
-        auto chassisState = m_Kinematics->CalculuateChassisSpeedsWithWheelConstraints(moduleStates);
+        auto angle = gyroAngle;
+        printf("CALLING CalculateChassisSpeedsWithWheelConstraints\n");
+        CowChassisSpeeds chassisState = m_Kinematics->CalculateChassisSpeedsWithWheelConstraints(moduleStates);
+        printf("about to return blank pose\n");
         return Pose2d();
 
         auto idealStates = m_Kinematics->CalculateModuleStates(chassisState);

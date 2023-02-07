@@ -40,12 +40,12 @@ namespace CowLib
         }
     }
 
-    Rotation2d::Rotation2d(const Rotation2d &other)
-    {
-        m_CosAngle = other.m_CosAngle;
-        m_SinAngle = other.m_SinAngle;
-        m_Degrees  = other.m_Degrees;
-    }
+    // Rotation2d::Rotation2d(const Rotation2d &other)
+    // {
+    //     m_CosAngle = other.m_CosAngle;
+    //     m_SinAngle = other.m_SinAngle;
+    //     m_Degrees  = other.m_Degrees;
+    // }
 
     Rotation2d::Rotation2d(const frc::Rotation2d &other)
     {
@@ -159,10 +159,10 @@ namespace CowLib
         return Rotation2d(m_Degrees * scalar, true);
     }
 
-    Rotation2d Rotation2d::operator=(const Rotation2d &other) const
-    {
-        return Rotation2d(other);
-    }
+    // Rotation2d Rotation2d::operator=(const Rotation2d &other) const
+    // {
+    //     return Rotation2d(other);
+    // }
 
     Rotation2d Rotation2d::RotateBy(const Rotation2d &other) const
     {

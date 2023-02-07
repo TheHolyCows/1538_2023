@@ -23,15 +23,15 @@ namespace CowLib
     private:
         static constexpr int NUM_MODULES = 4;
 
-        mutable frc::Matrixd<NUM_MODULES * 2, 3> m_InverseKinematics;
+        frc::Matrixd<NUM_MODULES * 2, 3> m_InverseKinematics;
         Eigen::HouseholderQR<frc::Matrixd<NUM_MODULES * 2, 3>> m_ForwardKinematics;
 
         Translation2d m_PreviousCenterOfRotation;
 
         std::array<Translation2d, NUM_MODULES> m_ModulePositions;
 
-        mutable std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates{};
-        mutable std::array<Rotation2d, 4> m_ModuleRotations{};
+        std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates{};
+        std::array<Rotation2d, 4> m_ModuleRotations{};
 
     public:
         explicit CowSwerveKinematics(double wheelBase);
@@ -41,10 +41,10 @@ namespace CowLib
 
         std::array<CowSwerveModuleState, 4> CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds,
                                                                   const Translation2d centerOfRotation
-                                                                  = Translation2d(0, 0)) const;
+                                                                  = Translation2d(0, 0));
 
         std::array<CowSwerveModuleState, 4>
-        CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds, const double corx, const double cory) const
+        CalculateModuleStates(const CowChassisSpeeds &chassisSpeeds, const double corx, const double cory)
         {
             return CalculateModuleStates(chassisSpeeds, Translation2d(corx, cory));
         }
@@ -52,7 +52,7 @@ namespace CowLib
         CowChassisSpeeds CalculateChassisSpeeds(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
         CowChassisSpeeds
-        CalculuateChassisSpeedsWithWheelConstraints(const std::array<CowSwerveModuleState, 4> &moduleStates);
+        CalculateChassisSpeedsWithWheelConstraints(const std::array<CowSwerveModuleState, 4> &moduleStates);
 
         std::array<Translation2d, 4> GetModulePositions();
 
