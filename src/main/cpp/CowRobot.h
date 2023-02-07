@@ -14,7 +14,7 @@
 #include "CowLib/Utility.h"
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
-#include "Subsystems/Arm.h"
+#include "Subsystems/Arm/Arm.h"
 
 #include <frc/BuiltInAccelerometer.h>
 #include <frc/filter/LinearFilter.h>
