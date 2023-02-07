@@ -56,7 +56,8 @@ void ArmInterface::SetSafePos(const double position)
         ss << "Error: Angle is Invalid: " << m_CurrentConfig.angle << "!";
         throw std::runtime_error(ss.str());
     }
-    const double MaxPosAtCurrentAngle = m_ArmHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
+    const double totalHeight          = m_ArmHeight + m_ClawHeight;
+    const double MaxPosAtCurrentAngle = totalHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
     if (position > MaxPosAtCurrentAngle)
     {
         m_CurrentConfig.pos = MaxPosAtCurrentAngle;
