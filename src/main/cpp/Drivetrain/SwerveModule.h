@@ -60,7 +60,7 @@ public:
     CowLib::CowSwerveModuleState GetState();
     CowLib::CowSwerveModulePosition GetPosition();
 
-    void SetTargetState(CowLib::CowSwerveModuleState state);
+    void SetTargetState(CowLib::CowSwerveModuleState state, bool force = false);
 
     void ResetConstants();
 
