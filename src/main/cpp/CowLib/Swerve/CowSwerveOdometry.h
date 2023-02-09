@@ -33,12 +33,9 @@ namespace CowLib
         std::array<double, 4> m_PreviousDistances;
 
     public:
-        CowSwerveOdometry(CowSwerveKinematics *kinematics, Pose2d initialPose, std::array<double, 4> previousDistances);
-
-        CowSwerveOdometry(CowSwerveKinematics *kinematics, Pose2d initialPose);
-
-        CowSwerveOdometry(CowSwerveKinematics *kinematics);
-
+        CowSwerveOdometry(CowSwerveKinematics *kinematics,
+                          Pose2d initialPose                      = Pose2d(),
+                          std::array<double, 4> previousDistances = { 0, 0, 0, 0 });
         ~CowSwerveOdometry() = default;
 
         void Reset(Pose2d pose);

@@ -31,7 +31,7 @@ namespace CowLib
         std::array<Translation2d, NUM_MODULES> m_ModulePositions;
 
         std::array<CowSwerveModuleState, NUM_MODULES> m_ModuleStates{};
-        std::array<frc::Rotation2d *, NUM_MODULES> m_ModuleRotations{};
+        std::array<Rotation2d, NUM_MODULES> m_ModuleRotations{};
 
     public:
         explicit CowSwerveKinematics(double wheelBase);

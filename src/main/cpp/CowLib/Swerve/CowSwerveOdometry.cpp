@@ -22,16 +22,6 @@ namespace CowLib
         m_PreviousDistances = previousDistances;
     }
 
-    CowSwerveOdometry::CowSwerveOdometry(CowSwerveKinematics *kinematics, Pose2d initialPose)
-    {
-        CowSwerveOdometry(kinematics, initialPose, { 0, 0, 0, 0 });
-    }
-
-    CowSwerveOdometry::CowSwerveOdometry(CowSwerveKinematics *kinematics)
-    {
-        CowSwerveOdometry(kinematics, Pose2d());
-    }
-
     void CowSwerveOdometry::Reset(Pose2d pose, std::array<double, 4> previousDistances)
     {
         m_PreviousDistances = previousDistances;
