@@ -55,8 +55,8 @@ namespace CowLib
         auto angle = gyroAngle;
         printf("CALLING CalculateChassisSpeedsWithWheelConstraints\n");
         CowChassisSpeeds chassisState = m_Kinematics->CalculateChassisSpeedsWithWheelConstraints(moduleStates);
-        printf("about to return blank pose\n");
-        return Pose2d();
+        // printf("about to return blank pose\n");
+        // return Pose2d();
 
         auto idealStates = m_Kinematics->CalculateModuleStates(chassisState);
 

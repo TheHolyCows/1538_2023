@@ -133,11 +133,13 @@ namespace CowLib
 
     Rotation2d Translation2d::GetAngle(const Translation2d &a, const Translation2d &b)
     {
-        double cos_angle = Dot(a, b) / (a.Norm() * b.Norm());
-        if (std::isnan(cos_angle))
+        auto divisor = a.Norm() * b.Norm();
+        if (divisor == 0)
         {
             return Rotation2d();
         }
+        double cos_angle = Dot(a, b) / (a.Norm() * b.Norm());
+
         return Rotation2d::FromRadians(acos(LimitMix(cos_angle)));
     }
 
