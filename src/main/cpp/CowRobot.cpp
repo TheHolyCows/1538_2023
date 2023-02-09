@@ -126,7 +126,7 @@ double CowRobot::PIDToAprilTagTranslation()
 
     double yOutput = m_AprilTagPIDController.Calculate(targetY, 0.0);
 
-    printf("arpiil tag y target: %f output: %f\n", targetY, yOutput);
+    printf("april tag y target: %f output: %f\n", targetY, yOutput);
 
     return yOutput;
 }
@@ -138,7 +138,7 @@ double CowRobot::PIDToAprilTagRotation()
 
     double yawOutput = m_AprilTagPIDController.Calculate(targetYaw, 0.0);
 
-    printf("arpiil tag yaw target: %f output: %f\n", targetYaw, yawOutput);
+    printf("april tag yaw target: %f output: %f\n", targetYaw, yawOutput);
 
     return yawOutput;
 }
