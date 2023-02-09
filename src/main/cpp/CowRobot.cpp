@@ -31,6 +31,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
+    m_Limelight = new Limelight("limelight");
     // m_Arm = new Arm(9, 10);
 }
 
@@ -89,7 +90,7 @@ void CowRobot::Handle()
     {
         // m_DSUpdateCount is reset in PrintToDS
         CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
-        CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
+        // CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
     }
 
     // accelerometers
