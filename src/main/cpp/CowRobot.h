@@ -10,11 +10,13 @@
 #include "CowLib/CowAlphaNum.h"
 #include "CowLib/CowLogger.h"
 #include "CowLib/CowMotorController.h"
+#include "CowLib/CowPID.h"
 #include "CowLib/CowTimer.h"
 #include "CowLib/Utility.h"
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
 #include "Drivetrain/SwerveDriveController.h"
+#include "frc/controller/PIDController.h"
 #include "Subsystems/Arm.h"
 #include "Subsystems/ArmState.h"
 #include "Subsystems/Limelight.h"
@@ -60,6 +62,14 @@ private:
     double m_MatchTime;
     double m_StartTime;
 
+    frc2::PIDController m_AprilTagPIDController{ CONSTANT("APRIL_TAG_P"),
+                                                 CONSTANT("APRIL_TAG_I"),
+                                                 CONSTANT("APRIL_TAG_D") };
+
+    frc2::PIDController m_AprilTagRotationPIDController{ CONSTANT("APRIL_TAG_ROTATION_P"),
+                                                         CONSTANT("APRIL_TAG_ROTATION_I"),
+                                                         CONSTANT("APRIL_TAG_ROTATION_D") };
+
 public:
     CowRobot();
     void Reset();
@@ -86,6 +96,8 @@ public:
 
     void SetArmState(ARM_STATE, ARM_CARGO);
     void ArmSM();
+    double PIDToAprilTagTranslation();
+    double PIDToAprilTagRotation();
 };
 
 #endif
