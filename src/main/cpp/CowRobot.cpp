@@ -116,7 +116,7 @@ double CowRobot::PIDToAprilTagTranslation()
     auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
     double targetY     = targetPoseVec[1];
 
-    double yOutput = m_AprilTagPIDController.Calculate(0.0, targetY);
+    double yOutput = m_AprilTagPIDController.Calculate(targetY, 0.0);
 
     printf("arpiil tag y target: %f output: %f\n", targetY, yOutput);
 
@@ -128,7 +128,7 @@ double CowRobot::PIDToAprilTagRotation()
     auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
     double targetYaw   = targetPoseVec[5];
 
-    double yawOutput = m_AprilTagPIDController.Calculate(0.0, targetYaw);
+    double yawOutput = m_AprilTagPIDController.Calculate(targetYaw, 0.0);
 
     printf("arpiil tag yaw target: %f output: %f\n", targetYaw, yawOutput);
 
