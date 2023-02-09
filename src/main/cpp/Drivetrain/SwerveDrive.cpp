@@ -81,19 +81,21 @@ void SwerveDrive::SetVelocity(double vx,
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
+    std::array<CowLib::CowSwerveModuleState, 4> moduleStates;
 
-    // This just overwrites for now. Maybe fix?
     if (m_Locked)
     {
-        double angles[4]{ 45, 315, 135, 225 };
-        // TODO: check if 0.3 is good
-        // units::feet_per_second_t velocity { 0.3 };
+        // hardcoded angles for e-brake X formation
+        double angles[4] = { 45, 315, 135, 225 };
 
         for (int i = 0; i < 4; i++)
         {
-            moduleStates[i] = CowLib::CowSwerveModuleState{ 0.3, angles[i] };
+            moduleStates[i] = CowLib::CowSwerveModuleState{ 0.0, angles[i] };
         }
+    }
+    else
+    {
+        moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
     }
 
     // Just in case
@@ -101,7 +103,7 @@ void SwerveDrive::SetVelocity(double vx,
 
     for (auto module : m_Modules)
     {
-        module->SetTargetState(moduleStates[module->GetId()]);
+        module->SetTargetState(moduleStates[module->GetId()], m_Locked);
     }
 }
 
@@ -167,7 +169,8 @@ bool SwerveDrive::GetLocked() const
 
 /**
  * @brief Sets locked state
- *
+ * moves wheels into X formation, braking in place on charge station
+ * call to this within Operator Controller is all that is needed to e-brake
  * @param isLocked
  */
 void SwerveDrive::SetLocked(bool isLocked)
@@ -206,27 +209,14 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 
 void SwerveDrive::Handle()
 {
+    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
     for (auto module : m_Modules)
     {
         module->Handle();
+        modulePositions[module->GetId()] = module->GetPosition();
     }
-
-    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
-    std::transform(m_Modules.begin(),
-                   m_Modules.end(),
-                   modulePositions.begin(),
-                   [](SwerveModule *module) { return module->GetPosition(); });
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
     m_Pose = m_Odometry->GetWPIPose();
-
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-    //                           "odometry pose: x %f, y %f, %fdeg",
-    //                           m_Odometry->GetX(),
-    //                           m_Odometry->GetY(),
-    //                           m_Odometry->GetRotation());
-
-    // frc::SmartDashboard::PutNumberArray("odometry pose (x, y, deg)",
-    //                                     { m_Odometry->GetX(), m_Odometry->GetY(), m_Odometry->GetRotation() });
 }

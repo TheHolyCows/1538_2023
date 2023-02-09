@@ -46,6 +46,8 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     // m_Controller->ResetConstants(); error
+
+    CowLib::CowLogger::GetInstance()->Reset();
 }
 
 /**
