@@ -75,6 +75,8 @@ public:
     void Handle();
 
     void DoNothing(void);
+
+    double YPIDOutputToAprilTag();
 };
 
 #endif

@@ -110,3 +110,8 @@ void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
 }
+
+double CowRobot::YPIDOutputToAprilTag()
+{
+    return 0.0;
+}
