@@ -111,7 +111,26 @@ void CowRobot::DoNothing()
     // TODO: make the robot stop (including drive)
 }
 
-double CowRobot::YPIDOutputToAprilTag()
+double CowRobot::PIDToAprilTagTranslation()
 {
-    return 0.0;
+    auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
+    double targetY     = targetPoseVec[1];
+
+    double yOutput = m_AprilTagPIDController.Calculate(0.0, targetY);
+
+    printf("arpiil tag y target: %f output: %f\n", targetY, yOutput);
+
+    return yOutput;
+}
+
+double CowRobot::PIDToAprilTagRotation()
+{
+    auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
+    double targetYaw   = targetPoseVec[5];
+
+    double yawOutput = m_AprilTagPIDController.Calculate(0.0, targetYaw);
+
+    printf("arpiil tag yaw target: %f output: %f\n", targetYaw, yawOutput);
+
+    return yawOutput;
 }
