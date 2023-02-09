@@ -30,7 +30,7 @@ namespace LimelightHelpers
 
     inline std::shared_ptr<nt::NetworkTable> GetLimelightNTTable(const std::string &tableName)
     {
-        return nt::NetworkTableInstance::GetDefault().GetTable(sanitizeName(tableName));
+        return nt::NetworkTableInstance::GetDefault().GetTable((tableName));
     }
 
     inline nt::NetworkTableEntry GetLimelightNTTableEntry(const std::string &tableName, const std::string &entryName)

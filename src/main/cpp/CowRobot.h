@@ -27,7 +27,6 @@ class CowRobot
 public:
     // Drive Motors
     SwerveDrive *m_Drivetrain;
-    Limelight *m_Limelight;
 
 private:
     Arm *m_Arm;
