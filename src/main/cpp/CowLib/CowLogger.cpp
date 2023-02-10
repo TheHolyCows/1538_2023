@@ -41,9 +41,24 @@ namespace CowLib
             return;
         }
 
+        ResetConstants();
+
         m_LogServer.sin_family      = AF_INET;
-        m_LogServer.sin_addr.s_addr = inet_addr(m_LogServerIP);
-        m_LogServer.sin_port        = htons(m_LogServerPort);
+        m_LogServer.sin_addr.s_addr = m_LogServerIP;
+        m_LogServer.sin_port        = m_LogServerPort;
+    }
+
+    /**
+     * CowLogger::ResetConstants()
+     * resets log ip and port after reading values from constants
+    */
+    void CowLogger::ResetConstants()
+    {
+        uint32_t ipOctet = ((uint32_t) CONSTANT("LOG_SERVER_OCTET")) & 0xff;
+        m_LogServerIP    = htonl(m_LogServerSubnet | ipOctet);
+
+        uint16_t port   = ((uint16_t) CONSTANT("LOG_SERVER_PORT"));
+        m_LogServerPort = htons(port);
     }
 
     /**
@@ -317,4 +332,26 @@ namespace CowLib
             }
         }
     }
+
+    /**
+     * CowLogger::Reset
+     * reset socket (is that necessary?) and refresh IP and port from constants
+    */
+    void CowLogger::Reset()
+    {
+        close(m_LogSocket);
+        m_LogSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        if (m_LogSocket < 0)
+        {
+            std::cout << "CowLogger::CowLogger() error: failed to create socket" << std::endl;
+            return;
+        }
+
+        ResetConstants();
+
+        m_LogServer.sin_family      = AF_INET;
+        m_LogServer.sin_addr.s_addr = m_LogServerIP;
+        m_LogServer.sin_port        = m_LogServerPort;
+    }
+
 } /* namespace CowLib */

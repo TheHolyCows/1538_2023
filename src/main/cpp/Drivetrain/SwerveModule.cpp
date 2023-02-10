@@ -70,45 +70,22 @@ CowLib::CowSwerveModulePosition SwerveModule::GetPosition()
 }
 
 /**
- * @brief Sets the desired module state
+ * @brief Sets the desired module state to the given state after optimizing
  * @param state Target state
+ * @param force force angle during low speeds
  */
-void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state)
+void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force)
 {
     CowLib::CowSwerveModuleState optimized = Optimize(state, m_Angle);
-    // auto wpistate
-    //     = frc::SwerveModuleState{ units::feet_per_second_t{ state.velocity }, units::degree_t{ state.angle } };
-    // frc::SwerveModuleState::Optimize(wpistate, frc::Rotation2d(units::degree_t{ m_Angle }));
-    // auto optimized = CowLib::CowSwerveModuleState::FromWPI(wpistate);
-
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " optimized velocity", optimized.velocity);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " optimized angle", optimized.angle);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " before opti angle", state.angle);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " current angle in deg", m_Angle);
-    frc::SmartDashboard::PutNumber("Module " + std::to_string(m_Id) + " rotation motor position (turns)",
-                                   m_RotationMotor->GetPosition());
-
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-    //                           "Module %d velocity: %f target angle: %f current angle: %f\n",
-    //                           m_Id,
-    //                           optimized.velocity,
-    //                           optimized.angle,
-    //                           m_Angle);
-
-    // auto optimized = state;
-    // frc::SwerveModuleState optimized = state;
 
     double percentOutput = optimized.velocity / CONSTANT("SWERVE_MAX_SPEED");
 
     m_DriveControlRequest.PercentOut = percentOutput;
-    // = units::turns_per_second_t{ CowLib::Conversions::FPSToFalcon(optimized.velocity,
-    //                                                               CONSTANT("WHEEL_CIRCUMFERENCE"),
-    //                                                               CONSTANT("SWERVE_DRIVE_GEAR_RATIO")) };
 
-    // Don't rotate for low speeds
+    // Don't rotate for low speeds - unless we are e-braking
     double targetAngle;
 
-    if (fabs(optimized.velocity) <= CONSTANT("SWERVE_MAX_SPEED") * 0.01)
+    if (!force && fabs(optimized.velocity) <= CONSTANT("SWERVE_MAX_SPEED") * 0.01)
     {
         targetAngle = m_PreviousAngle;
     }

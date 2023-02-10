@@ -45,6 +45,8 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     // m_Controller->ResetConstants(); error
+
+    CowLib::CowLogger::GetInstance()->Reset();
 }
 
 /**
@@ -107,4 +109,9 @@ void CowRobot::StartTime()
 void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
+}
+
+double CowRobot::YPIDOutputToAprilTag()
+{
+    return 0.0;
 }
