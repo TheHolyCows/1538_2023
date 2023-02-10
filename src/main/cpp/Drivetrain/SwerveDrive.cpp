@@ -121,7 +121,7 @@ void SwerveDrive::SetVelocity(double vx,
 
     for (auto module : m_Modules)
     {
-        module->SetTargetState(moduleStates[module->GetID()], m_Locked);
+        module->SetTargetState(moduleStates[module->GetId()], m_Locked || force);
     }
 }
 
