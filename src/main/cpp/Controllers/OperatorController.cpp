@@ -90,14 +90,17 @@ void OperatorController::Handle(CowRobot *bot)
         = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
           * CONSTANT("DESIRED_MAX_ANG_VEL") * -1;
 
+    bool force = false;
+
     if (m_CB->GetLeftDriveStickButton(5))
     {
         y     = bot->PIDToAprilTagTranslation();
         omega = bot->PIDToAprilTagRotation();
+        force = true;
     }
 
     // Default Drive
-    bot->GetDrivetrain()->SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY);
+    bot->GetDrivetrain()->SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY, force);
 }
 
 void OperatorController::ResetConstants()

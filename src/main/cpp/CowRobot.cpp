@@ -116,33 +116,40 @@ void CowRobot::DoNothing()
 
 double CowRobot::PIDToAprilTagTranslation()
 {
-    bool targetFound = LimelightHelpers::GetLimelightNTDouble("limelight", "tv") == 1;
+    // return 0.0;
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
     if (!targetFound)
     {
-        printf("no target found\n");
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return 0;
     }
 
-    auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
+    auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
+                             .GetTable("limelight")
+                             ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
     if (targetPoseVec.size() != 6)
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "April tag targeting array has incorrect length");
     }
-    printf("vec length: %d", targetPoseVec.size());
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
     double targetX = targetPoseVec[0];
 
-    double yOutput = m_AprilTagPIDController.Calculate(targetX, 0.0);
+    double yOutput = m_AprilTagPIDController.Calculate(0.0, targetX);
 
-    printf("april tag y target: %f output: %f\n", targetX, yOutput);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f output: %f", targetX, yOutput);
     return yOutput;
 }
 
 double CowRobot::PIDToAprilTagRotation()
 {
-    bool targetFound = LimelightHelpers::GetLimelightNTDouble("limelight", "tv") == 1;
+    // double test = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0.0);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "test LL %f", test);
+
+    return 0.0;
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
     if (!targetFound)
     {
-        printf("no target found\n");
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return 0;
     }
     auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
@@ -150,13 +157,13 @@ double CowRobot::PIDToAprilTagRotation()
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "April tag targeting array has incorrect length");
     }
-    printf("vec length: %d", targetPoseVec.size());
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
 
     double targetYaw = targetPoseVec[4];
 
-    double yawOutput = m_AprilTagPIDController.Calculate(targetYaw, 0.0);
+    double yawOutput = m_AprilTagPIDController.Calculate(0.0, targetYaw);
 
-    printf("april tag yaw target: %f output: %f\n", targetYaw, yawOutput);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag yaw target: %f output: %f", targetYaw, yawOutput);
 
     return yawOutput;
 }

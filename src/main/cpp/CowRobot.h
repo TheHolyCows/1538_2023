@@ -23,6 +23,7 @@
 #include <frc/filter/LinearFilter.h>
 #include <frc/PowerDistribution.h>
 #include <math.h>
+#include <vector>
 
 class CowRobot
 {
