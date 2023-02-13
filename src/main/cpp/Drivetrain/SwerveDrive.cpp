@@ -104,7 +104,7 @@ void SwerveDrive::SetVelocity(double vx,
 
     for (auto module : m_Modules)
     {
-        module->SetTargetState(moduleStates[module->GetId()], m_Locked || force);
+        module->SetTargetState(moduleStates[module->GetID()], m_Locked);
     }
 }
 
@@ -203,7 +203,7 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions;
     for (auto module : m_Modules)
     {
-        modulePositions[module->GetId()] = module->GetPosition();
+        modulePositions[module->GetID()] = module->GetPosition();
     }
 
     m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
@@ -216,7 +216,7 @@ void SwerveDrive::Handle()
     for (auto module : m_Modules)
     {
         module->Handle();
-        modulePositions[module->GetId()] = module->GetPosition();
+        modulePositions[module->GetID()] = module->GetPosition();
     }
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
