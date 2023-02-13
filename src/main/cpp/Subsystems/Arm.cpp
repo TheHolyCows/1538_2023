@@ -102,8 +102,14 @@ void Arm::CheckMinMax()
 
 void Arm::ZeroSensors()
 {
-    double angle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
+    // Find the angle that is arm straight up
+    double zeroAngle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
 
+    // Want to ensure current angle is up to date
+    m_CurrentConfig.angle
+        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+
+    // Set to current angle - straight up angle, changing scope
     m_RotationMotor->SetSensorPosition(
-        CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
+        CowLib::Conversions::DegreesToFalcon(m_CurrentConfig.angle - zeroAngle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
 }
