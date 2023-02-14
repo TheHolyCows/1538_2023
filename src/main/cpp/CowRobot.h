@@ -84,6 +84,10 @@ public:
     void Handle();
 
     void DoNothing(void);
+
+    double YPIDOutputToAprilTag();
+
+    void ArmSM();
 };
 
 #endif

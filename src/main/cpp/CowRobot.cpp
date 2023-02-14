@@ -41,7 +41,8 @@ CowRobot::CowRobot()
     m_DriveController = new SwerveDriveController(*m_Drivetrain);
 
     // m_Arm = new Arm(9, 10, 11, 12, 1);
-    m_Arm = new Arm(9, 10, 11, 12, 4);
+    // m_Arm = new Arm(9, 10, 11, 12, 4);
+    m_Arm = new Arm(9, 10, 11, 12, 1);
 }
 
 /**

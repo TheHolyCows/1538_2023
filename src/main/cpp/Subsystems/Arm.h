@@ -8,18 +8,39 @@
 #ifndef SRC_SUBSYSTEMS_ARM_H_
 #define SRC_SUBSYSTEMS_ARM_H_
 
-#include "../../CowConstants.h"
-#include "../../CowLib/Conversions.h"
-#include "../../CowLib/CowMotorController.h"
-#include "../Pivot/PivotInterface.h"
-#include "../Telescope/TelescopeInterface.h"
+#include "../CowConstants.h"
+#include "../CowLib/Conversions.h"
+#include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
+#include "Claw/Claw.h"
+#include "Pivot/Pivot.h"
+#include "Telescope/Telescope.h"
 
 #include <iostream>
 #include <memory>
 
 class Arm : public ArmInterface
 {
+public:
+    enum ARM_STATE
+    {
+        ARM_NONE = 0,
+        ARM_IN,
+        ARM_STOW,
+        ARM_L3,
+        ARM_L2,
+        ARM_L1,
+        ARM_SCORE,
+        ARM_MANUAL
+    };
+
+    enum ARM_CARGO
+    {
+        ST_NONE = 0,
+        ST_CONE,
+        ST_CUBE
+    };
+
 private:
     /**
      * @brief Will rotate the arm to the specified angle
@@ -35,13 +56,25 @@ private:
      */
     void SetArmPosition(const double pos) override;
 
+    /**
+     * @brief Will set wrist position
+     * 
+     * @param position The desired position of the wrist
+    */
+    void SetWristPosition(const double pos) override;
+
     std::shared_ptr<CowLib::CowMotorController> m_RotationMotor;
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
 
     CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
 
-    std::unique_ptr<TelescopeInterface> m_Telescope;
-    std::unique_ptr<PivotInterface> m_Pivot;
+    std::unique_ptr<Telescope> m_Telescope;
+    std::unique_ptr<Pivot> m_Pivot;
+    std::unique_ptr<Claw> m_Claw;
+
+    ARM_CARGO m_Cargo;
+    ARM_STATE m_State;
+    bool m_Orientation;
 
 public:
     /**
@@ -49,14 +82,45 @@ public:
      * 
      * @param rotationMotor The id of the motor to control the rotation of the arm
      * @param telescopeMotor The id of the motor to control telescoping of the arm
+     * @param wristMotor The id of the motor to control wrist movement
+     * @param intakeMotor The id of the motor to control intake rollers
+     * @param solenoidChannel The id of the solenoid channel for the wrist
      */
-    Arm(const int rotationMotor, const int telescopeMotor);
+    Arm(const int rotationMotor, const int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel);
 
     /**
      * @brief Default destructor
      * 
      */
     ~Arm() = default;
+
+    /**
+     * @brief sets current cargo arm is carrying
+    */
+    void SetArmCargo(ARM_CARGO);
+
+    /**
+     * @brief sets the arm to a given setpoint based on the state
+     * does some checking for valid states
+    */
+    void SetArmState(ARM_STATE);
+
+    /**
+     * @brief returns current cargo of arm 
+    */
+    ARM_CARGO GetArmCargo();
+
+    /**
+     * @brief returns current state of arm 
+    */
+    ARM_STATE GetArmState();
+
+    /**
+     * comment these
+    */
+    void RequestAngle(double position);
+
+    void RequestPosition(double angle);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
