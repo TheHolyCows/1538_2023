@@ -7,10 +7,7 @@
 
 #include "Arm.h"
 
-#include "../Pivot/Pivot.h"
-#include "../Telescope/Telescope.h"
-
-Arm::Arm(int rotationMotor, int telescopeMotor)
+Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel)
 {
     // Set ArmInterface Members
     m_MinAngle = 0;
@@ -18,16 +15,17 @@ Arm::Arm(int rotationMotor, int telescopeMotor)
     m_MinPos   = 0;
     m_MaxPos   = 0;
 
-    m_RotationMotor.reset(new CowLib::CowMotorController(rotationMotor));
+    // move to pivot
+    m_RotationMotor.reset(new CowLib::CowMotorController(pivotMotor));
     m_RotationControlRequest = { 0 };
 
     // check these
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
 
-    // Allocate a Telescope Object
     m_Telescope = std::make_unique<Telescope>(telescopeMotor);
-    m_Pivot     = std::make_unique<Pivot>(rotationMotor);
+    m_Pivot     = std::make_unique<Pivot>(pivotMotor);
+    m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     ResetConstants();
 }
@@ -43,22 +41,46 @@ void Arm::SetArmPosition(double position)
     m_Telescope->RequestPosition(position);
 }
 
+/**
+ * @brief sets current cargo of the arm
+ * PLEASE CALL AFTER YOU SET STATE
+*/
+void Arm::SetArmCargo(ARM_CARGO cargo)
+{
+    if (m_State == ARM_NONE || m_State == ARM_IN)
+        m_Cargo = cargo;
+}
+
+void Arm::SetArmState(ARM_STATE state)
+{
+    // don't move arm to in position while scoring?
+    // if (m_State == ARM_STOW && state == ARM_IN)
+    // {
+    //     m_State = ARM_L1;
+    // }
+
+    if (state == ARM_MANUAL && m_State != ARM_MANUAL)
+    {
+        // manual control, may change control modes
+    }
+
+    m_State = state;
+}
+
 void Arm::ResetConstants()
 {
+    m_Cargo = ST_NONE;
+    m_State = ARM_NONE;
     m_Pivot->ResetConstants();
     m_Telescope->ResetConstants();
+    m_Claw->ResetConstants();
 }
 
 void Arm::Handle()
 {
-    if (m_Pivot)
-    {
-        m_Pivot->SetAngle();
-    }
-    if (m_Telescope)
-    {
-        m_Telescope->SetPosition();
-    }
+    // m_Pivot->Handle();
+    // m_Telescope->Handle();
+    m_Claw->Handle();
 }
 
 void Arm::CheckMinMax()

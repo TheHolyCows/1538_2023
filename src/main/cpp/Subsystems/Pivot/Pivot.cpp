@@ -5,8 +5,6 @@
 // created on: 2023-1-14
 //==================================================
 
-#pragma once
-
 #include "Pivot.h"
 
 Pivot::Pivot(const int MotorId)

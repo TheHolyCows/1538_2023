@@ -8,11 +8,12 @@
 #ifndef SRC_SUBSYSTEMS_CLAW_H_
 #define SRC_SUBSYSTEMS_CLAW_H_
 
-#include "../CowConstants.h"
-#include "../CowLib/CowMotorController.h"
+#include "../../CowConstants.h"
+#include "../../CowLib/Conversions.h"
+#include "../../CowLib/CowMotorController.h"
 
-#include <iostream>
 #include <frc/Solenoid.h>
+#include <iostream>
 
 class Claw
 {
