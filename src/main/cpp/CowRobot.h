@@ -63,14 +63,6 @@ private:
     double m_MatchTime;
     double m_StartTime;
 
-    frc2::PIDController m_AprilTagPIDController{ CONSTANT("APRIL_TAG_P"),
-                                                 CONSTANT("APRIL_TAG_I"),
-                                                 CONSTANT("APRIL_TAG_D") };
-
-    frc2::PIDController m_AprilTagRotationPIDController{ CONSTANT("APRIL_TAG_ROTATION_P"),
-                                                         CONSTANT("APRIL_TAG_ROTATION_I"),
-                                                         CONSTANT("APRIL_TAG_ROTATION_D") };
-
 public:
     CowRobot();
     void Reset();
@@ -92,13 +84,6 @@ public:
     void Handle();
 
     void DoNothing(void);
-
-    double YPIDOutputToAprilTag();
-
-    void SetArmState(ARM_STATE, ARM_CARGO);
-    void ArmSM();
-    double PIDToAprilTagTranslation();
-    double PIDToAprilTagRotation();
 };
 
 #endif

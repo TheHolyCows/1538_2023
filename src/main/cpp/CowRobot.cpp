@@ -2,6 +2,7 @@
 
 #include "CowLib/CowLogger.h"
 #include "Subsystems/Limelight.h"
+#include "Subsystems/Vision.h"
 
 CowRobot::CowRobot()
 {
@@ -55,6 +56,8 @@ void CowRobot::Reset()
     m_Drivetrain->ResetConstants();
     m_DriveController->ResetConstants();
     // m_Controller->ResetConstants(); error
+
+    Vision::GetInstance().Reset();
 
     CowLib::CowLogger::GetInstance()->Reset();
 }

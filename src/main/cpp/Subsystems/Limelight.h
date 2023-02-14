@@ -65,6 +65,11 @@ namespace LimelightHelpers
         GetLimelightNTTableEntry(tableName, entryName).SetDoubleArray(vals);
     }
 
+    inline bool GetTV(const std::string &limelightName = "")
+    {
+        return GetLimelightNTDouble(limelightName, "tv");
+    }
+
     inline double GetTX(const std::string &limelightName = "")
     {
         return GetLimelightNTDouble(limelightName, "tx");
