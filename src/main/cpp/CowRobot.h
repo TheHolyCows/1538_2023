@@ -77,6 +77,8 @@ public:
     void DoNothing(void);
 
     double YPIDOutputToAprilTag();
+
+    void ArmSM();
 };
 
 #endif

@@ -31,7 +31,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
-    // m_Arm = new Arm(9, 10);
+    m_Arm = new Arm(9, 10, 11, 12, 1);
 }
 
 /**
@@ -114,4 +114,30 @@ void CowRobot::DoNothing()
 double CowRobot::YPIDOutputToAprilTag()
 {
     return 0.0;
+}
+
+/**
+ * called each cycle by operator controller (at the bottom)
+*/
+void CowRobot::ArmSM()
+{
+    switch (m_Arm->GetArmState())
+    {
+    case Arm::ARM_NONE :
+        m_Arm->RequestAngle(0);
+        m_Arm->RequestPosition(0);
+        break;
+    case Arm::ARM_IN :
+        break;
+    case Arm::ARM_STOW :
+        break;
+    case Arm::ARM_L3 :
+        break;
+    case Arm::ARM_L2 :
+        break;
+    case Arm::ARM_L1 :
+        break;
+    case Arm::ARM_SCORE :
+        break;
+    }
 }
