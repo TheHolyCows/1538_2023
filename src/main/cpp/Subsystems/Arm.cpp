@@ -70,6 +70,10 @@ void Arm::SetArmCargo(ARM_CARGO cargo)
 void Arm::SetArmState(ARM_STATE state)
 {
     // don't move arm to in position while scoring?
+    // if (m_State == ARM_STOW && state == ARM_IN)
+    // {
+    //     m_State = ARM_L1;
+    // }
 
     if (state == ARM_MANUAL && m_State != ARM_MANUAL)
     {
