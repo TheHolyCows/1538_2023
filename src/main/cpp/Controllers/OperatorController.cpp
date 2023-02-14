@@ -94,8 +94,8 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetLeftDriveStickButton(5))
     {
-        y     = bot->PIDToAprilTagTranslation();
-        omega = bot->PIDToAprilTagRotation();
+        y     = Vision::GetInstance().ScoringYPID(Vision::GamePiece::CONE);
+        omega = Vision::GetInstance().ScoringYawPID();
         force = true;
     }
 
