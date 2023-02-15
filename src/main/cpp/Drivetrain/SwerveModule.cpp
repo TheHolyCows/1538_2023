@@ -94,6 +94,9 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force
         targetAngle = optimized.angle;
     }
 
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "omtimized vel %f\n", optimized.velocity);
+    // printf("optimized vel: %f\n", optimized.velocity);
+
     m_PreviousAngle = targetAngle;
 
     m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
