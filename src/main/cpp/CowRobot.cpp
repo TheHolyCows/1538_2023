@@ -57,7 +57,7 @@ void CowRobot::Reset()
     m_DriveController->ResetConstants();
     // m_Controller->ResetConstants(); error
 
-    Vision::GetInstance().Reset();
+    Vision::GetInstance()->Reset();
 
     CowLib::CowLogger::GetInstance()->Reset();
 }

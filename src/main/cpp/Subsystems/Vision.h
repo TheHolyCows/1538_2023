@@ -4,6 +4,7 @@
 #include "../CowConstants.h"
 #include "../CowLib/CowLogger.h"
 #include "../CowLib/CowPID.h"
+#include "frc/controller/PIDController.h"
 #include "Limelight.h"
 
 #include <memory>
@@ -18,13 +19,16 @@ public:
     };
 
 private:
+    static Vision *s_Instance;
+
     Vision();
 
     std::unique_ptr<CowLib::CowPID> m_ScoringYPID;
     std::unique_ptr<CowLib::CowPID> m_ScoringYawPID;
+    frc2::PIDController ypid2;
 
 public:
-    static Vision &GetInstance();
+    static Vision *GetInstance();
 
     ~Vision() = default;
 
