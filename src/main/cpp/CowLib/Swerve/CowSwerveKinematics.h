@@ -3,6 +3,7 @@
 
 #include "./CowChassisSpeeds.h"
 #include "./CowSwerveModuleState.h"
+#include "InternalSwerveKinematics.h"
 
 #include <algorithm>
 #include <array>
@@ -19,7 +20,8 @@ namespace CowLib
     class CowSwerveKinematics
     {
     private:
-        frc::SwerveDriveKinematics<4> *m_Kinematics;
+        // frc::SwerveDriveKinematics<4> *m_Kinematics;
+        CowLib::InternalSwerveKinematics<4> *m_Kinematics;
 
         std::array<frc::SwerveModuleState, 4> m_WPIModuleStates{};
 
@@ -32,7 +34,7 @@ namespace CowLib
         std::array<CowSwerveModuleState, 4>
         CalculateModuleStates(CowChassisSpeeds &chassisSpeeds, double centerOfRotationX, double centerOfRotationY);
 
-        frc::SwerveDriveKinematics<4> *GetInternalKinematics();
+        CowLib::InternalSwerveKinematics<4> *GetInternalKinematics();
     };
 
 } // namespace CowLib

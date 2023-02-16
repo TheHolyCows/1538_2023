@@ -5,7 +5,8 @@ SwerveModuleInterface::SwerveModuleInterface(const int id, const double encoderO
       m_EncoderOffset(encoderOffset),
       m_Velocity(0),
       m_Position(0),
-      m_Angle(0)
+      m_Angle(0),
+      m_AngularVelocity(0)
 {
 }
 

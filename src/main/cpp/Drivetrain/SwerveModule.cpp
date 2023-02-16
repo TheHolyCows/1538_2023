@@ -107,4 +107,6 @@ void SwerveModule::Handle()
 
     m_Angle
         = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("SWERVE_ROTATION_GEAR_RATIO"));
+
+    m_AngularVelocity = m_RotationMotor->GetVelocity() * 360.0 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO");
 }

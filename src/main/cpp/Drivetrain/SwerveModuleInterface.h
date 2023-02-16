@@ -12,6 +12,7 @@ protected:
     double m_Velocity;
     double m_Position;
     double m_Angle;
+    double m_AngularVelocity;
 
     /**
      * @brief Helper function for optimize
@@ -40,7 +41,7 @@ public:
 
     inline int GetID() const { return m_Id; }
 
-    inline CowLib::CowSwerveModuleState GetState() const { return { m_Velocity, m_Velocity }; }
+    inline CowLib::CowSwerveModuleState GetState() const { return { m_Velocity, m_Angle, m_AngularVelocity }; }
 
     inline CowLib::CowSwerveModulePosition GetPosition() const { return { m_Position, m_Angle }; }
 
