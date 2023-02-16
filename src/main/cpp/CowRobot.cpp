@@ -130,8 +130,8 @@ void CowRobot::ArmSM()
     switch (m_Arm->GetArmState())
     {
     case Arm::ARM_NONE :
-        m_Arm->RequestAngle(0);
-        m_Arm->RequestPosition(0);
+        m_Arm->SetAngle(0);
+        m_Arm->SetTelescopePosition(0);
         break;
     case Arm::ARM_IN :
         break;
@@ -144,6 +144,10 @@ void CowRobot::ArmSM()
     case Arm::ARM_L1 :
         break;
     case Arm::ARM_SCORE :
+        break;
+    case Arm::ARM_MANUAL :
+        break;
+    default :
         break;
     }
 }
