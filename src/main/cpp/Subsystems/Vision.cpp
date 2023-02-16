@@ -81,7 +81,7 @@ double Vision::ScoringYPID(GamePiece type)
     m_ScoringYPID->SetSetpoint(targetX);
     double yOutput = m_ScoringYPID->Calculate(0.0);
     yOutput        = ypid2.Calculate(targetX, 0.0);
-    if (fabs(targetX) < 0.1)
+    if (fabs(targetX) < 0.01)
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f within tolorance", targetX);
 
