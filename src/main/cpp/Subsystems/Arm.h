@@ -12,6 +12,7 @@
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
+#include "ArmState.h"
 #include "Claw/Claw.h"
 #include "Pivot/Pivot.h"
 #include "Telescope/Telescope.h"
@@ -21,26 +22,6 @@
 
 class Arm : public ArmInterface
 {
-public:
-    enum ARM_STATE
-    {
-        ARM_NONE = 0,
-        ARM_IN,
-        ARM_STOW,
-        ARM_L3,
-        ARM_L2,
-        ARM_L1,
-        ARM_SCORE,
-        ARM_MANUAL
-    };
-
-    enum ARM_CARGO
-    {
-        ST_NONE = 0,
-        ST_CONE,
-        ST_CUBE
-    };
-
 private:
     /**
      * @brief Will rotate the arm to the specified angle
