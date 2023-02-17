@@ -7,8 +7,8 @@ CowRobot::CowRobot()
     m_DSUpdateCount = 0;
 
     // uncomment for b-bot
-    // m_PowerDistributionPanel = new frc::PowerDistribution(40, frc::PowerDistribution::ModuleType::kRev);
-    m_PowerDistributionPanel = new frc::PowerDistribution();
+    m_PowerDistributionPanel = new frc::PowerDistribution(1, frc::PowerDistribution::ModuleType::kRev);
+    // m_PowerDistributionPanel = new frc::PowerDistribution();
 
     // mxp board was removed from robot - can remove this code
     m_LEDDisplay = nullptr;
@@ -88,6 +88,7 @@ void CowRobot::Handle()
 
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
+    m_Claw->Handle();
 
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
