@@ -185,17 +185,21 @@ void CowRobot::ArmSM()
         m_Arm->RequestAngle(0);
         m_Arm->RequestPosition(0);
         break;
-    case Arm::ARM_IN :
+    case ARM_IN :
         break;
-    case Arm::ARM_STOW :
+    case ARM_STOW :
         break;
-    case Arm::ARM_L3 :
+    case ARM_L3 :
         break;
-    case Arm::ARM_L2 :
+    case ARM_L2 :
         break;
-    case Arm::ARM_L1 :
+    case ARM_L1 :
         break;
-    case Arm::ARM_SCORE :
+    case ARM_SCORE :
+        break;
+    case ARM_MANUAL :
+        break;
+    default :
         break;
     }
 }
