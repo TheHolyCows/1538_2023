@@ -6,11 +6,10 @@
 //==================================================
 
 #include "Claw.h"
-#include "../CowLib/Conversions.h"
 
 Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 {
-    m_WristMotor = new CowLib::CowMotorController(wristMotor);
+    m_WristMotor  = new CowLib::CowMotorController(wristMotor);
     m_IntakeMotor = new CowLib::CowMotorController(intakeMotor);
 
     m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
@@ -29,7 +28,6 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 void Claw::SetWristPosition(double position)
 {
     m_WristControlRequest.Position = position * CONSTANT("ARM_WRIST_RATIO");
-
 }
 
 double Claw::GetWristPosition()
@@ -40,7 +38,7 @@ double Claw::GetWristPosition()
 void Claw::SetIntakeSpeed(double percent)
 {
     m_IntakeControlRequest.PercentOut = percent * CONSTANT("ARM_INTAKE_RATIO");
-    m_IntakePercent = percent;
+    m_IntakePercent                   = percent;
 }
 
 double Claw::GetIntakeSpeed()
@@ -60,12 +58,12 @@ void Claw::ResetConstants()
 
 void Claw::Handle()
 {
-    if(m_IntakeMotor)
+    if (m_IntakeMotor)
     {
         m_IntakeMotor->Set(m_IntakeControlRequest);
     }
 
-    if(m_WristMotor)
+    if (m_WristMotor)
     {
         m_WristMotor->Set(m_WristControlRequest);
     }

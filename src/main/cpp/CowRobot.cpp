@@ -6,8 +6,6 @@ CowRobot::CowRobot()
     m_StartTime     = 0;
     m_DSUpdateCount = 0;
 
-    m_LEDDisplay = new CowLib::CowAlphaNum(0x70);
-
     m_PowerDistributionPanel = new frc::PowerDistribution();
 
     m_Gyro = CowPigeon::GetInstance();
@@ -31,7 +29,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
-    // m_Arm = new Arm(9, 10);
+    // m_Arm = new Arm(9, 10, 11, 12, 1);
 }
 
 /**
@@ -114,4 +112,34 @@ void CowRobot::DoNothing()
 double CowRobot::YPIDOutputToAprilTag()
 {
     return 0.0;
+}
+
+/**
+ * called each cycle by operator controller (at the bottom)
+*/
+void CowRobot::ArmSM()
+{
+    switch (m_Arm->GetArmState())
+    {
+    case ARM_NONE :
+        m_Arm->SetAngle(0);
+        m_Arm->SetTelescopePosition(0);
+        break;
+    case ARM_IN :
+        break;
+    case ARM_STOW :
+        break;
+    case ARM_L3 :
+        break;
+    case ARM_L2 :
+        break;
+    case ARM_L1 :
+        break;
+    case ARM_SCORE :
+        break;
+    case ARM_MANUAL :
+        break;
+    default :
+        break;
+    }
 }

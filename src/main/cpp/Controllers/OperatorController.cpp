@@ -89,6 +89,8 @@ void OperatorController::Handle(CowRobot *bot)
         fieldRelative,
         centerOfRotationX,
         centerOfRotationY);
+
+    //bot->ArmSM();
 }
 
 void OperatorController::ResetConstants()

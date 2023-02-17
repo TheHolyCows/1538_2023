@@ -12,6 +12,10 @@
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
+#include "ArmState.h"
+#include "Claw/Claw.h"
+#include "Pivot/Pivot.h"
+#include "Telescope/Telescope.h"
 
 #include <iostream>
 #include <memory>
@@ -33,13 +37,18 @@ private:
      */
     void SetArmPosition(const double pos) override;
 
-    std::unique_ptr<CowLib::CowMotorController> m_RotationMotor;
-    std::unique_ptr<CowLib::CowMotorController> m_TelescopeMotor;
+    std::shared_ptr<CowLib::CowMotorController> m_RotationMotor;
+    std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
 
     CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
-    CowLib::CowMotorController::PositionPercentOutput m_TelescopeControlRequest;
 
-    int m_LoopCount;
+    std::unique_ptr<Telescope> m_Telescope;
+    std::unique_ptr<Pivot> m_Pivot;
+    std::unique_ptr<Claw> m_Claw;
+
+    ARM_CARGO m_Cargo;
+    ARM_STATE m_State;
+    bool m_Orientation;
 
 public:
     /**
@@ -47,14 +56,45 @@ public:
      * 
      * @param rotationMotor The id of the motor to control the rotation of the arm
      * @param telescopeMotor The id of the motor to control telescoping of the arm
+     * @param wristMotor The id of the motor to control wrist movement
+     * @param intakeMotor The id of the motor to control intake rollers
+     * @param solenoidChannel The id of the solenoid channel for the wrist
      */
-    Arm(const int rotationMotor, const int telescopeMotor);
+    Arm(const int rotationMotor, const int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel);
 
     /**
      * @brief Default destructor
      * 
      */
     ~Arm() = default;
+
+    /**
+     * @brief sets current cargo arm is carrying
+    */
+    void SetArmCargo(ARM_CARGO);
+
+    /**
+     * @brief sets the arm to a given setpoint based on the state
+     * does some checking for valid states
+    */
+    void SetArmState(ARM_STATE);
+
+    /**
+     * @brief returns current cargo of arm 
+    */
+    ARM_CARGO GetArmCargo();
+
+    /**
+     * @brief returns current state of arm 
+    */
+    ARM_STATE GetArmState();
+
+    /**
+     * comment these
+    */
+    void RequestAngle(double position);
+
+    void RequestPosition(double angle);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
