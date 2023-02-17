@@ -20,6 +20,9 @@ CowRobot::CowRobot()
     // mxp board was removed from robot - can remove this code
     m_LEDDisplay = nullptr;
 
+    // mxp board was removed from robot - can remove this code
+    m_LEDDisplay = nullptr;
+
     m_Gyro = CowPigeon::GetInstance();
 
     m_PreviousGyroError = 0;
