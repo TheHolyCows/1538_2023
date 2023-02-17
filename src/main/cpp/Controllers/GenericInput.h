@@ -1,7 +1,7 @@
 #ifndef __COWLIB_GENERICINPUT_H__
 #define __COWLIB_GENERICINPUT_H__
 
-
+#include "../CowConstants.h"
 
 class GenericInput
 {
@@ -19,7 +19,6 @@ public:
 
 private:
     bool m_Value = false;
-    bool m_Pressed = false;
     bool m_PressLocked;
  
 };
@@ -33,6 +32,7 @@ public:
     
 private:
     double m_Value = 0;
+    bool m_Triggered = false;
     bool m_PressLocked;
     
 };
