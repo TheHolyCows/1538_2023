@@ -50,6 +50,9 @@ void SwerveModuleSim::ResetEncoders()
 
 void SwerveModuleSim::Handle()
 {
+    frc::SmartDashboard::PutNumber("SwerveModuleSim/Module" + std::to_string(m_Id) + "/velocity", m_Velocity);
+    frc::SmartDashboard::PutNumber("SwerveModuleSim/Module" + std::to_string(m_Id) + "/angle", m_Angle);
+
     // Change velocity based on accel
     if (fabs(m_TargetVelocity - m_Velocity) <= m_Accel * 0.02)
     {
