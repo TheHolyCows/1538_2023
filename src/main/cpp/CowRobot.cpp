@@ -10,8 +10,6 @@ CowRobot::CowRobot()
     m_StartTime     = 0;
     m_DSUpdateCount = 0;
 
-    m_LEDDisplay = new CowLib::CowAlphaNum(0x70);
-
     m_PowerDistributionPanel = new frc::PowerDistribution();
 
     m_Gyro = CowPigeon::GetInstance();
@@ -35,7 +33,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
-    m_Arm = new Arm(9, 10, 11, 12, 1);
+    // m_Arm = new Arm(9, 10, 11, 12, 1);
 }
 
 /**
