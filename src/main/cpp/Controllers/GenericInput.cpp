@@ -3,9 +3,6 @@
 GenericInput::GenericInput()
 {
 
-
-
-
 }
 
 Button::Button(const int ID)
@@ -15,8 +12,16 @@ Button::Button(const int ID)
 bool Button::OnPress()
 {
 
+
+
+    return m_Pressed;
 }
 bool Button::OnHold()
+{
+
+}
+
+Trigger::Trigger(const int ID)
 {
 
 }
@@ -28,7 +33,15 @@ bool Trigger::OnHold()
 {
 
 }
-void GenericInput::Handle()
+void Button::Handle()
 {
-    
+    if(m_Value == false)
+    {
+        m_PressLocked = false;
+    }
+}
+
+void Trigger::Handle()
+{
+
 }
