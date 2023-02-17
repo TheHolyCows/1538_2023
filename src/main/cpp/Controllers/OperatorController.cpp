@@ -15,6 +15,17 @@ void OperatorController::Handle(CowRobot *bot)
     double centerOfRotationX = 0;
     double centerOfRotationY = 0;
 
+    // testing intake - remove when done
+    bot->m_Claw->SetOpen(m_CB->GetLeftDriveStickButton(5));
+    if (m_CB->GetLeftDriveStickButton(2))
+    {
+        bot->m_Claw->SetIntakeSpeed(1);
+    }
+    else
+    {
+        bot->m_Claw->SetIntakeSpeed(0);
+    }
+
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
     {
         if (m_EvasiveSwerveWheel == NONE)

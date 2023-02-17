@@ -16,6 +16,7 @@
 #include "Drivetrain/SwerveDrive.h"
 #include "Subsystems/Arm.h"
 #include "Subsystems/ArmState.h"
+#include "Subsystems/Claw/Claw.h" /* TODO: remove when integrated in Arm */
 #include "Subsystems/Limelight.h"
 
 #include <frc/BuiltInAccelerometer.h>
@@ -28,6 +29,9 @@ class CowRobot
 public:
     // Drive Motors
     SwerveDrive *m_Drivetrain;
+
+    // TODO: remove when done
+    Claw *m_Claw;
 
 private:
     Arm *m_Arm;
