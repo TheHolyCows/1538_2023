@@ -43,6 +43,17 @@ namespace CowLib
                                                  frc::Rotation2d{ units::degree_t(angle) },
                                                  units::degrees_per_second_t(omega) };
         }
+
+        template<size_t N>
+        static std::array<ExtendedWPISwerveModuleState, N> ToWPIExtendedArray(std::array<CowSwerveModuleState, N> arr)
+        {
+            auto newArr = std::array<ExtendedWPISwerveModuleState, N>{};
+            for (size_t i = 0; i < N; i++)
+            {
+                newArr[i] = arr[i].ToWPIExtended();
+            }
+            return newArr;
+        }
     };
 
 } // namespace CowLib
