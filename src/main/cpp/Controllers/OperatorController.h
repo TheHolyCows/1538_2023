@@ -12,6 +12,7 @@
 #include "../CowLib/CowLib.h"
 #include "../CowRobot.h"
 #include "../Declarations.h"
+#include "../Subsystems/ArmState.h"
 #include "../Subsystems/Limelight.h"
 #include "../Subsystems/Vision.h"
 
