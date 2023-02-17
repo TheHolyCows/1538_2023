@@ -9,7 +9,7 @@
 
 Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 {
-    m_WristMotor  = new CowLib::CowMotorController(wristMotor);
+    // m_WristMotor  = new CowLib::CowMotorController(wristMotor);
     m_IntakeMotor = new CowLib::CowMotorController(intakeMotor);
 
     // m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);

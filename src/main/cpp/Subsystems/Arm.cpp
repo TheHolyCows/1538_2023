@@ -23,9 +23,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
 
-    m_Telescope = std::make_unique<Telescope>(telescopeMotor);
-    m_Pivot     = std::make_unique<Pivot>(pivotMotor);
-    m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
+    // m_Telescope = std::make_unique<Telescope>(telescopeMotor);
+    // m_Pivot     = std::make_unique<Pivot>(pivotMotor);
+    m_Claw = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     ResetConstants();
 }
