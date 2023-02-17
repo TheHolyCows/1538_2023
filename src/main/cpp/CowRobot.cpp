@@ -6,7 +6,12 @@ CowRobot::CowRobot()
     m_StartTime     = 0;
     m_DSUpdateCount = 0;
 
+    // uncomment for b-bot
+    // m_PowerDistributionPanel = new frc::PowerDistribution(40, frc::PowerDistribution::ModuleType::kRev);
     m_PowerDistributionPanel = new frc::PowerDistribution();
+
+    // mxp board was removed from robot - can remove this code
+    m_LEDDisplay = nullptr;
 
     m_Gyro = CowPigeon::GetInstance();
 
@@ -32,6 +37,7 @@ CowRobot::CowRobot()
     m_DriveController = new SwerveDriveController(*m_Drivetrain);
 
     // m_Arm = new Arm(9, 10, 11, 12, 1);
+    m_Arm = new Arm(9, 10, 11, 12, 1);
 }
 
 /**
