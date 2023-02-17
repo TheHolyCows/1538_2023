@@ -34,6 +34,7 @@ namespace CowLib
         std::array<CowSwerveModuleState, 4>
         CalculateModuleStates(CowChassisSpeeds &chassisSpeeds, double centerOfRotationX, double centerOfRotationY);
 
+        // frc::SwerveDriveKinematics<4> *GetInternalKinematics();
         CowLib::InternalSwerveKinematics<4> *GetInternalKinematics();
     };
 

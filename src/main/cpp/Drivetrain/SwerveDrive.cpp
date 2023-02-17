@@ -22,7 +22,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
 
-    m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYawDegrees(), 0, 0, 0);
+    // m_Odometry = new CowLib::CowSwerveOdometry(m_Kinematics, m_Gyro->GetYawDegrees(), 0, 0, 0);
 
     // m_VisionPIDController = new CowLib::CowPID(CONSTANT("SWERVE_VISION_P"), CONSTANT("SWERVE_VISION_I"),
     // CONSTANT("SWERVE_VISION_D"), 0);
@@ -203,7 +203,7 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
         modulePositions[module->GetID()] = module->GetPosition();
     }
 
-    m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
+    // m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
     m_Gyro->SetYaw(pose.Rotation().Degrees().value());
 }
 
@@ -216,7 +216,7 @@ void SwerveDrive::Handle()
         modulePositions[module->GetID()] = module->GetPosition();
     }
 
-    m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
+    // m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
-    m_Pose = m_Odometry->GetWPIPose();
+    // m_Pose = m_Odometry->GetWPIPose();
 }

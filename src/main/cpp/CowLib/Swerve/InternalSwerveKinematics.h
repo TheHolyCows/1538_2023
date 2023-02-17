@@ -4,6 +4,7 @@
 #include "ExtendedWPISwerveModuleState.h"
 #include "units/angular_velocity.h"
 
+#include <algorithm>
 #include <frc/EigenCore.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 
@@ -17,16 +18,18 @@ namespace CowLib
 
         mutable frc::Matrixd<NumModules * 2, 4> m_SecondOrderKinematics;
 
-        wpi::array<frc::Translation2d, NumModules> m_Modules;
-        mutable wpi::array<CowLib::ExtendedWPISwerveModuleState, NumModules> m_ModuleStates;
+        std::array<frc::Translation2d, NumModules> m_Modules;
+        mutable std::array<CowLib::ExtendedWPISwerveModuleState, NumModules> m_ModuleStates;
 
         mutable frc::Translation2d m_PreviousCoR;
 
     public:
         template<typename... Wheels>
         InternalSwerveKinematics(frc::Translation2d wheel, Wheels &&...wheels)
-            : m_Modules{ wheel, wheels... }
+            : frc::SwerveDriveKinematics<NumModules>(wheel, wheels...)
         {
+            m_Modules = { wheel, wheels... };
+
             static_assert(sizeof...(wheels) >= 1, "A swerve drive requires at least two modules");
 
             for (size_t i = 0; i < NumModules; i++)
@@ -35,7 +38,7 @@ namespace CowLib
                 m_InverseKinematics.template block<2, 3>(i * 2, 0) <<
                     1, 0, (-m_Modules[i].Y()).value(),
                     0, 1, (+m_Modules[i].X()).value();
-                
+
                 m_SecondOrderKinematics.template block <2, 4>(i * 2, 0) <<
                     1, 0, (-m_Modules[i].X()).value(), (-m_Modules[i].Y()).value(),
                     0, 1, (-m_Modules[i].Y()).value(), (m_Modules[i].X()).value();
@@ -47,34 +50,30 @@ namespace CowLib
             wpi::math::MathSharedStore::ReportUsage(wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
         }
 
-        InternalSwerveKinematics(const wpi::array<frc::Translation2d, NumModules> &wheels)
-            : m_Modules{ wheels },
-              m_ModuleStates(wpi::empty_array)
-        {
-            for (size_t i = 0; i < NumModules; i++)
-            {
-                // clang-format off
-                m_InverseKinematics.template block<2, 3>(i * 2, 0) <<
-                    1, 0, (-m_Modules[i].Y()).value(),
-                    0, 1, (+m_Modules[i].X()).value();
-                
-                m_SecondOrderKinematics.template block <2, 4>(i * 2, 0) <<
-                    1, 0, (-m_Modules[i].X()).value(), (-m_Modules[i].Y()).value(),
-                    0, 1, (-m_Modules[i].Y()).value(), (m_Modules[i].X()).value();
-                // clang-format on
-            }
+        // InternalSwerveKinematics(const wpi::array<frc::Translation2d, 4> &wheels)
+        //     : frc::SwerveDriveKinematics<4>(wheels)
+        // {
+        //     m_Modules = wheels;
 
-            m_ForwardKinematics = m_InverseKinematics.householderQr();
+        //     for (size_t i = 0; i < NumModules; i++)
+        //     {
+        //         // clang-format off
+        //         m_InverseKinematics.template block<2, 3>(i * 2, 0) <<
+        //             1, 0, (-m_Modules[i].Y()).value(),
+        //             0, 1, (+m_Modules[i].X()).value();
 
-            wpi::math::MathSharedStore::ReportUsage(wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
-        }
+        //         m_SecondOrderKinematics.template block <2, 4>(i * 2, 0) <<
+        //             1, 0, (-m_Modules[i].X()).value(), (-m_Modules[i].Y()).value(),
+        //             0, 1, (-m_Modules[i].Y()).value(), (m_Modules[i].X()).value();
+        //         // clang-format on
+        //     }
 
-        InternalSwerveKinematics(const InternalSwerveKinematics &) = default;
+        //     m_ForwardKinematics = m_InverseKinematics.householderQr();
 
-        static void DesaturateWheelSpeeds();
-        static void DesaturateWheelSpeeds(bool morestuff);
+        //     wpi::math::MathSharedStore::ReportUsage(wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
+        // }
 
-        wpi::array<CowLib::ExtendedWPISwerveModuleState, NumModules>
+        std::array<CowLib::ExtendedWPISwerveModuleState, NumModules>
         ToSwerveModuleStates(const frc::ChassisSpeeds &chassisSpeeds,
                              const frc::Translation2d &centerOfRotation = frc::Translation2d{}) const
         {
@@ -149,13 +148,13 @@ namespace CowLib
                           "Number of modules is not consistent with number of wheel "
                           "locations provided in constructor.");
 
-            wpi::array<ExtendedWPISwerveModuleState, NumModules> moduleStates{ wheelStates... };
+            std::array<ExtendedWPISwerveModuleState, NumModules> moduleStates{ wheelStates... };
 
             return this->ToChassisSpeeds(moduleStates);
         }
 
         frc::ChassisSpeeds
-        ToChassisSpeeds(wpi::array<CowLib::ExtendedWPISwerveModuleState, NumModules> moduleStates) const
+        ToChassisSpeeds(std::array<CowLib::ExtendedWPISwerveModuleState, NumModules> moduleStates) const
         {
             frc::Matrixd<NumModules * 2, 1> moduleStatesMatrix;
 
@@ -178,12 +177,12 @@ namespace CowLib
                           "Number of modules is not consistent with number of wheel "
                           "locations provided in constructor.");
 
-            wpi::array<ExtendedWPISwerveModuleState, NumModules> moduleDeltas{ wheelDeltas... };
+            std::array<ExtendedWPISwerveModuleState, NumModules> moduleDeltas{ wheelDeltas... };
 
             return this->ToTwist2d(moduleDeltas);
         }
 
-        frc::Twist2d ToTwist2d(wpi::array<frc::SwerveModulePosition, NumModules> wheelDeltas) const
+        frc::Twist2d ToTwist2d(std::array<frc::SwerveModulePosition, NumModules> wheelDeltas) const
         {
             frc::Matrixd<NumModules * 2, 1> moduleDeltaMatrix;
 
@@ -201,7 +200,7 @@ namespace CowLib
                      units::radian_t{ chassisDeltaVector(2) } };
         }
 
-        static void DesaturateWheelSpeeds(wpi::array<CowLib::ExtendedWPISwerveModuleState, NumModules> *moduleStates,
+        static void DesaturateWheelSpeeds(std::array<CowLib::ExtendedWPISwerveModuleState, NumModules> *moduleStates,
                                           units::meters_per_second_t attainableMaxSpeed)
         {
             auto &states      = *moduleStates;
@@ -220,7 +219,7 @@ namespace CowLib
             }
         }
 
-        static void DesaturateWheelSpeeds(wpi::array<CowLib::ExtendedWPISwerveModuleState, NumModules> *moduleStates,
+        static void DesaturateWheelSpeeds(std::array<CowLib::ExtendedWPISwerveModuleState, NumModules> *moduleStates,
                                           frc::ChassisSpeeds currentChassisSpeed,
                                           units::meters_per_second_t attainableMaxModuleSpeed,
                                           units::meters_per_second_t attainableMaxRobotTranslationSpeed,
