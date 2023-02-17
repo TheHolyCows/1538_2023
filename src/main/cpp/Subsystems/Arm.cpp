@@ -44,7 +44,7 @@ void Arm::SetArmPosition(double position)
 /**
  * @brief return current cargo held
 */
-Arm::ARM_CARGO Arm::GetArmCargo()
+ARM_CARGO Arm::GetArmCargo()
 {
     return m_Cargo;
 }
@@ -52,7 +52,7 @@ Arm::ARM_CARGO Arm::GetArmCargo()
 /**
  * @brief return current state
 */
-Arm::ARM_STATE Arm::GetArmState()
+ARM_STATE Arm::GetArmState()
 {
     return m_State;
 }

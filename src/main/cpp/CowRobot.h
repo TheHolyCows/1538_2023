@@ -7,7 +7,6 @@
 
 #include "Controllers/GenericController.h"
 #include "CowConstants.h"
-#include "CowLib/CowAlphaNum.h"
 #include "CowLib/CowLogger.h"
 #include "CowLib/CowMotorController.h"
 #include "CowLib/CowTimer.h"
@@ -15,7 +14,8 @@
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
 #include "Drivetrain/SwerveDriveController.h"
-#include "Subsystems/Arm/Arm.h"
+#include "Subsystems/Arm.h"
+#include "Subsystems/ArmState.h"
 #include "Subsystems/Limelight.h"
 
 #include <frc/BuiltInAccelerometer.h>
