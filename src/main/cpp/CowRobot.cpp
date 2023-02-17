@@ -222,9 +222,5 @@ void CowRobot::ArmSM()
         break;
     default :
         break;
-    case Arm::ARM_MANUAL :
-        break;
-    default :
-        break;
     }
 }
