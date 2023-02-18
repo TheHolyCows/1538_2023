@@ -15,6 +15,7 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
     // m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_IntakeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
+    // TODO: don't like the hardcoded 40 here, see if we can put it elsewhere
     m_Solenoid = new frc::Solenoid(40, frc::PneumaticsModuleType::CTREPCM, solenoidChannel);
 
     m_WristPosition = 0;

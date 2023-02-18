@@ -16,7 +16,6 @@
 #include "Drivetrain/SwerveDrive.h"
 #include "Subsystems/Arm.h"
 #include "Subsystems/ArmState.h"
-#include "Subsystems/Claw/Claw.h" /* TODO: remove when integrated in Arm */
 #include "Subsystems/Limelight.h"
 
 #include <frc/BuiltInAccelerometer.h>
