@@ -56,6 +56,9 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force
     m_PreviousAngle = targetAngle;
 
     m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
+    m_RotationControlRequest.FeedForward
+        = state.omega * 12 * -0.3 / (360 * (6380 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) / 60);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "module ");
 }
 
 void SwerveModule::ResetConstants()

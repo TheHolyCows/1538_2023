@@ -50,6 +50,7 @@ namespace CowLib
             wpi::math::MathSharedStore::ReportUsage(wpi::math::MathUsageId::kKinematics_SwerveDrive, 1);
         }
 
+        // This constructor gives linker errors
         // InternalSwerveKinematics(const wpi::array<frc::Translation2d, 4> &wheels)
         //     : frc::SwerveDriveKinematics<4>(wheels)
         // {
