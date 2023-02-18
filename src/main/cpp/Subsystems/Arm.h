@@ -58,7 +58,6 @@ private:
     bool m_Orientation;
 
 public:
-
     /**
      * @brief Arm Constructor
      * 
@@ -104,11 +103,14 @@ public:
     void UpdateClawState();
 
     /**
-     * TODO: comment these
+     * @brief requests update to angle of pivot
     */
-    void RequestAngle(double position);
+    void RequestAngle(double angle);
 
-    void RequestPosition(double angle);
+    /**
+     * @brief requests update to position of telescope
+    */
+    void RequestPosition(double position);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
