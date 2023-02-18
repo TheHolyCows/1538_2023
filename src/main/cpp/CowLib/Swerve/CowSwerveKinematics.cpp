@@ -73,8 +73,9 @@ namespace CowLib
         {
             double velocity = moduleStates[i].speed.convert<units::feet_per_second>().value();
             double angle    = moduleStates[i].angle.Degrees().value();
+            double omega    = moduleStates[i].omega.convert<units::degrees_per_second>().value();
 
-            convertedStates[i] = CowSwerveModuleState{ velocity, angle };
+            convertedStates[i] = CowSwerveModuleState{ velocity, angle, omega };
         }
 
         return convertedStates;
