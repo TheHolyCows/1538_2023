@@ -40,7 +40,7 @@ CowRobot::CowRobot()
 
     m_DriveController = new SwerveDriveController(*m_Drivetrain);
 
-    // m_Arm = new Arm(9, 10, 11, 12, 1);
+    // m_Arm = new Arm(9, 10, 11, 12, 4);
 }
 
 /**
@@ -139,6 +139,20 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 }
 
 /**
+ * @brief Updates arm state based on inputs from operator
+ * 
+ */
+void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
+{
+    m_Arm->SetArmState(state);
+
+    if (state == ARM_IN)
+    {
+        m_Arm->SetArmCargo(cargo);
+    }
+}
+
+/**
  * called each cycle by operator controller (at the bottom)
 */
 void CowRobot::ArmSM()
@@ -183,8 +197,10 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(0);
         break;
     case ARM_IN :
+        m_Arm->UpdateClawState();
         break;
     case ARM_STOW :
+        m_Arm->UpdateClawState();
         break;
     case ARM_L3 :
         break;

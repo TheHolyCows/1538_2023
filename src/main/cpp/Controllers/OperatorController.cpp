@@ -14,7 +14,7 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickAxis(1), Vision::GamePiece::CUBE);
     }
-    else
+    if (m_CB->GetLeftDriveStickButton(4))
     {
         bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickAxis(1),
                                          m_CB->GetLeftDriveStickAxis(0),

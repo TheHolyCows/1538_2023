@@ -58,6 +58,7 @@ private:
     bool m_Orientation;
 
 public:
+
     /**
      * @brief Arm Constructor
      * 
@@ -97,7 +98,13 @@ public:
     ARM_STATE GetArmState();
 
     /**
-     * comment these
+     * @brief Update the Claw state
+     * controls claw open or close and intake on or off
+     */
+    void UpdateClawState();
+
+    /**
+     * TODO: comment these
     */
     void RequestAngle(double position);
 
