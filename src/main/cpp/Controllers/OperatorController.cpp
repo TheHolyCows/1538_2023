@@ -29,7 +29,7 @@ void OperatorController::Handle(CowRobot *bot)
     //     bot->SetArmState(ARM_NONE, ST_NONE);
     // }
 
-    if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
+    if (m_CB->GetLeftDriveStickAxis(7) > 0.85)
     {
         if (m_EvasiveSwerveWheel == NONE)
         {
@@ -91,22 +91,22 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // Left trigger
-    bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
+    bool fieldRelative = m_CB->GetLeftDriveStickAxis(6) < 0.85;
 
     // Inital Drive Values
     double x
-        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
-          * CONSTANT("DESIRED_MAX_SPEED") * -1;
-    double y
         = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
-          * CONSTANT("DESIRED_MAX_SPEED") * -1;
+          * CONSTANT("DESIRED_MAX_SPEED");
+    double y
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
+          * CONSTANT("DESIRED_MAX_SPEED");
     double omega
         = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
-          * CONSTANT("DESIRED_MAX_ANG_VEL") * -1;
+          * CONSTANT("DESIRED_MAX_ANG_VEL");
 
     bool force = false;
 
-    if (m_CB->GetLeftDriveStickButton(5))
+    if (m_CB->GetLeftDriveStickAxis(2) > 0.85)
     {
         y             = Vision::GetInstance()->ScoringYPID(Vision::GamePiece::CONE);
         omega         = Vision::GetInstance()->ScoringYawPID();
