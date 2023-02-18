@@ -58,8 +58,7 @@ ARM_STATE Arm::GetArmState()
 }
 
 /**
- * @brief 
- * state controller for Claw/Intake
+ * @brief state controller for Claw/Intake
  * should be relatively simple logic control based on current state
  * ST_NONE for cargo should not change solenoid
  */
