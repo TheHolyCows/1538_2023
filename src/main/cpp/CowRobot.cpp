@@ -1,5 +1,9 @@
 #include "CowRobot.h"
 
+#include "CowLib/CowLogger.h"
+#include "Subsystems/Limelight.h"
+#include "Subsystems/Vision.h"
+
 CowRobot::CowRobot()
 {
     m_MatchTime     = 0;
@@ -48,6 +52,8 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     // m_Controller->ResetConstants(); TODO: error
+
+    Vision::GetInstance()->Reset();
 
     CowLib::CowLogger::GetInstance()->Reset();
 }
