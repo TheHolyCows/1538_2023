@@ -61,7 +61,8 @@ void SwerveDrive::SetVelocity(double vx,
                               double omega,
                               bool isFieldRelative,
                               double centerOfRotationX,
-                              double centerOfRotationY)
+                              double centerOfRotationY,
+                              bool force)
 {
     CowLib::CowChassisSpeeds chassisSpeeds{};
 
@@ -117,14 +118,16 @@ void SwerveDrive::SetVelocity(double vx,
 void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
                               bool isFieldRelative,
                               double centerOfRotationX,
-                              double centerOfRotationY)
+                              double centerOfRotationY,
+                              bool force)
 {
     SetVelocity(chassisSpeeds.vx,
                 chassisSpeeds.vy,
                 chassisSpeeds.omega,
                 isFieldRelative,
                 centerOfRotationX,
-                centerOfRotationY);
+                centerOfRotationY,
+                force);
 }
 
 /**

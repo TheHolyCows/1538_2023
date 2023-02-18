@@ -79,18 +79,29 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
-    bot->GetDrivetrain()->SetVelocity(
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_SPEED") * -1,
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_SPEED") * -1,
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
-        fieldRelative,
-        centerOfRotationX,
-        centerOfRotationY);
+    // Inital Drive Values
+    double x
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
+          * CONSTANT("DESIRED_MAX_SPEED") * -1;
+    double y
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
+          * CONSTANT("DESIRED_MAX_SPEED") * -1;
+    double omega
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
+          * CONSTANT("DESIRED_MAX_ANG_VEL") * -1;
 
-    //bot->ArmSM();
+    bool force = false;
+
+    if (m_CB->GetLeftDriveStickButton(5))
+    {
+        y             = Vision::GetInstance()->ScoringYPID(Vision::GamePiece::CONE);
+        omega         = Vision::GetInstance()->ScoringYawPID();
+        force         = true;
+        fieldRelative = false;
+    }
+
+    // Default Drive
+    bot->GetDrivetrain()->SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY, force);
 }
 
 void OperatorController::ResetConstants()
