@@ -38,7 +38,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
-    m_Arm = new Arm(9, 10, 11, 12, 4);
+    // m_Arm = new Arm(9, 10, 11, 12, 4);
 }
 
 /**
@@ -90,7 +90,7 @@ void CowRobot::Handle()
 
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
-    m_Arm->Handle();
+    // m_Arm->Handle();
 
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
