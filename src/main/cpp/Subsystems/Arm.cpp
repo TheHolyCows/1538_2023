@@ -58,6 +58,35 @@ ARM_STATE Arm::GetArmState()
 }
 
 /**
+ * @brief 
+ * state controller for Claw/Intake
+ * should be relatively simple logic control based on current state
+ * ST_NONE for cargo should not change solenoid
+ */
+void Arm::UpdateClawState()
+{
+    // set cargo open/close state
+    if (m_Cargo == ST_CUBE)
+    {
+        m_Claw->SetOpen(true);
+    }
+    else if (m_Cargo == ST_CONE)
+    {
+        m_Claw->SetOpen(false);
+    }
+
+    // set intake on off state - will add exfil state for scoring in future
+    if (m_State == ARM_IN)
+    {
+        m_Claw->SetIntakeSpeed(1);
+    }
+    else
+    {
+        m_Claw->SetIntakeSpeed(0);
+    }
+}
+
+/**
  * @brief sets current cargo of the arm
  * PLEASE CALL AFTER YOU SET STATE
 */

@@ -31,9 +31,6 @@ public:
     // Drive Motors
     SwerveDrive *m_Drivetrain;
 
-    // TODO: remove when done
-    Claw *m_Claw;
-
 private:
     Arm *m_Arm;
 
@@ -88,6 +85,7 @@ public:
 
     double YPIDOutputToAprilTag();
 
+    void SetArmState(ARM_STATE, ARM_CARGO);
     void ArmSM();
 };
 
