@@ -13,6 +13,7 @@
 #include "../CowRobot.h"
 #include "../Declarations.h"
 #include "../Subsystems/Limelight.h"
+#include "frc/controller/PIDController.h"
 
 #include <iostream>
 #include <math.h>
@@ -23,6 +24,10 @@ class OperatorController : public GenericController
 private:
     OperatorController();
     CowControlBoard *m_CB;
+
+    frc2::PIDController *m_ThetaPID;
+    double m_TargetHeading;
+    bool m_HeadingLocked;
 
     enum DriverButtonMap
     {
@@ -44,6 +49,8 @@ private:
     Wheel m_EvasiveSwerveWheel;
 
     CowLib::CowExponentialFilter *m_ControllerExpFilter;
+
+    double m_PrevHeading;
 
 public:
     OperatorController(CowControlBoard *controlboard);

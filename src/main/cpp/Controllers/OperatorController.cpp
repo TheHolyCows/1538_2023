@@ -1,5 +1,7 @@
 #include "OperatorController.h"
 
+#include "frc/TimedRobot.h"
+
 OperatorController::OperatorController(CowControlBoard *controlboard)
     : m_CB(controlboard)
 {
@@ -8,6 +10,12 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
     m_EvasiveSwerveWheel = NONE;
 
     m_ControllerExpFilter = new CowLib::CowExponentialFilter(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
+
+    m_PrevHeading   = 0;
+    m_TargetHeading = 0;
+    m_ThetaPID      = new frc2::PIDController(CONSTANT("HEADING_P"), CONSTANT("HEADING_I"), CONSTANT("HEADING_D"));
+    m_ThetaPID->EnableContinuousInput(0, 360);
+    m_HeadingLocked = false;
 }
 
 void OperatorController::Handle(CowRobot *bot)
@@ -79,16 +87,50 @@ void OperatorController::Handle(CowRobot *bot)
     // Left trigger
     bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
 
+    double omega = 0;
+
+    frc::SmartDashboard::PutNumber("rotation axis", m_CB->GetLeftDriveStickAxis(4));
+
+    if (fabs(m_CB->GetLeftDriveStickAxis(4)) > CONSTANT("STICK_DEADBAND"))
+    {
+        omega = m_ControllerExpFilter->Filter(
+                    CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
+                * CONSTANT("DESIRED_MAX_ANG_VEL") * -1;
+        m_HeadingLocked = false;
+    }
+    else
+    {
+        double heading = bot->GetDrivetrain()->GetPoseRot();
+        if (fabs(heading - m_PrevHeading) < CONSTANT("HEADING_PID_THRESHOLD"))
+        {
+            frc::SmartDashboard::PutNumber("heading lock setpoint", m_TargetHeading);
+
+            if (!m_HeadingLocked)
+            {
+                m_TargetHeading = heading;
+                m_HeadingLocked = true;
+            }
+
+            omega = m_ThetaPID->Calculate(bot->GetGyro()->GetYawDegrees(), m_TargetHeading);
+            frc::SmartDashboard::PutNumber("heading pid error", m_ThetaPID->GetPositionError());
+            frc::SmartDashboard::PutNumber("heading pid output", omega);
+        }
+    }
+
+    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
+    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
+
     bot->GetDrivetrain()->SetVelocity(
         m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
             * CONSTANT("DESIRED_MAX_SPEED") * -1,
         m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
             * CONSTANT("DESIRED_MAX_SPEED") * -1,
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
+        omega,
         fieldRelative,
         centerOfRotationX,
         centerOfRotationY);
+
+    m_PrevHeading = bot->GetDrivetrain()->GetPoseRot();
 }
 
 void OperatorController::ResetConstants()
