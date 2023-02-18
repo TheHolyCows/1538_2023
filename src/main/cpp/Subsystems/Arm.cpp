@@ -23,9 +23,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
 
-    m_Telescope = std::make_unique<Telescope>(telescopeMotor);
-    m_Pivot     = std::make_unique<Pivot>(pivotMotor);
-    m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
+    // m_Telescope = std::make_unique<Telescope>(telescopeMotor);
+    // m_Pivot     = std::make_unique<Pivot>(pivotMotor);
+    m_Claw = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     ResetConstants();
 }
@@ -55,6 +55,34 @@ ARM_CARGO Arm::GetArmCargo()
 ARM_STATE Arm::GetArmState()
 {
     return m_State;
+}
+
+/**
+ * @brief state controller for Claw/Intake
+ * should be relatively simple logic control based on current state
+ * ST_NONE for cargo should not change solenoid
+ */
+void Arm::UpdateClawState()
+{
+    // set cargo open/close state
+    if (m_Cargo == ST_CUBE)
+    {
+        m_Claw->SetOpen(true);
+    }
+    else if (m_Cargo == ST_CONE)
+    {
+        m_Claw->SetOpen(false);
+    }
+
+    // set intake on off state - will add exfil state for scoring in future
+    if (m_State == ARM_IN)
+    {
+        m_Claw->SetIntakeSpeed(1);
+    }
+    else
+    {
+        m_Claw->SetIntakeSpeed(0);
+    }
 }
 
 /**

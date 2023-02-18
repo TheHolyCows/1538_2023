@@ -11,8 +11,8 @@ CowRobot::CowRobot()
     m_DSUpdateCount = 0;
 
     // uncomment for b-bot
-    // m_PowerDistributionPanel = new frc::PowerDistribution(40, frc::PowerDistribution::ModuleType::kRev);
-    m_PowerDistributionPanel = new frc::PowerDistribution();
+    m_PowerDistributionPanel = new frc::PowerDistribution(1, frc::PowerDistribution::ModuleType::kRev);
+    // m_PowerDistributionPanel = new frc::PowerDistribution();
 
     // mxp board was removed from robot - can remove this code
     m_LEDDisplay = nullptr;
@@ -38,7 +38,7 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
-    m_Arm = new Arm(9, 10, 11, 12, 1);
+    // m_Arm = new Arm(9, 10, 11, 12, 4);
 }
 
 /**
@@ -51,7 +51,7 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->ResetConstants();
-    // m_Controller->ResetConstants(); error
+    // m_Controller->ResetConstants(); TODO: error
 
     Vision::GetInstance()->Reset();
 
@@ -90,6 +90,7 @@ void CowRobot::Handle()
 
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
+    // m_Arm->Handle();
 
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
@@ -126,6 +127,20 @@ double CowRobot::YPIDOutputToAprilTag()
 }
 
 /**
+ * @brief Updates arm state based on inputs from operator
+ * 
+ */
+void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
+{
+    m_Arm->SetArmState(state);
+
+    if (state == ARM_IN)
+    {
+        m_Arm->SetArmCargo(cargo);
+    }
+}
+
+/**
  * called each cycle by operator controller (at the bottom)
 */
 void CowRobot::ArmSM()
@@ -133,12 +148,15 @@ void CowRobot::ArmSM()
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
-        m_Arm->SetAngle(0);
-        m_Arm->SetTelescopePosition(0);
+        // m_Arm->SetAngle(0);
+        // m_Arm->SetTelescopePosition(0);
+        m_Arm->UpdateClawState();
         break;
     case ARM_IN :
+        m_Arm->UpdateClawState();
         break;
     case ARM_STOW :
+        m_Arm->UpdateClawState();
         break;
     case ARM_L3 :
         break;

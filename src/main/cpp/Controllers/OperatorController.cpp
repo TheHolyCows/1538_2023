@@ -15,6 +15,20 @@ void OperatorController::Handle(CowRobot *bot)
     double centerOfRotationX = 0;
     double centerOfRotationY = 0;
 
+    // testing intake - remove when done
+    // if (m_CB->GetLeftDriveStickButton(2))
+    // {
+    //     bot->SetArmState(ARM_IN, ST_CUBE);
+    // }
+    // if (m_CB->GetLeftDriveStickButton(4))
+    // {
+    //     bot->SetArmState(ARM_IN, ST_CONE);
+    // }
+    // if (m_CB->GetLeftDriveStickButton(5))
+    // {
+    //     bot->SetArmState(ARM_NONE, ST_NONE);
+    // }
+
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
     {
         if (m_EvasiveSwerveWheel == NONE)
@@ -102,6 +116,8 @@ void OperatorController::Handle(CowRobot *bot)
 
     // Default Drive
     bot->GetDrivetrain()->SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY, force);
+
+    // bot->ArmSM();
 }
 
 void OperatorController::ResetConstants()

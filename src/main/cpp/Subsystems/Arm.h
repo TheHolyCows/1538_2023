@@ -90,11 +90,20 @@ public:
     ARM_STATE GetArmState();
 
     /**
-     * comment these
-    */
-    void RequestAngle(double position);
+     * @brief Update the Claw state
+     * controls claw open or close and intake on or off
+     */
+    void UpdateClawState();
 
-    void RequestPosition(double angle);
+    /**
+     * @brief requests update to angle of pivot
+    */
+    void RequestAngle(double angle);
+
+    /**
+     * @brief requests update to position of telescope
+    */
+    void RequestPosition(double position);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
