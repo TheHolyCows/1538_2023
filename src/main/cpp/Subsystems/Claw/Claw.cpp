@@ -13,7 +13,7 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
     m_IntakeMotor = new CowLib::CowMotorController(intakeMotor);
 
     // m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
-    // m_IntakeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    m_IntakeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
     m_Solenoid = new frc::Solenoid(40, frc::PneumaticsModuleType::CTREPCM, solenoidChannel);
 

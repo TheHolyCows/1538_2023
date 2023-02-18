@@ -16,14 +16,17 @@ void OperatorController::Handle(CowRobot *bot)
     double centerOfRotationY = 0;
 
     // testing intake - remove when done
-    bot->m_Claw->SetOpen(m_CB->GetLeftDriveStickButton(5));
     if (m_CB->GetLeftDriveStickButton(2))
     {
-        bot->m_Claw->SetIntakeSpeed(1);
+        bot->SetArmState(ARM_IN, ST_CUBE);
     }
-    else
+    if (m_CB->GetLeftDriveStickButton(4))
     {
-        bot->m_Claw->SetIntakeSpeed(0);
+        bot->SetArmState(ARM_IN, ST_CONE);
+    }
+    if (m_CB->GetLeftDriveStickButton(5))
+    {
+        bot->SetArmState(ARM_NONE, ST_NONE);
     }
 
     if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
@@ -101,7 +104,7 @@ void OperatorController::Handle(CowRobot *bot)
         centerOfRotationX,
         centerOfRotationY);
 
-    //bot->ArmSM();
+    bot->ArmSM();
 }
 
 void OperatorController::ResetConstants()
