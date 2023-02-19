@@ -120,15 +120,17 @@ void OperatorController::Handle(CowRobot *bot)
     frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
     frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
-    bot->GetDrivetrain()->SetVelocity(
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_SPEED") * -1,
-        m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")))
-            * CONSTANT("DESIRED_MAX_SPEED") * -1,
-        omega,
-        fieldRelative,
-        centerOfRotationX,
-        centerOfRotationY);
+    double xInput
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND")));
+    double yInput
+        = m_ControllerExpFilter->Filter(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND")));
+
+    bot->GetDrivetrain()->SetVelocity(xInput * CONSTANT("DESIRED_MAX_SPEED") * -1,
+                                      yInput * CONSTANT("DESIRED_MAX_SPEED") * -1,
+                                      omega,
+                                      fieldRelative,
+                                      centerOfRotationX,
+                                      centerOfRotationY);
 
     m_PrevHeading = bot->GetDrivetrain()->GetPoseRot();
 }
