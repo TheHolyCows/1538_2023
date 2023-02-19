@@ -31,6 +31,8 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
+    m_DriveController = new SwerveDriveController(*m_Drivetrain);
+
     // m_Arm = new Arm(9, 10);
 }
 

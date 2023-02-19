@@ -25,10 +25,6 @@ private:
     OperatorController();
     CowControlBoard *m_CB;
 
-    frc2::PIDController *m_ThetaPID;
-    double m_TargetHeading;
-    bool m_HeadingLocked;
-
     enum DriverButtonMap
     {
     };
@@ -37,20 +33,16 @@ private:
     {
     };
 
-    enum Wheel
-    {
-        NONE = -1,
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT
-    };
+    // enum Wheel
+    // {
+    //     NONE = -1,
+    //     FRONT_LEFT,
+    //     FRONT_RIGHT,
+    //     BACK_LEFT,
+    //     BACK_RIGHT
+    // };
 
-    Wheel m_EvasiveSwerveWheel;
-
-    CowLib::CowExponentialFilter *m_ControllerExpFilter;
-
-    double m_PrevHeading;
+    // Wheel m_EvasiveSwerveWheel;
 
 public:
     OperatorController(CowControlBoard *controlboard);
