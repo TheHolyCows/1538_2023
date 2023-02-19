@@ -5,8 +5,8 @@
 #ifndef __OPERATOR_CONTROLLER_H__
 #define __OPERATOR_CONTROLLER_H__
 
+#include "../ControlBoards/GenericControlBoard.h"
 #include "../CowConstants.h"
-#include "../CowControlBoard.h"
 #include "../CowLib/CowExponentialFilter.h"
 #include "../CowLib/CowLatch.h"
 #include "../CowLib/CowLib.h"
@@ -24,7 +24,7 @@ class OperatorController : public GenericController
 {
 private:
     OperatorController();
-    CowControlBoard *m_CB;
+    GenericControlBoard *m_CB;
 
     enum DriverButtonMap
     {
@@ -48,7 +48,7 @@ private:
     CowLib::CowExponentialFilter *m_ControllerExpFilter;
 
 public:
-    OperatorController(CowControlBoard *controlboard);
+    OperatorController(GenericControlBoard *controlboard);
     void Handle(CowRobot *bot);
 
     void ResetConstants();

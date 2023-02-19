@@ -85,13 +85,11 @@ void CowBase::DisabledPeriodic()
     //     m_Display->DisplayPeriodic();
     // }
 
-    if (m_ControlBoard->GetLeftDriveStickButton(7))
+    if (m_ControlBoard->GetConstantsResetButton())
     {
         m_Constants->RestoreData();
 
-        // TODO: change back to 7
-        // if (m_ControlBoard->GetSteeringButton(7)) {
-        if (m_ControlBoard->GetLeftDriveStickButton(7))
+        if (m_ControlBoard->GetConstantsResetButton())
         {
             m_Bot->Reset();
 
