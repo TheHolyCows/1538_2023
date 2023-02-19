@@ -48,8 +48,6 @@ public:
     OperatorController(CowControlBoard *controlboard);
     void Handle(CowRobot *bot);
 
-    void ResetConstants();
-
     double m_TrackingCooldownTimer;
 };
 

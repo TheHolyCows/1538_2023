@@ -46,6 +46,7 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->ResetConstants();
+    m_DriveController->ResetConstants();
     // m_Controller->ResetConstants(); error
 
     CowLib::CowLogger::GetInstance()->Reset();

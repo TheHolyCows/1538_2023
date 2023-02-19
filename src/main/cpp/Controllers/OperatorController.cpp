@@ -15,7 +15,3 @@ void OperatorController::Handle(CowRobot *bot)
                                      m_CB->GetLeftDriveStickAxis(4),
                                      true);
 }
-
-void OperatorController::ResetConstants()
-{
-}
