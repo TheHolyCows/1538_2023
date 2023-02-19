@@ -10,8 +10,15 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
-    bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickAxis(1),
-                                     m_CB->GetLeftDriveStickAxis(2),
-                                     m_CB->GetLeftDriveStickAxis(4),
-                                     true);
+    if (m_CB->GetLeftDriveStickButton(5))
+    {
+        bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickAxis(1), Vision::GamePiece::CUBE);
+    }
+    else
+    {
+        bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickAxis(1),
+                                         m_CB->GetLeftDriveStickAxis(0),
+                                         m_CB->GetLeftDriveStickAxis(4),
+                                         true);
+    }
 }

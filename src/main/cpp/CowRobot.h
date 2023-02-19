@@ -85,8 +85,7 @@ public:
 
     void DoNothing(void);
 
-    double YPIDOutputToAprilTag();
-
+    void SetArmState(ARM_STATE, ARM_CARGO);
     void ArmSM();
 };
 

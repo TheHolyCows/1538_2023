@@ -2,6 +2,7 @@
 
 #include "../CowLib/CowExponentialFilter.h"
 #include "../CowPigeon.h"
+#include "../Subsystems/Vision.h"
 #include "SwerveDrive.h"
 
 #include <frc/controller/PIDController.h>
@@ -15,9 +16,13 @@ public:
 
     void Drive(double x, double y, double rotation, bool fieldRelative);
 
+    void AlignToScore(double x, Vision::GamePiece gamePiece);
+
     void ResetConstants();
 
 private:
+    double ProcessDriveAxis(double input, double scale, bool reverse);
+
     SwerveDrive &m_Drivetrain;
 
     CowPigeon &m_Gyro;

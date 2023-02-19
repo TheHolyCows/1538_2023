@@ -92,8 +92,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     if (fabs(rotation) > CONSTANT("STICK_DEADBAND"))
     {
-        omega = m_ExponentialFilter->Filter(CowLib::Deadband(rotation, CONSTANT("STICK_DEADBAND")))
-                * CONSTANT("DESIRED_MAX_ANG_VEL") * -1;
+        omega           = ProcessDriveAxis(rotation, CONSTANT("DESIRED_MAX_ANG_VEL"), true);
         m_HeadingLocked = false;
     }
     else
@@ -118,15 +117,32 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
     frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
-    double xInput = m_ExponentialFilter->Filter(CowLib::Deadband(x, CONSTANT("STICK_DEADBAND")));
-    double yInput = m_ExponentialFilter->Filter(CowLib::Deadband(y, CONSTANT("STICK_DEADBAND")));
-
-    m_Drivetrain.SetVelocity(xInput * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                             yInput * CONSTANT("DESIRED_MAX_SPEED") * -1,
+    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), true),
+                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), true),
                              omega,
                              fieldRelative,
                              centerOfRotationX,
                              centerOfRotationY);
 
     m_PrevHeading = m_Drivetrain.GetPoseRot();
+}
+
+void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
+{
+    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), true);
+
+    // Default Drive
+    m_Drivetrain.SetVelocity(x,
+                             Vision::GetInstance()->ScoringYPID(gamePiece),
+                             Vision::GetInstance()->ScoringYawPID(),
+                             false,
+                             0,
+                             0,
+                             true);
+}
+
+double SwerveDriveController::ProcessDriveAxis(double input, double scale, bool reverse)
+{
+    return m_ExponentialFilter->Filter(CowLib::Deadband(input, CONSTANT("STICK_DEADBAND"))) * scale
+           * (reverse ? -1 : 1);
 }
