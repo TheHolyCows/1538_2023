@@ -37,13 +37,6 @@ private:
      */
     void SetArmPosition(const double pos) override;
 
-    /**
-     * @brief Will set wrist position
-     * 
-     * @param position The desired position of the wrist
-    */
-    void SetWristPosition(const double pos) override;
-
     std::shared_ptr<CowLib::CowMotorController> m_RotationMotor;
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
 
