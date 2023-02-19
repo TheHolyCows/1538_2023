@@ -17,9 +17,6 @@ CowRobot::CowRobot()
     // mxp board was removed from robot - can remove this code
     m_LEDDisplay = nullptr;
 
-    // mxp board was removed from robot - can remove this code
-    m_LEDDisplay = nullptr;
-
     m_Gyro = CowPigeon::GetInstance();
 
     m_PreviousGyroError = 0;
@@ -57,7 +54,7 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     m_DriveController->ResetConstants();
-    // m_Controller->ResetConstants(); error
+    // m_Controller->ResetConstants(); TODO: error
 
     Vision::GetInstance()->Reset();
 
@@ -125,6 +122,53 @@ void CowRobot::StartTime()
 void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
+}
+
+/**
+ * @brief Updates arm state based on inputs from operator
+ * 
+ */
+void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
+{
+    m_Arm->SetArmState(state);
+
+    if (state == ARM_IN)
+    {
+        m_Arm->SetArmCargo(cargo);
+    }
+}
+
+/**
+ * called each cycle by operator controller (at the bottom)
+*/
+void CowRobot::ArmSM()
+{
+    switch (m_Arm->GetArmState())
+    {
+    case ARM_NONE :
+        // m_Arm->SetAngle(0);
+        // m_Arm->SetTelescopePosition(0);
+        m_Arm->UpdateClawState();
+        break;
+    case ARM_IN :
+        m_Arm->UpdateClawState();
+        break;
+    case ARM_STOW :
+        m_Arm->UpdateClawState();
+        break;
+    case ARM_L3 :
+        break;
+    case ARM_L2 :
+        break;
+    case ARM_L1 :
+        break;
+    case ARM_SCORE :
+        break;
+    case ARM_MANUAL :
+        break;
+    default :
+        break;
+    }
 }
 
 /**
