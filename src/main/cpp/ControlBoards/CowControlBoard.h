@@ -6,6 +6,7 @@
 
 #pragma once /* __COW_CONTROL_BOARD_H__ */
 
+#include "ButtonMap.h"
 #include "GenericControlBoard.h"
 
 #include <frc/Joystick.h>
@@ -18,12 +19,6 @@ private:
     frc::Joystick *m_OperatorControlStick;
 
     bool m_PreviousAuto;
-
-    enum OP_BUTTON_MAP
-    {
-        CONST_RESET = 5,
-        SELECT_AUTO = 6
-    };
 
 public:
     CowControlBoard();
