@@ -31,6 +31,7 @@ Vision::Vision()
 
 void Vision::Reset()
 {
+    // TODO: find out why this was disabled. may have crashed
     // m_ScoringYPID->UpdateConstants(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D"), 0);
     // m_ScoringYawPID->UpdateConstants(CONSTANT("SCORING_YAW_P"),
     //                                  CONSTANT("SCORING_YAW_I"),
@@ -96,6 +97,7 @@ double Vision::ScoringYPID(GamePiece type)
 
 double Vision::ScoringYawPID()
 {
+    // TODO: tune and re-enable
     return 0;
     // bool targetFound = LimelightHelpers::GetTV();
     // // bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;

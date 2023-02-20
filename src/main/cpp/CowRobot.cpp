@@ -38,6 +38,8 @@ CowRobot::CowRobot()
 
     m_Drivetrain->ResetEncoders();
 
+    m_DriveController = new SwerveDriveController(*m_Drivetrain);
+
     // m_Arm = new Arm(9, 10, 11, 12, 4);
 }
 
@@ -51,6 +53,7 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->ResetConstants();
+    m_DriveController->ResetConstants();
     // m_Controller->ResetConstants(); TODO: error
 
     Vision::GetInstance()->Reset();
@@ -119,11 +122,6 @@ void CowRobot::StartTime()
 void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
-}
-
-double CowRobot::YPIDOutputToAprilTag()
-{
-    return 0.0;
 }
 
 /**

@@ -1,5 +1,8 @@
 #include "SwerveDrive.h"
 
+#include "frc/RobotBase.h"
+#include "SwerveModuleSim.h"
+
 /**
  * @brief Construct a new SwerveDrive object
  *
@@ -11,13 +14,27 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Locked = false;
 
-    for (int i = 0; i < 4; i++)
+    if (!frc::RobotBase::IsReal())
     {
-        m_Modules[i] = new SwerveModule(i,
-                                        moduleConstants[i].driveMotorId,
-                                        moduleConstants[i].rotationMotorId,
-                                        moduleConstants[i].encoderId,
-                                        moduleConstants[i].encoderOffset);
+        for (int i = 0; i < 4; i++)
+        {
+            m_Modules[i] = new SwerveModuleSim(i,
+                                               CONSTANT("MODULE_MAX_ACCEL"),
+                                               CONSTANT("MODULE_MAX_ANGULAR_VELOCITY"),
+                                               0,
+                                               moduleConstants[i].encoderOffset);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            m_Modules[i] = new SwerveModule(i,
+                                            moduleConstants[i].driveMotorId,
+                                            moduleConstants[i].rotationMotorId,
+                                            moduleConstants[i].encoderId,
+                                            moduleConstants[i].encoderOffset);
+        }
     }
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
@@ -213,10 +230,20 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 void SwerveDrive::Handle()
 {
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
+    std::array<CowLib::CowSwerveModuleState, 4> moduleStates{};
     for (auto module : m_Modules)
     {
         module->Handle();
         modulePositions[module->GetID()] = module->GetPosition();
+        moduleStates[module->GetID()]    = module->GetState();
+    }
+
+    if (!frc::RobotBase::IsReal())
+    {
+        m_Gyro->SetYaw(m_Kinematics->GetInternalKinematics()
+                           ->ToChassisSpeeds(CowLib::CowSwerveModuleState::ToWPIExtendedArray(moduleStates))
+                           .omega.value()
+                       + m_Gyro->GetYawDegrees());
     }
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);

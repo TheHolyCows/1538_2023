@@ -15,6 +15,7 @@
 #include "CowLib/Utility.h"
 #include "CowPigeon.h"
 #include "Drivetrain/SwerveDrive.h"
+#include "Drivetrain/SwerveDriveController.h"
 #include "frc/controller/PIDController.h"
 #include "Subsystems/Arm.h"
 #include "Subsystems/ArmState.h"
@@ -38,6 +39,8 @@ private:
     int m_DSUpdateCount;
 
     GenericController *m_Controller = nullptr;
+
+    SwerveDriveController *m_DriveController;
 
     // gyro and accelerometers
     CowPigeon *m_Gyro;
@@ -76,11 +79,11 @@ public:
 
     SwerveDrive *GetDrivetrain() { return m_Drivetrain; }
 
+    SwerveDriveController *GetDriveController() { return m_DriveController; }
+
     void Handle();
 
     void DoNothing(void);
-
-    double YPIDOutputToAprilTag();
 
     void SetArmState(ARM_STATE, ARM_CARGO);
     void ArmSM();
