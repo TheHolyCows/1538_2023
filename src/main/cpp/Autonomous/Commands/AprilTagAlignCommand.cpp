@@ -7,11 +7,12 @@ AprilTagAlignCommand::AprilTagAlignCommand(Vision::GamePiece gamePiece)
 
 bool AprilTagAlignCommand::IsComplete()
 {
-    // return true;
+    return Vision::GetInstance()->ScoringYAligned(m_GamePiece) && Vision::GetInstance()->ScoringYawAligned();
 }
 
 void AprilTagAlignCommand::Start(CowRobot *robot)
 {
+    return;
 }
 
 void AprilTagAlignCommand::Handle(CowRobot *robot)

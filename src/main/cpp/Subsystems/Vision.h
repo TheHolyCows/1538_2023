@@ -12,6 +12,7 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableValue.h>
+#include <vector>
 
 class Vision
 {

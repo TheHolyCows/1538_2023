@@ -88,19 +88,19 @@ void CowBase::DisabledPeriodic()
     if (m_ControlBoard->GetConstantsResetButton())
     {
         m_Constants->RestoreData();
-
-        if (m_ControlBoard->GetConstantsResetButton())
-        {
-            m_Bot->Reset();
-
-            /*
-             * POSITION FIRST_OWNERSHIP SECOND_OWNERSHIP DRIVE
-             * iterates over AutoModes
-             */
-            AutoModes::GetInstance()->NextMode();
-            CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
-        }
+        m_Bot->Reset();
     }
+
+    if (m_ControlBoard->GetAutoSelectButton())
+    {
+        /*
+         * POSITION FIRST_OWNERSHIP SECOND_OWNERSHIP DRIVE
+         * iterates over AutoModes
+         */
+        AutoModes::GetInstance()->NextMode();
+        CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
+    }
+
     if (m_Bot)
     {
         // TODO: add this back in

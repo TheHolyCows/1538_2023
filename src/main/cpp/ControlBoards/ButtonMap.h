@@ -9,6 +9,7 @@ enum DR_BUTTON_MAP
 
 enum OP_BUTTON_MAP
 {
+    BT_HUM_INTAKE  = 1,
     BT_STOW        = 2,
     BT_CONST_RESET = 3,
     BT_SCORE       = 3, // drop cargo

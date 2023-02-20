@@ -92,7 +92,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     if (fabs(rotation) > CONSTANT("STICK_DEADBAND"))
     {
-        omega           = ProcessDriveAxis(rotation, CONSTANT("DESIRED_MAX_ANG_VEL"), true);
+        omega           = ProcessDriveAxis(rotation, CONSTANT("DESIRED_MAX_ANG_VEL"), false);
         m_HeadingLocked = false;
     }
     else
@@ -117,8 +117,8 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
     frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
-    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), true),
-                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), true),
+    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
+                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
                              omega,
                              fieldRelative,
                              centerOfRotationX,
@@ -129,7 +129,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
 void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
 {
-    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), true);
+    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
     // Default Drive
     m_Drivetrain.SetVelocity(x,
