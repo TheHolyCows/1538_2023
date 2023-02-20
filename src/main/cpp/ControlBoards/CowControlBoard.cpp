@@ -12,24 +12,24 @@ CowControlBoard::CowControlBoard()
 // Returns state of autonomous select button
 bool CowControlBoard::GetAutoSelectButton()
 {
-    if (GetOperatorButton(CONST_RESET) && !m_PreviousAuto)
+    if (GetOperatorButton(BT_CONST_RESET) && !m_PreviousAuto)
     {
-        m_PreviousAuto = GetOperatorButton(CONST_RESET);
+        m_PreviousAuto = GetOperatorButton(BT_CONST_RESET);
         return true;
     }
-    m_PreviousAuto = GetOperatorButton(CONST_RESET);
+    m_PreviousAuto = GetOperatorButton(BT_CONST_RESET);
     return false;
 }
 
 bool CowControlBoard::GetConstantsResetButton()
 {
     // TODO: change this
-    if (GetOperatorButton(SELECT_AUTO) && !m_PreviousAuto)
+    if (GetOperatorButton(BT_SELECT_AUTO) && !m_PreviousAuto)
     {
-        m_PreviousAuto = GetOperatorButton(SELECT_AUTO);
+        m_PreviousAuto = GetOperatorButton(BT_SELECT_AUTO);
         return true;
     }
-    m_PreviousAuto = GetOperatorButton(SELECT_AUTO);
+    m_PreviousAuto = GetOperatorButton(BT_SELECT_AUTO);
     return false;
 }
 

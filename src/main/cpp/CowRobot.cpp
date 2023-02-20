@@ -1,9 +1,5 @@
 #include "CowRobot.h"
 
-#include "CowLib/CowLogger.h"
-#include "Subsystems/Limelight.h"
-#include "Subsystems/Vision.h"
-
 CowRobot::CowRobot()
 {
     m_MatchTime     = 0;

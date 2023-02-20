@@ -1,9 +1,5 @@
 #include "Vision.h"
 
-#include "../CowLib/Utility.h"
-#include "frc/controller/PIDController.h"
-#include "Limelight.h"
-
 Vision *Vision::s_Instance = nullptr;
 
 Vision *Vision::GetInstance()

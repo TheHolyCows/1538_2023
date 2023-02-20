@@ -4,10 +4,14 @@
 #include "../CowConstants.h"
 #include "../CowLib/CowLogger.h"
 #include "../CowLib/CowPID.h"
-#include "frc/controller/PIDController.h"
-#include "Limelight.h"
+#include "../CowLib/Utility.h"
 
+#include <frc/controller/PIDController.h>
 #include <memory>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
+#include <networktables/NetworkTableValue.h>
 
 class Vision
 {
