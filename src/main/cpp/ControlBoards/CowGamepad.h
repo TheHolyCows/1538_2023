@@ -28,6 +28,8 @@ public:
 
     bool GetAutoSelectButton() override;
     bool GetConstantsResetButton() override;
+    bool GetRobotRelativeButton() override;
+    bool GetVisionTargetButton() override;
 
     bool GetDriveButton(int) override;
     double GetDriveAxis(int) override;

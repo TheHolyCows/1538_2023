@@ -5,23 +5,13 @@ CowControlBoard::CowControlBoard()
     : m_DriverControlStick(new frc::Joystick(0)),
       m_OperatorPanel(new frc::Joystick(1)),
       m_OperatorControlStick(new frc::Joystick(2)),
-      m_PreviousAuto(false)
+      m_PreviousAuto(false),
+      m_PreviousReset(false)
 {
 }
 
 // Returns state of autonomous select button
 bool CowControlBoard::GetAutoSelectButton()
-{
-    if (GetOperatorButton(BT_CONST_RESET) && !m_PreviousAuto)
-    {
-        m_PreviousAuto = GetOperatorButton(BT_CONST_RESET);
-        return true;
-    }
-    m_PreviousAuto = GetOperatorButton(BT_CONST_RESET);
-    return false;
-}
-
-bool CowControlBoard::GetConstantsResetButton()
 {
     // TODO: change this
     if (GetOperatorButton(BT_SELECT_AUTO) && !m_PreviousAuto)
@@ -31,6 +21,27 @@ bool CowControlBoard::GetConstantsResetButton()
     }
     m_PreviousAuto = GetOperatorButton(BT_SELECT_AUTO);
     return false;
+}
+
+bool CowControlBoard::GetConstantsResetButton()
+{
+    if (GetOperatorButton(BT_CONST_RESET) && !m_PreviousReset)
+    {
+        m_PreviousReset = GetOperatorButton(BT_CONST_RESET);
+        return true;
+    }
+    m_PreviousReset = GetOperatorButton(BT_CONST_RESET);
+    return false;
+}
+
+bool CowControlBoard::GetRobotRelativeButton()
+{
+    return (GetDriveAxis(2) > 0.85);
+}
+
+bool CowControlBoard::GetVisionTargetButton()
+{
+    return (GetDriveAxis(6) > 0.85);
 }
 
 bool CowControlBoard::GetDriveButton(int button)
@@ -55,7 +66,7 @@ double CowControlBoard::GetLeftDriveStickY()
 
 double CowControlBoard::GetRightDriveStickX()
 {
-    return m_DriverControlStick->GetRawAxis(4);
+    return m_DriverControlStick->GetRawAxis(4) * -1;
 }
 
 double CowControlBoard::GetRightDriveStickY()
