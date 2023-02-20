@@ -1,8 +1,6 @@
 #include "OperatorController.h"
 
-#include "frc/TimedRobot.h"
-
-OperatorController::OperatorController(CowControlBoard *controlboard)
+OperatorController::OperatorController(GenericControlBoard *controlboard)
     : m_CB(controlboard)
 {
     m_TrackingCooldownTimer = 0.0;
@@ -10,15 +8,19 @@ OperatorController::OperatorController(CowControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
-    if (m_CB->GetLeftDriveStickButton(5))
+    // vision align
+    if (m_CB->GetDriveAxis(2))
     {
-        bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickAxis(1), Vision::GamePiece::CUBE);
+        bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickY(), Vision::GamePiece::CUBE);
     }
-    if (m_CB->GetLeftDriveStickButton(4))
+    else
     {
-        bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickAxis(1),
-                                         m_CB->GetLeftDriveStickAxis(0),
-                                         m_CB->GetLeftDriveStickAxis(4),
-                                         true);
+        // standard drive with quickturn field/bot relative option
+        bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickY(),
+                                         m_CB->GetLeftDriveStickX(),
+                                         m_CB->GetRightDriveStickX(),
+                                         m_CB->GetDriveAxis(6) > 0.85);
     }
+
+    // bot->ArmSM();
 }
