@@ -31,6 +31,16 @@ bool CowGamepad::GetConstantsResetButton()
     return false;
 }
 
+bool CowGamepad::GetRobotRelativeButton()
+{
+    return (GetDriveAxis(2) > 0.85);
+}
+
+bool CowGamepad::GetVisionTargetButton()
+{
+    return (GetDriveAxis(3) > 0.85);
+}
+
 bool CowGamepad::GetDriveButton(int button)
 {
     return m_DriverControlStick->GetRawButton(button);
@@ -53,7 +63,7 @@ double CowGamepad::GetLeftDriveStickY()
 
 double CowGamepad::GetRightDriveStickX()
 {
-    return m_DriverControlStick->GetRawAxis(4);
+    return m_DriverControlStick->GetRawAxis(4) * -1;
 }
 
 double CowGamepad::GetRightDriveStickY()

@@ -19,12 +19,15 @@ private:
     frc::Joystick *m_OperatorControlStick;
 
     bool m_PreviousAuto;
+    bool m_PreviousReset;
 
 public:
     CowControlBoard();
 
     bool GetAutoSelectButton() override;
     bool GetConstantsResetButton() override;
+    bool GetRobotRelativeButton() override;
+    bool GetVisionTargetButton() override;
 
     bool GetDriveButton(int) override;
     double GetDriveAxis(int) override;
