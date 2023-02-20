@@ -44,7 +44,7 @@ public:
     double ScoringYPID(GamePiece type);
     double ScoringYawPID();
 
-    bool ScoringYAligned();
+    bool ScoringYAligned(GamePiece type);
     bool ScoringYawAligned();
 };
 

@@ -129,3 +129,37 @@ double Vision::ScoringYawPID()
 
     // return yawOutput;
 }
+
+bool Vision::ScoringYAligned(GamePiece type)
+{
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
+    if (!targetFound)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return false;
+    }
+
+    auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
+                             .GetTable("limelight")
+                             ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
+    // auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
+
+    if (targetPoseVec.size() != 6)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
+                                  "April tag targeting array has incorrect length %f",
+                                  targetPoseVec.size());
+
+        return false;
+    }
+
+    double targetX = targetPoseVec[0];
+
+    return fabs(targetX) < CONSTANT("SCORING_Y_TOLERANCE");
+}
+
+bool Vision::ScoringYawAligned()
+{
+    // TODO: Implement
+    return false;
+}

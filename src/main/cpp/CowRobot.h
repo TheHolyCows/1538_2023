@@ -81,6 +81,8 @@ public:
 
     SwerveDriveController *GetDriveController() { return m_DriveController; }
 
+    Arm *GetArm() { return m_Arm; }
+
     void Handle();
 
     void DoNothing(void);

@@ -18,11 +18,17 @@ AutoModes::AutoModes()
     //     std::cout << "Lambda command" << std::endl;
     // }));
 
-    // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
-    m_Modes["Wait 5 seconds"].push_back(new LambdaCommand([](CowRobot *robot) { robot->GetDrivetrain()->Reset(); }));
-    m_Modes["Wait 5 seconds"].push_back(new WaitCommand(10, true));
-    m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
-    m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
+    // // Theoretically this will follow trajectory "Test1" but 3 seconds into "Test2" it will run a lambda function with full access to the CowRobot instance
+    // m_Modes["Wait 5 seconds"].push_back(new LambdaCommand([](CowRobot *robot) { robot->GetDrivetrain()->Reset(); }));
+    // m_Modes["Wait 5 seconds"].push_back(new WaitCommand(10, true));
+    // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
+    // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
+
+    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 5, 1, true, true));
+
+    // m_Modes["..."].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
+    // m_Modes["..."].push_back()
+
     // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();
