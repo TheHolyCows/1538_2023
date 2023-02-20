@@ -116,6 +116,8 @@ protected:
 
     // The Height of the rotation motor relative to the ground
     double m_ArmHeight;
+    // The height of the claw
+    double m_ClawHeight;
 
 private:
     /**

@@ -12,8 +12,6 @@ class GenericController
 public:
     virtual ~GenericController(){};
     virtual void Handle(CowRobot *bot) = 0;
-
-    virtual void ResetConstants() { return; };
 };
 
 #endif /* __GENERIC_CONTROLLER_H__ */

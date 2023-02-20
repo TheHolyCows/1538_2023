@@ -1,5 +1,8 @@
 #include "SwerveDrive.h"
 
+#include "frc/RobotBase.h"
+#include "SwerveModuleSim.h"
+
 /**
  * @brief Construct a new SwerveDrive object
  *
@@ -11,13 +14,27 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
 
     m_Locked = false;
 
-    for (int i = 0; i < 4; i++)
+    if (!frc::RobotBase::IsReal())
     {
-        m_Modules[i] = new SwerveModule(i,
-                                        moduleConstants[i].driveMotorId,
-                                        moduleConstants[i].rotationMotorId,
-                                        moduleConstants[i].encoderId,
-                                        moduleConstants[i].encoderOffset);
+        for (int i = 0; i < 4; i++)
+        {
+            m_Modules[i] = new SwerveModuleSim(i,
+                                               CONSTANT("MODULE_MAX_ACCEL"),
+                                               CONSTANT("MODULE_MAX_ANGULAR_VELOCITY"),
+                                               0,
+                                               moduleConstants[i].encoderOffset);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            m_Modules[i] = new SwerveModule(i,
+                                            moduleConstants[i].driveMotorId,
+                                            moduleConstants[i].rotationMotorId,
+                                            moduleConstants[i].encoderId,
+                                            moduleConstants[i].encoderOffset);
+        }
     }
 
     m_Kinematics = new CowLib::CowSwerveKinematics(wheelBase);
@@ -61,7 +78,8 @@ void SwerveDrive::SetVelocity(double vx,
                               double omega,
                               bool isFieldRelative,
                               double centerOfRotationX,
-                              double centerOfRotationY)
+                              double centerOfRotationY,
+                              bool force)
 {
     CowLib::CowChassisSpeeds chassisSpeeds{};
 
@@ -81,19 +99,21 @@ void SwerveDrive::SetVelocity(double vx,
         chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
     }
 
-    auto moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
+    std::array<CowLib::CowSwerveModuleState, 4> moduleStates;
 
-    // This just overwrites for now. Maybe fix?
     if (m_Locked)
     {
-        double angles[4]{ 45, 315, 135, 225 };
-        // TODO: check if 0.3 is good
-        // units::feet_per_second_t velocity { 0.3 };
+        // hardcoded angles for e-brake X formation
+        double angles[4] = { 45, 315, 135, 225 };
 
         for (int i = 0; i < 4; i++)
         {
-            moduleStates[i] = CowLib::CowSwerveModuleState{ 0.3, angles[i] };
+            moduleStates[i] = CowLib::CowSwerveModuleState{ 0.0, angles[i] };
         }
+    }
+    else
+    {
+        moduleStates = m_Kinematics->CalculateModuleStates(chassisSpeeds, centerOfRotationX, centerOfRotationY);
     }
 
     // Just in case
@@ -101,7 +121,7 @@ void SwerveDrive::SetVelocity(double vx,
 
     for (auto module : m_Modules)
     {
-        module->SetTargetState(moduleStates[module->GetId()]);
+        module->SetTargetState(moduleStates[module->GetID()], m_Locked);
     }
 }
 
@@ -115,14 +135,16 @@ void SwerveDrive::SetVelocity(double vx,
 void SwerveDrive::SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
                               bool isFieldRelative,
                               double centerOfRotationX,
-                              double centerOfRotationY)
+                              double centerOfRotationY,
+                              bool force)
 {
     SetVelocity(chassisSpeeds.vx,
                 chassisSpeeds.vy,
                 chassisSpeeds.omega,
                 isFieldRelative,
                 centerOfRotationX,
-                centerOfRotationY);
+                centerOfRotationY,
+                force);
 }
 
 /**
@@ -167,7 +189,8 @@ bool SwerveDrive::GetLocked() const
 
 /**
  * @brief Sets locked state
- *
+ * moves wheels into X formation, braking in place on charge station
+ * call to this within Operator Controller is all that is needed to e-brake
  * @param isLocked
  */
 void SwerveDrive::SetLocked(bool isLocked)
@@ -197,7 +220,7 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions;
     for (auto module : m_Modules)
     {
-        modulePositions[module->GetId()] = module->GetPosition();
+        modulePositions[module->GetID()] = module->GetPosition();
     }
 
     m_Odometry->Reset(pose, pose.Rotation().Degrees().value(), modulePositions);
@@ -206,27 +229,24 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 
 void SwerveDrive::Handle()
 {
+    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
+    std::array<CowLib::CowSwerveModuleState, 4> moduleStates{};
     for (auto module : m_Modules)
     {
         module->Handle();
+        modulePositions[module->GetID()] = module->GetPosition();
+        moduleStates[module->GetID()]    = module->GetState();
     }
 
-    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
-    std::transform(m_Modules.begin(),
-                   m_Modules.end(),
-                   modulePositions.begin(),
-                   [](SwerveModule *module) { return module->GetPosition(); });
+    if (!frc::RobotBase::IsReal())
+    {
+        m_Gyro->SetYaw(m_Kinematics->GetInternalKinematics()
+                           ->ToChassisSpeeds(CowLib::CowSwerveModuleState::ToWPIExtendedArray(moduleStates))
+                           .omega.value()
+                       + m_Gyro->GetYawDegrees());
+    }
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
     m_Pose = m_Odometry->GetWPIPose();
-
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-    //                           "odometry pose: x %f, y %f, %fdeg",
-    //                           m_Odometry->GetX(),
-    //                           m_Odometry->GetY(),
-    //                           m_Odometry->GetRotation());
-
-    // frc::SmartDashboard::PutNumberArray("odometry pose (x, y, deg)",
-    //                                     { m_Odometry->GetX(), m_Odometry->GetY(), m_Odometry->GetRotation() });
 }

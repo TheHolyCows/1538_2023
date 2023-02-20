@@ -10,6 +10,7 @@
 #include "../CowLib/Utility.h"
 #include "../CowPigeon.h"
 #include "SwerveModule.h"
+#include "SwerveModuleInterface.h"
 
 #include <algorithm>
 #include <array>
@@ -25,7 +26,7 @@
 class SwerveDrive
 {
 private:
-    std::array<SwerveModule *, 4> m_Modules{};
+    std::array<SwerveModuleInterface *, 4> m_Modules{};
 
     frc::Rotation2d m_Angle = frc::Rotation2d{ 0_deg };
 
@@ -63,12 +64,14 @@ public:
                      double rotation,
                      bool isFieldRelative     = true,
                      double centerOfRotationX = 0,
-                     double centerOfRotationY = 0);
+                     double centerOfRotationY = 0,
+                     bool force               = false);
 
     void SetVelocity(CowLib::CowChassisSpeeds chassisSpeeds,
                      bool isFieldRelative     = true,
                      double centerOfRotationX = 0,
-                     double centerOfRotationY = 0);
+                     double centerOfRotationY = 0,
+                     bool force               = false);
 
     // void SetVisionAlignVelocity(double x, double y, double rotation, bool isFieldRelative = true);
 

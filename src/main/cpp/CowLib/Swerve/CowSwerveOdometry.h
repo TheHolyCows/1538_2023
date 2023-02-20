@@ -4,6 +4,8 @@
 #include "./CowSwerveKinematics.h"
 #include "./CowSwerveModulePosition.h"
 #include "./CowSwerveModuleState.h"
+#include "frc/smartdashboard/Field2d.h"
+#include "frc/smartdashboard/SmartDashboard.h"
 
 #include <algorithm>
 #include <array>
@@ -18,6 +20,8 @@ namespace CowLib
     class CowSwerveOdometry
     {
     private:
+        frc::Field2d m_Field;
+
         frc::SwerveDrivePoseEstimator<4> *m_PoseEstimator;
         frc::Pose2d m_Pose;
 

@@ -7,9 +7,7 @@
 
 #include "Arm.h"
 
-#include "ArmMock.h"
-
-Arm::Arm(int rotationMotor, int telescopeMotor)
+Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel)
 {
     // Set ArmInterface Members
     m_MinAngle = 0;
@@ -17,71 +15,112 @@ Arm::Arm(int rotationMotor, int telescopeMotor)
     m_MinPos   = 0;
     m_MaxPos   = 0;
 
-    m_RotationMotor.reset(new CowLib::CowMotorController(rotationMotor));
-    m_TelescopeMotor.reset(new CowLib::CowMotorController(telescopeMotor));
-    m_RotationControlRequest  = { 0 };
-    m_TelescopeControlRequest = { 0 };
-    m_LoopCount               = 0;
-    // no longer works with Phoenix Pro
-    // m_RotatorMotor->SetControlMode(CowLib::CowMotorController::POSITION);
-    // m_TelescopeMotor->SetControlMode(CowLib::CowMotorController::POSITION);
-
-    // don't think we want the rotator to be in brake mode so we can check max and min
-    // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
-    m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    // move to pivot
+    m_RotationMotor.reset(new CowLib::CowMotorController(pivotMotor));
+    m_RotationControlRequest = { 0 };
 
     // check these
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
+
+    // m_Telescope = std::make_unique<Telescope>(telescopeMotor);
+    // m_Pivot     = std::make_unique<Pivot>(pivotMotor);
+    m_Claw = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     ResetConstants();
 }
 
 void Arm::SetArmAngle(double angle)
 {
-    m_RotationControlRequest.Position
-        = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    m_Pivot->RequestAngle(angle);
 }
 
 void Arm::SetArmPosition(double position)
 {
     // TODO: check this math
-    m_TelescopeControlRequest.Position = position * CONSTANT("TELESCOPE_RATIO");
+    m_Telescope->RequestPosition(position);
+}
+
+/**
+ * @brief return current cargo held
+*/
+ARM_CARGO Arm::GetArmCargo()
+{
+    return m_Cargo;
+}
+
+/**
+ * @brief return current state
+*/
+ARM_STATE Arm::GetArmState()
+{
+    return m_State;
+}
+
+/**
+ * @brief state controller for Claw/Intake
+ * should be relatively simple logic control based on current state
+ * ST_NONE for cargo should not change solenoid
+ */
+void Arm::UpdateClawState()
+{
+    // set cargo open/close state
+    if (m_Cargo == ST_CUBE)
+    {
+        m_Claw->SetOpen(true);
+    }
+    else if (m_Cargo == ST_CONE)
+    {
+        m_Claw->SetOpen(false);
+    }
+
+    // set intake on off state - will add exfil state for scoring in future
+    if (m_State == ARM_IN)
+    {
+        m_Claw->SetIntakeSpeed(1);
+    }
+    else
+    {
+        m_Claw->SetIntakeSpeed(0);
+    }
+}
+
+/**
+ * @brief sets current cargo of the arm
+ * PLEASE CALL AFTER YOU SET STATE
+*/
+void Arm::SetArmCargo(ARM_CARGO cargo)
+{
+    if (m_State == ARM_NONE || m_State == ARM_IN)
+        m_Cargo = cargo;
+}
+
+void Arm::SetArmState(ARM_STATE state)
+{
+    // don't move arm to in position while scoring?
+
+    if (state == ARM_MANUAL && m_State != ARM_MANUAL)
+    {
+        // manual control, may change control modes
+    }
+
+    m_State = state;
 }
 
 void Arm::ResetConstants()
 {
-    m_RotationMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
-    m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_P"),
-                             CONSTANT("TELESCOPE_I"),
-                             CONSTANT("TELESCOPE_D"),
-                             CONSTANT("TELESCOPE_F"));
+    m_Cargo = ST_NONE;
+    m_State = ARM_NONE;
+    m_Pivot->ResetConstants();
+    m_Telescope->ResetConstants();
+    m_Claw->ResetConstants();
 }
 
 void Arm::Handle()
 {
-    if (m_LoopCount++ % 20 == 0)
-    {
-        double p = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * m_CurrentConfig.pos)
-                   + (CONSTANT("ARM_P_ANGLE") * m_CurrentConfig.angle);
-
-        m_RotationMotor->SetPID(p, CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
-    }
-
-    if (m_RotationMotor)
-    {
-        m_RotationMotor->Set(m_RotationControlRequest);
-
-        m_CurrentConfig.angle
-            = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
-    }
-
-    if (m_TelescopeMotor)
-    {
-        m_TelescopeMotor->Set(m_TelescopeControlRequest);
-
-        m_CurrentConfig.pos = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
-    }
+    // m_Pivot->Handle();
+    // m_Telescope->Handle();
+    m_Claw->Handle();
 }
 
 void Arm::CheckMinMax()
@@ -102,8 +141,14 @@ void Arm::CheckMinMax()
 
 void Arm::ZeroSensors()
 {
-    double angle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
+    // Find the angle that is arm straight up
+    double zeroAngle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
 
+    // Want to ensure current angle is up to date
+    m_CurrentConfig.angle
+        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+
+    // Set to current angle - straight up angle, changing scope
     m_RotationMotor->SetSensorPosition(
-        CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
+        CowLib::Conversions::DegreesToFalcon(m_CurrentConfig.angle - zeroAngle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
 }

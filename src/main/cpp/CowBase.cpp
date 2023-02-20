@@ -9,7 +9,7 @@ CowBase::CowBase()
     CowConstants::GetInstance()->RestoreData();
     m_Bot = new CowRobot();
 
-    m_Display = new CowDisplay(m_Bot);
+    // m_Display = new CowDisplay(m_Bot); - removed from bot
 
     // init logger
     CowLib::CowLogger::GetInstance();
@@ -27,7 +27,7 @@ CowBase::~CowBase()
     delete m_ControlBoard;
     delete m_OpController;
     delete m_AutoController;
-    delete m_Display;
+    // delete m_Display;
 }
 
 void CowBase::RobotInit()
@@ -80,18 +80,16 @@ void CowBase::DisabledPeriodic()
 
     // m_Bot->GyroHandleCalibration();
 
-    if (m_Display)
-    {
-        m_Display->DisplayPeriodic();
-    }
+    // if (m_Display)
+    // {
+    //     m_Display->DisplayPeriodic();
+    // }
 
-    if (m_ControlBoard->GetLeftDriveStickButton(7))
+    if (m_ControlBoard->GetConstantsResetButton())
     {
         m_Constants->RestoreData();
 
-        // TODO: change back to 7
-        // if (m_ControlBoard->GetSteeringButton(7)) {
-        if (m_ControlBoard->GetLeftDriveStickButton(7))
+        if (m_ControlBoard->GetConstantsResetButton())
         {
             m_Bot->Reset();
 
