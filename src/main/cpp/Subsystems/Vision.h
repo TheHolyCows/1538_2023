@@ -39,6 +39,9 @@ public:
 
     double ScoringYPID(GamePiece type);
     double ScoringYawPID();
+
+    bool ScoringYAligned();
+    bool ScoringYawAligned();
 };
 
 #endif /* __VISION_H__ */

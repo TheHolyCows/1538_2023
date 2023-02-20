@@ -1,5 +1,7 @@
 #include "CowSwerveKinematics.h"
 
+#include "InternalSwerveKinematics.h"
+
 namespace CowLib
 {
 
@@ -12,10 +14,14 @@ namespace CowLib
         auto p = units::foot_t{ wheelBase / 2.0 };
         auto n = units::foot_t{ wheelBase / -2.0 };
 
-        m_Kinematics = new frc::SwerveDriveKinematics<4>(frc::Translation2d{ p, p },
-                                                         frc::Translation2d{ p, n },
-                                                         frc::Translation2d{ n, p },
-                                                         frc::Translation2d{ n, n });
+        // wpi::array<frc::Translation2d, 4> wheelLocations = { frc::Translation2d(p, p),
+        //                                                      frc::Translation2d(p, n),
+        //                                                      frc::Translation2d(n, p),
+        //                                                      frc::Translation2d(n, n) };
+        // m_Kinematics                                     = new CowLib::InternalSwerveKinematics<4>(wheelLocations);
+
+        m_Kinematics = new CowLib::InternalSwerveKinematics<4>(
+            { frc::Translation2d(p, p), frc::Translation2d(p, n), frc::Translation2d(n, p), frc::Translation2d(n, n) });
     }
 
     CowSwerveKinematics::~CowSwerveKinematics()
@@ -67,8 +73,9 @@ namespace CowLib
         {
             double velocity = moduleStates[i].speed.convert<units::feet_per_second>().value();
             double angle    = moduleStates[i].angle.Degrees().value();
+            double omega    = moduleStates[i].omega.convert<units::degrees_per_second>().value();
 
-            convertedStates[i] = CowSwerveModuleState{ velocity, angle };
+            convertedStates[i] = CowSwerveModuleState{ velocity, angle, omega };
         }
 
         return convertedStates;
@@ -78,7 +85,8 @@ namespace CowLib
  * @brief Retrieves the internal kinematics instance
  * @return WPILib SwerveDriveKinematics
  */
-    frc::SwerveDriveKinematics<4> *CowSwerveKinematics::GetInternalKinematics()
+    // frc::SwerveDriveKinematics<4> *CowSwerveKinematics::GetInternalKinematics()
+    CowLib::InternalSwerveKinematics<4> *CowSwerveKinematics::GetInternalKinematics()
     {
         return m_Kinematics;
     }

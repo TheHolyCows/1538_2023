@@ -15,6 +15,7 @@
 #include "../Subsystems/ArmState.h"
 #include "../Subsystems/Limelight.h"
 #include "../Subsystems/Vision.h"
+#include "frc/controller/PIDController.h"
 
 #include <iostream>
 #include <math.h>
@@ -34,24 +35,20 @@ private:
     {
     };
 
-    enum Wheel
-    {
-        NONE = -1,
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT
-    };
+    // enum Wheel
+    // {
+    //     NONE = -1,
+    //     FRONT_LEFT,
+    //     FRONT_RIGHT,
+    //     BACK_LEFT,
+    //     BACK_RIGHT
+    // };
 
-    Wheel m_EvasiveSwerveWheel;
-
-    CowLib::CowExponentialFilter *m_ControllerExpFilter;
+    // Wheel m_EvasiveSwerveWheel;
 
 public:
     OperatorController(GenericControlBoard *controlboard);
     void Handle(CowRobot *bot);
-
-    void ResetConstants();
 
     double m_TrackingCooldownTimer;
 };
