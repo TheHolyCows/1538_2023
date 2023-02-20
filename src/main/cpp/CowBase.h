@@ -27,7 +27,6 @@ private:
     AutoModeController *m_AutoController;
     CowConstants *m_Constants;
     CowDisplay *m_Display;
-    bool m_Teleop;
 
     int m_DisabledCount = 0;
 

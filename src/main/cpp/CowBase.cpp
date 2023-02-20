@@ -17,17 +17,6 @@ CowBase::CowBase()
     // init gyro
     CowPigeon::GetInstance();
 
-    m_Teleop = false;
-    AddPeriodic(
-        [this]
-        {
-            if (this->m_Teleop)
-            {
-                this->m_Bot->Handle();
-            }
-        },
-        10_ms);
-
     // SetPeriod(HZ(ROBOT_HZ));
     // GetWatchdog().SetEnabled(false);
     printf("Done constructing CowBase!\n");
@@ -53,8 +42,6 @@ void CowBase::RobotInit()
 
 void CowBase::DisabledInit()
 {
-    m_Teleop = false;
-
     CowConstants::GetInstance()->RestoreData();
     m_Bot->Reset();
     printf("DISABLED INIT -------------------\n");
@@ -62,8 +49,6 @@ void CowBase::DisabledInit()
 
 void CowBase::AutonomousInit()
 {
-    m_Teleop = false;
-
     m_Bot->GetDrivetrain()->ResetEncoders();
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
@@ -80,8 +65,6 @@ void CowBase::AutonomousInit()
 
 void CowBase::TeleopInit()
 {
-    m_Teleop = true;
-
     m_Bot->StartTime();
     // m_Bot->GetGyro()->FinalizeCalibration();
     std::cout << "setting controller " << m_OpController << std::endl;
@@ -141,7 +124,7 @@ void CowBase::AutonomousPeriodic()
 
 void CowBase::TeleopPeriodic()
 {
-    // m_Bot->Handle();
+    m_Bot->Handle();
 }
 
 int main()
