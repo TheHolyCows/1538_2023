@@ -5,10 +5,11 @@
 
 class GenericInput
 {
-    virtual void Handle()=0;
-    virtual bool OnPress()=0;
-    virtual bool OnHold()=0;
+    virtual void Handle()  = 0;
+    virtual bool OnPress() = 0;
+    virtual bool OnHold()  = 0;
 };
+
 class Button : public GenericInput
 {
 public:
@@ -20,8 +21,8 @@ public:
 private:
     bool m_Value = false;
     bool m_PressLocked;
- 
 };
+
 class Trigger : public GenericInput
 {
 public:
@@ -29,12 +30,11 @@ public:
     void Handle();
     bool OnPress();
     bool OnHold();
-    
+
 private:
-    double m_Value = 0;
+    double m_Value   = 0;
     bool m_Triggered = false;
     bool m_PressLocked;
-    
 };
 
 #endif /* __COWLIB_GENERICINPUT_H__ */

@@ -1,12 +1,6 @@
 #include "GenericInput.h"
 
-GenericInput::GenericInput()
-{
-
-}
-
-
-//  --  All Button Code  -- 
+//  --  All Button Code  --
 Button::Button(const int ID)
 {
     // m_Value should be Linked with button input
@@ -14,7 +8,7 @@ Button::Button(const int ID)
 
 bool Button::OnPress()
 {
-    if(m_Value && !m_PressLocked)
+    if (m_Value && !m_PressLocked)
     {
         return true;
         m_PressLocked = true;
@@ -32,12 +26,11 @@ bool Button::OnHold()
 
 void Button::Handle()
 {
-    if(!m_Value)
+    if (!m_Value)
     {
         m_PressLocked = false;
     }
 }
-
 
 //  --  All Trigger Code  --
 Trigger::Trigger(const int ID)
@@ -47,7 +40,7 @@ Trigger::Trigger(const int ID)
 
 bool Trigger::OnPress()
 {
-    if(m_Triggered && !m_PressLocked)
+    if (m_Triggered && !m_PressLocked)
     {
         return true;
     }
@@ -59,7 +52,7 @@ bool Trigger::OnPress()
 
 bool Trigger::OnHold()
 {
-    if(m_Triggered)
+    if (m_Triggered)
     {
         return true;
     }
@@ -71,13 +64,13 @@ bool Trigger::OnHold()
 
 void Trigger::Handle()
 {
-    if(m_Value > CONSTANT("TRIGGER_SENSITIVITY"))
+    if (m_Value > CONSTANT("TRIGGER_SENSITIVITY"))
     {
         m_Triggered = true;
     }
     else
     {
-         m_PressLocked = false;
-         m_Triggered = false;
+        m_PressLocked = false;
+        m_Triggered   = false;
     }
 }
