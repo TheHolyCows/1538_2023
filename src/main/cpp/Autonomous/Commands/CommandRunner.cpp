@@ -4,8 +4,17 @@ CommandRunner::CommandRunner(RobotCommand &command, double timeout)
     : m_Command(command),
       m_State(NOT_STARTED),
       m_Timeout({ timeout > 0, timeout }),
-      m_Timer(new CowLib::CowTimer())
+      m_Timer(std::make_unique<CowLib::CowTimer>())
 {
+    m_Timer->Reset();
+}
+
+void CommandRunner::SetCommand(RobotCommand &command)
+{
+    m_Command = command;
+    m_State   = NOT_STARTED;
+    m_Timer->Reset();
+    m_Timer->Stop();
 }
 
 void CommandRunner::Start(CowRobot *robot)

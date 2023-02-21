@@ -4,13 +4,15 @@ SwerveDriveController::SwerveDriveController(SwerveDrive &drivetrain)
     : m_Drivetrain(drivetrain),
       m_Gyro(*CowPigeon::GetInstance()),
       m_HeadingLocked(false),
-      m_TargetHeading(0)
+      m_TargetHeading(0),
 {
     m_ExponentialFilter = std::make_unique<CowLib::CowExponentialFilter>(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 
     m_HeadingPIDController
         = std::make_unique<frc2::PIDController>(CONSTANT("HEADING_P"), CONSTANT("HEADING_I"), CONSTANT("HEADING_D"));
     m_HeadingPIDController->EnableContinuousInput(0, 360);
+
+    // m_CommandRunner = std::make_unique<CommandRunner>(NullCommand());
 }
 
 void SwerveDriveController::ResetConstants()
@@ -129,16 +131,27 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
 void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
 {
+    double y     = 0;
+    double omega = 0;
+
+    if (!Vision::GetInstance()->ScoringYawAligned())
+    {
+        omega = Vision::GetInstance()->ScoringYawPID();
+    }
+    else
+    {
+        m_TargetHeading = m_Drivetrain.GetPoseRot();
+        y               = Vision::GetInstance()->ScoringYPID(gamePiece);
+    }
+
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
-    // Default Drive
-    m_Drivetrain.SetVelocity(x,
-                             Vision::GetInstance()->ScoringYPID(gamePiece),
-                             Vision::GetInstance()->ScoringYawPID(),
-                             false,
-                             0,
-                             0,
-                             true);
+    m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
+}
+
+void SwerveDriveController::TrajectoryToAprilTag()
+{
+    // m_CommandRunner = std::make_unique<CommandRunner>(PathplannerSwerveTrajectoryCommand(""));
 }
 
 double SwerveDriveController::ProcessDriveAxis(double input, double scale, bool reverse)

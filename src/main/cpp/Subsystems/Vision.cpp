@@ -13,20 +13,19 @@ Vision *Vision::GetInstance()
 }
 
 Vision::Vision()
-    : ypid2(frc2::PIDController(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D")))
+    : m_ScoringYPID(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D")),
+      m_ScoringYawPID(CONSTANT("SCORING_YAW_P"), CONSTANT("SCORING_YAW_I"), CONSTANT("SCORING_YAW_D"))
 {
-    m_ScoringYPID = std::make_unique<CowLib::CowPID>(CONSTANT("SCORING_Y_P"),
-                                                     CONSTANT("SCORING_Y_I"),
-                                                     CONSTANT("SCORING_Y_D"),
-                                                     0);
-    m_ScoringYPID = std::make_unique<CowLib::CowPID>(CONSTANT("SCORING_YAW_P"),
-                                                     CONSTANT("SCORING_YAW_I"),
-                                                     CONSTANT("SCORING_YAW_D"),
-                                                     0);
 }
 
 void Vision::Reset()
 {
+    m_ScoringYPID.SetPID(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D"));
+    m_ScoringYawPID.SetPID(CONSTANT("SCORING_YAW_P"), CONSTANT("SCORING_YAW_I"), CONSTANT("SCORING_YAW_D"));
+
+    m_ScoringYPID.Reset();
+    m_ScoringYawPID.Reset();
+
     // TODO: find out why this was disabled. may have crashed
     // m_ScoringYPID->UpdateConstants(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D"), 0);
     // m_ScoringYawPID->UpdateConstants(CONSTANT("SCORING_YAW_P"),
@@ -58,6 +57,7 @@ double Vision::ScoringYPID(GamePiece type)
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
                                   "April tag targeting array has incorrect length %f",
                                   targetPoseVec.size());
+        return 0;
     }
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
@@ -75,17 +75,16 @@ double Vision::ScoringYPID(GamePiece type)
         }
     }
 
-    m_ScoringYPID->SetSetpoint(targetX);
-    double yOutput = m_ScoringYPID->Calculate(0.0);
-    yOutput        = ypid2.Calculate(targetX, 0.0);
+    double yOutput = m_ScoringYPID.Calculate(targetX, 0.0);
+    frc::SmartDashboard::PutNumber("april tag/y/target x", targetX);
+    frc::SmartDashboard::PutNumber("april tag/y/y output", yOutput);
+
     if (fabs(targetX) < 0.01)
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f within tolorance", targetX);
 
-        yOutput = 0;
+        return 0;
     }
-
-    yOutput = CowLib::LimitMix(yOutput, 0.8);
 
     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f output: %f", targetX, yOutput);
     return yOutput;
@@ -93,41 +92,41 @@ double Vision::ScoringYPID(GamePiece type)
 
 double Vision::ScoringYawPID()
 {
-    // TODO: tune and re-enable
-    return 0;
-    // bool targetFound = LimelightHelpers::GetTV();
-    // // bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
-    // if (!targetFound)
-    // {
-    //     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
-    //     return 0;
-    // }
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
+    if (!targetFound)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return 0;
+    }
 
-    // // auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
-    // //                          .GetTable("limelight")
-    // //                          ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
-    // auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
+    auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
+                             .GetTable("limelight")
+                             ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
 
-    // if (targetPoseVec.size() != 6)
-    // {
-    //     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
-    //                               "April tag targeting array has incorrect length %f",
-    //                               targetPoseVec.size());
-    // }
+    if (targetPoseVec.size() != 6)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
+                                  "April tag targeting array has incorrect length %f",
+                                  targetPoseVec.size());
+        return 0;
+    }
 
-    // // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
-    // double targetYaw = targetPoseVec[4];
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
+    double targetYaw = targetPoseVec[4];
 
-    // m_ScoringYPID->SetSetpoint(targetYaw);
-    // double yawOutput = m_ScoringYPID->Calculate(0.0);
-    // if (fabs(targetYaw) < 0.1)
-    // {
-    //     yawOutput = 0;
-    // }
+    double yawOutput = m_ScoringYawPID.Calculate(targetYaw, 0.0);
 
-    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f output: %f", targetYaw, yawOutput);
+    frc::SmartDashboard::PutNumber("april tag/yaw/target yaw", targetYaw);
+    frc::SmartDashboard::PutNumber("april tag/yaw/yaw output", yawOutput);
 
-    // return yawOutput;
+    if (fabs(targetYaw) < 0.1)
+    {
+        yawOutput = 0;
+    }
+
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "april tag y target: %f output: %f", targetYaw, yawOutput);
+
+    return yawOutput;
 }
 
 bool Vision::ScoringYAligned(GamePiece type)
@@ -142,7 +141,6 @@ bool Vision::ScoringYAligned(GamePiece type)
     auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
                              .GetTable("limelight")
                              ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
-    // auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
 
     if (targetPoseVec.size() != 6)
     {
@@ -160,6 +158,72 @@ bool Vision::ScoringYAligned(GamePiece type)
 
 bool Vision::ScoringYawAligned()
 {
-    // TODO: Implement
-    return false;
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
+    if (!targetFound)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return false;
+    }
+
+    auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
+                             .GetTable("limelight")
+                             ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
+
+    if (targetPoseVec.size() != 6)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
+                                  "April tag targeting array has incorrect length %f",
+                                  targetPoseVec.size());
+
+        return false;
+    }
+
+    double targetYaw = targetPoseVec[4];
+
+    return fabs(targetYaw) < CONSTANT("SCORING_YAW_TOLERANCE");
+}
+
+pathplanner::PathPlannerTrajectory Vision::GenerateTrajectoryToNearestAprilTag()
+{
+    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
+    if (!targetFound)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return pathplanner::PathPlannerTrajectory();
+    }
+
+    int tagID = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tid", -1);
+
+    static frc::AprilTagFieldLayout aprilTagFieldLayout = frc::AprilTagFieldLayout();
+
+    auto tagPose = aprilTagFieldLayout.GetTagPose(tagID);
+    if (!tagPose.has_value())
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no tag pose");
+        return pathplanner::PathPlannerTrajectory();
+    }
+
+    auto poseVec = nt::NetworkTableInstance::GetDefault()
+                       .GetTable("limelight")
+                       ->GetNumberArray("botpose", std::vector<double>(6));
+
+    if (poseVec.size() != 6)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
+                                  "April tag targeting array has incorrect length %f",
+                                  poseVec.size());
+
+        return pathplanner::PathPlannerTrajectory();
+    }
+
+    // TODO: confirm these are the correct indexes
+    frc::Pose2d pose
+        = frc::Pose2d(units::meter_t{ poseVec[0] }, units::meter_t{ poseVec[1] }, units::degree_t{ poseVec[5] });
+
+    pathplanner::PathPlannerTrajectory traj = pathplanner::PathPlanner::generatePath(
+        pathplanner::PathConstraints{ 2_mps, 1_mps_sq },
+        pathplanner::PathPoint(pose.Translation(), pose.Rotation()),
+        pathplanner::PathPoint((*tagPose).Translation().ToTranslation2d(), (*tagPose).Rotation().ToRotation2d()));
+
+    return traj;
 }

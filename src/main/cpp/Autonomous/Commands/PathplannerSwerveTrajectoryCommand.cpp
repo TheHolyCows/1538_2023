@@ -1,5 +1,26 @@
 #include "PathplannerSwerveTrajectoryCommand.h"
 
+PathplannerSwerveTrajectoryCommand::PathplannerSwerveTrajectoryCommand(pathplanner::PathPlannerTrajectory &trajectory,
+                                                                       bool stopAtEnd,
+                                                                       bool resetOdometry)
+{
+    // This is to make sure that it is loading trajectories on start and not on demand
+    m_Timer         = new CowLib::CowTimer();
+    m_Stop          = stopAtEnd;
+    m_ResetOdometry = resetOdometry;
+
+    m_Trajectory = trajectory;
+
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Loaded trajectory %s", trajectoryName.c_str());
+
+    m_HolonomicController = new pathplanner::PPHolonomicDriveController(
+        frc2::PIDController{ CONSTANT("AUTO_DRIVE_P"), CONSTANT("AUTO_DRIVE_I"), CONSTANT("AUTO_DRIVE_D") },
+        frc2::PIDController{ CONSTANT("AUTO_DRIVE_P"), CONSTANT("AUTO_DRIVE_I"), CONSTANT("AUTO_DRIVE_D") },
+        frc2::PIDController{ CONSTANT("AUTO_ROTATION_P"), CONSTANT("AUTO_ROTATION_I"), CONSTANT("AUTO_ROTATION_D") });
+
+    m_TotalTime = m_Trajectory.getTotalTime().value();
+}
+
 PathplannerSwerveTrajectoryCommand::PathplannerSwerveTrajectoryCommand(const std::string &trajectoryName,
                                                                        double maxSpeed,
                                                                        double maxAccel,

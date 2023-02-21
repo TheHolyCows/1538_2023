@@ -33,8 +33,10 @@ private:
     std::unique_ptr<CowLib::CowTimer> m_Timer;
 
 public:
-    CommandRunner(RobotCommand &command, double timeout = 0);
+    CommandRunner(RobotCommand &command = NullCommand(), double timeout = 0);
     ~CommandRunner() = default;
+
+    void SetCommand(RobotCommand &command);
 
     void Start(CowRobot *robot);
     void Handle(CowRobot *robot);

@@ -27,6 +27,9 @@ public:
                                        double maxAccel,
                                        bool stop,
                                        bool resetOdometry = false);
+    PathplannerSwerveTrajectoryCommand(pathplanner::PathPlannerTrajectory &trajectory,
+                                       bool stop,
+                                       bool resetOdometry = false);
     ~PathplannerSwerveTrajectoryCommand() override;
 
     bool IsComplete() override;
