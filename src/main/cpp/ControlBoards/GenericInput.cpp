@@ -3,15 +3,15 @@
 //  --  All Button Code  --
 Button::Button(const int ID)
 {
-    // m_Value should be Linked with button input
+    m_ID = ID;
 }
 
 bool Button::OnPress()
 {
     if (m_Value && !m_PressLocked)
     {
-        return true;
         m_PressLocked = true;
+        return true;
     }
     else
     {
@@ -26,6 +26,8 @@ bool Button::OnHold()
 
 void Button::Handle()
 {
+    m_Value = m_Controller->GetRawButton(m_ID);
+
     if (!m_Value)
     {
         m_PressLocked = false;
@@ -35,13 +37,14 @@ void Button::Handle()
 //  --  All Trigger Code  --
 Trigger::Trigger(const int ID)
 {
-    // m_Value should be linked with trigger % value
+     m_ID = ID;
 }
 
 bool Trigger::OnPress()
 {
     if (m_Triggered && !m_PressLocked)
-    {
+    {   
+        m_PressLocked = true;
         return true;
     }
     else
@@ -64,6 +67,8 @@ bool Trigger::OnHold()
 
 void Trigger::Handle()
 {
+    m_Value = m_Controller->GetRawAxis(m_ID);
+
     if (m_Value > CONSTANT("TRIGGER_SENSITIVITY"))
     {
         m_Triggered = true;

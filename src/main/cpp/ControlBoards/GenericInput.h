@@ -3,6 +3,8 @@
 
 #include "../CowConstants.h"
 
+#include <frc/Joystick.h>
+
 class GenericInput
 {
     virtual void Handle()  = 0;
@@ -16,11 +18,13 @@ public:
     Button(const int ID);
     void Handle();
     bool OnPress();
-    bool OnHold();
+    bool OnHold(); 
 
 private:
     bool m_Value = false;
     bool m_PressLocked;
+    frc::Joystick *m_Controller;
+    int m_ID;
 };
 
 class Trigger : public GenericInput
@@ -35,6 +39,8 @@ private:
     double m_Value   = 0;
     bool m_Triggered = false;
     bool m_PressLocked;
+    frc::Joystick *m_Controller;
+    int m_ID;
 };
 
 #endif /* __COWLIB_GENERICINPUT_H__ */
