@@ -10,8 +10,8 @@
 Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel)
 {
     // Set ArmInterface Members
-    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE");
-    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
+    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
+    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
     m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
     m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
 
@@ -34,13 +34,13 @@ double Arm::GetSafeAngle(double angle)
     if (angle >= m_MaxAngle)
     {
         // Set the current angle to MaxAngle
-        angle = m_MaxAngle;
+        return m_MaxAngle;
     }
-    // If Arm Angle is greater <= Max
+    // If Arm Angle is greater <= Min
     else if (angle <= m_MinAngle)
     {
         // Set the current angle to MinAngle and position to MaxPosAtMinAngle
-        angle = m_MinAngle;
+        return m_MinAngle;
     }
 
     return angle;
@@ -48,13 +48,21 @@ double Arm::GetSafeAngle(double angle)
 
 double Arm::GetSafeExt(double position)
 {
-    double curAngle             = m_Pivot->GetAngle();
+    double curAngle = m_Pivot->GetAngle();
+
+    // TODO: check this math
     double totalHeight          = m_ArmHeight + m_ClawHeight;
     double MaxPosAtCurrentAngle = totalHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
 
+    // do not extend into the bot
+    if (fabs(curAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    {
+        return m_MinPos;
+    }
+
     if (position > MaxPosAtCurrentAngle)
     {
-        m_CurrentConfig.ext = MaxPosAtCurrentAngle;
+        position = MaxPosAtCurrentAngle;
     }
 
     return position;
