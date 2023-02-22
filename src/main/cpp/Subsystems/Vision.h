@@ -50,8 +50,6 @@ public:
 
     bool ScoringYAligned(GamePiece type);
     bool ScoringYawAligned();
-
-    pathplanner::PathPlannerTrajectory GenerateTrajectoryToNearestAprilTag();
 };
 
 #endif /* __VISION_H__ */

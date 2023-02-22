@@ -37,6 +37,13 @@ AutoModes::AutoModes()
     // m_Modes["theoretical 2 cone"].push_back(new ParallelCommand(
     //     { new PathplannerSwerveTrajectoryCommand("2ConeIntake", 5, 3, true, true),
     //       new SeriesCommand({ new WaitCommand(3, false), new UpdateArmStateCommand(ARM_IN, ST_CONE) }) }));
+    // m_Modes["theoretical 2 cone"].push_back(new PathplannerSwerveTrajectoryCommand(
+    //     "2ConeIntake",
+    //     5,
+    //     3,
+    //     true,
+    //     true,
+    //     { PathplannerSwerveTrajectoryCommand::Event{ "start intake", new UpdateArmStateCommand(ARM_IN, ST_CONE) } }));
     // m_Modes["theoretical 2 cone"].push_back(new WaitCommand(1, false));
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_STOW));
     // m_Modes["theoretical 2 cone"].push_back(
