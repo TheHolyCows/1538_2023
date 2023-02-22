@@ -9,14 +9,6 @@ CommandRunner::CommandRunner(RobotCommand &command, double timeout)
     m_Timer->Reset();
 }
 
-void CommandRunner::SetCommand(RobotCommand &command)
-{
-    m_Command = command;
-    m_State   = NOT_STARTED;
-    m_Timer->Reset();
-    m_Timer->Stop();
-}
-
 void CommandRunner::Start(CowRobot *robot)
 {
     m_State = RUNNING;

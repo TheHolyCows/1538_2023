@@ -4,15 +4,13 @@ SwerveDriveController::SwerveDriveController(SwerveDrive &drivetrain)
     : m_Drivetrain(drivetrain),
       m_Gyro(*CowPigeon::GetInstance()),
       m_HeadingLocked(false),
-      m_TargetHeading(0),
+      m_TargetHeading(0)
 {
     m_ExponentialFilter = std::make_unique<CowLib::CowExponentialFilter>(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 
     m_HeadingPIDController
         = std::make_unique<frc2::PIDController>(CONSTANT("HEADING_P"), CONSTANT("HEADING_I"), CONSTANT("HEADING_D"));
     m_HeadingPIDController->EnableContinuousInput(0, 360);
-
-    // m_CommandRunner = std::make_unique<CommandRunner>(NullCommand());
 }
 
 void SwerveDriveController::ResetConstants()
@@ -147,11 +145,6 @@ void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
     m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
-}
-
-void SwerveDriveController::TrajectoryToAprilTag()
-{
-    // m_CommandRunner = std::make_unique<CommandRunner>(PathplannerSwerveTrajectoryCommand(""));
 }
 
 double SwerveDriveController::ProcessDriveAxis(double input, double scale, bool reverse)

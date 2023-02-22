@@ -1,8 +1,5 @@
 #pragma once
 
-#include "../Autonomous/Commands/CommandRunner.h"
-#include "../Autonomous/Commands/NullCommand.h"
-#include "../Autonomous/Commands/PathplannerSwerveTrajectoryCommand.h"
 #include "../CowLib/CowExponentialFilter.h"
 #include "../CowPigeon.h"
 #include "../Subsystems/Vision.h"
@@ -21,8 +18,6 @@ public:
 
     void AlignToScore(double x, Vision::GamePiece gamePiece);
 
-    void TrajectoryToAprilTag();
-
     void ResetConstants();
 
 private:
@@ -35,8 +30,6 @@ private:
     std::unique_ptr<CowLib::CowExponentialFilter> m_ExponentialFilter;
 
     std::unique_ptr<frc2::PIDController> m_HeadingPIDController;
-
-    // std::unique_ptr<CommandRunner> m_CommandRunner;
 
     bool m_HeadingLocked;
     double m_TargetHeading;

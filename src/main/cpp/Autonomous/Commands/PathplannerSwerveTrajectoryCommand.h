@@ -1,5 +1,4 @@
-#ifndef __SWERVE_TRAJECTORY_COMMAND_H__
-#define __SWERVE_TRAJECTORY_COMMAND_H__
+#pragma once
 
 #include "../../CowLib/CowTimer.h"
 #include "../../CowRobot.h"
@@ -42,5 +41,3 @@ public:
 
     frc::Pose2d GetStartingPose();
 };
-
-#endif /* __SWERVE_TRAJECTORY_COMMAND_H__ */
