@@ -5,6 +5,7 @@
 #ifndef __AUTO_MODES_H__
 #define __AUTO_MODES_H__
 
+#include "Commands/AprilTagAlignCommand.h"
 #include "Commands/HoldPositionCommand.h"
 #include "Commands/LambdaCommand.h"
 #include "Commands/PathplannerSwerveTrajectoryCommand.h"

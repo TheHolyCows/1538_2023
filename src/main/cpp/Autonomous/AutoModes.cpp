@@ -1,5 +1,10 @@
 #include "AutoModes.h"
 
+#include "Commands/ParallelCommand.h"
+#include "Commands/PathplannerSwerveTrajectoryCommand.h"
+#include "Commands/UpdateArmStateCommand.h"
+#include "Commands/WaitCommand.h"
+
 // TODO: make auto constants reloadable for quick testing
 // TODO: still need to add timeouts
 
@@ -26,8 +31,19 @@ AutoModes::AutoModes()
 
     m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 5, 1, true, true));
 
-    // m_Modes["..."].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
-    // m_Modes["..."].push_back()
+    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
+    // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
+    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_SCORE));
+    // m_Modes["theoretical 2 cone"].push_back(new ParallelCommand(
+    //     { new PathplannerSwerveTrajectoryCommand("2ConeIntake", 5, 3, true, true),
+    //       new SeriesCommand({ new WaitCommand(3, false), new UpdateArmStateCommand(ARM_IN, ST_CONE) }) }));
+    // m_Modes["theoretical 2 cone"].push_back(new WaitCommand(1, false));
+    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_STOW));
+    // m_Modes["theoretical 2 cone"].push_back(
+    //     new PathplannerSwerveTrajectoryCommand("2ConeDriveToScore", 5, 3, true, false));
+    // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
+    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3));
+    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_SCORE));
 
     // std::cout << "Complete AutoModes constructor" << std::endl;
 

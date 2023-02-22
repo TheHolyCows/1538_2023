@@ -1,8 +1,10 @@
 #include "AprilTagAlignCommand.h"
 
-AprilTagAlignCommand::AprilTagAlignCommand(Vision::GamePiece gamePiece)
+AprilTagAlignCommand::AprilTagAlignCommand(Vision::GamePiece gamePiece, const double timeout)
+    : m_Timer(std::make_unique<CowLib::CowTimer>()),
+      m_GamePiece(gamePiece),
+      m_Timeout(timeout)
 {
-    m_GamePiece = gamePiece;
 }
 
 bool AprilTagAlignCommand::IsComplete()
