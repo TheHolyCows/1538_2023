@@ -142,12 +142,12 @@ void CowRobot::ArmSM()
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
-        // m_Arm->SetAngle(0);
-        // m_Arm->SetTelescopePosition(0);
+        m_Arm->RequestPosition(0, 0);
         m_Arm->UpdateClawState();
         break;
     case ARM_IN :
         m_Arm->UpdateClawState();
+        // scott mentioned doing this as X,Y positions from bot, might be easier to derive?
         m_Arm->RequestPosition(CONSTANT("ARM_IN_ANGLE"), CONSTANT("ARM_IN_EXT"));
         break;
     case ARM_STOW :

@@ -148,6 +148,7 @@ void Arm::RequestPosition(double angle, double extension)
 {
     m_Pivot->RequestAngle(GetSafeAngle(angle));
     GetSafeExt(extension);
+    //m_Claw->RequestWristAngle(GetSafeWristAngle());
 }
 
 void Arm::Handle()
