@@ -43,7 +43,7 @@ public:
      * 
      * @return double The desired telescoping position of the arm in inches
      */
-    inline double GetTelescopePosition() const { return m_CurrentConfig.pos; }
+    inline double GetTelescopePosition() const { return m_CurrentConfig.ext; }
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
@@ -72,7 +72,7 @@ public:
      * This method assumes that the min and max angles are set correctly.
      * 
      */
-    virtual void ZeroSensors() = 0;
+    // virtual void ZeroSensors() = 0;
 
     /**
      * @brief The struct representing an angle and position of the arm
@@ -81,7 +81,7 @@ public:
     struct ArmConfig
     {
         double angle;
-        double pos;
+        double ext;
     };
 
 protected:
@@ -90,14 +90,14 @@ protected:
      * 
      * @param angle The angle to set to
      */
-    virtual void SetArmAngle(const double angle) = 0;
+    virtual void SetArmAngle(double angle) = 0;
 
     /**
      * @brief Will set the telescope motor's position
      * 
-     * @param pos The pos to set to
+     * @param pos The ext to set to
      */
-    virtual void SetArmPosition(const double pos) = 0;
+    virtual void SetArmExtension(double ext) = 0;
 
     // The Current Angle and Pos of the Arm
     ArmConfig m_CurrentConfig;

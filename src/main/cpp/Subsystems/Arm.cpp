@@ -10,35 +10,54 @@
 Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel)
 {
     // Set ArmInterface Members
-    m_MinAngle = 0;
-    m_MaxAngle = 0;
-    m_MinPos   = 0;
-    m_MaxPos   = 0;
+    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE");
+    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
+    m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
 
-    // move to pivot
-    m_RotationMotor.reset(new CowLib::CowMotorController(pivotMotor));
-    m_RotationControlRequest = { 0 };
+    m_LoopCount = 0;
 
     // check these
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
 
     // m_Telescope = std::make_unique<Telescope>(telescopeMotor);
-    // m_Pivot     = std::make_unique<Pivot>(pivotMotor);
-    m_Claw = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
+    m_Pivot = std::make_unique<Pivot>(pivotMotor);
+    m_Claw  = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     ResetConstants();
 }
 
-void Arm::SetArmAngle(double angle)
+double Arm::GetSafeAngle(double angle)
 {
-    m_Pivot->RequestAngle(angle);
+    // If Arm Angle is greater >= Max
+    if (angle >= m_MaxAngle)
+    {
+        // Set the current angle to MaxAngle
+        angle = m_MaxAngle;
+    }
+    // If Arm Angle is greater <= Max
+    else if (angle <= m_MinAngle)
+    {
+        // Set the current angle to MinAngle and position to MaxPosAtMinAngle
+        angle = m_MinAngle;
+    }
+
+    return angle;
 }
 
-void Arm::SetArmPosition(double position)
+double Arm::GetSafeExt(double position)
 {
-    // TODO: check this math
-    m_Telescope->RequestPosition(position);
+    double curAngle             = m_Pivot->GetAngle();
+    double totalHeight          = m_ArmHeight + m_ClawHeight;
+    double MaxPosAtCurrentAngle = totalHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
+
+    if (position > MaxPosAtCurrentAngle)
+    {
+        m_CurrentConfig.ext = MaxPosAtCurrentAngle;
+    }
+
+    return position;
 }
 
 /**
@@ -109,46 +128,39 @@ void Arm::SetArmState(ARM_STATE state)
 
 void Arm::ResetConstants()
 {
-    m_Cargo = ST_NONE;
-    m_State = ARM_NONE;
+    m_Cargo    = ST_NONE;
+    m_State    = ARM_NONE;
+    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE");
+    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
+    m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
     m_Pivot->ResetConstants();
-    m_Telescope->ResetConstants();
+    // m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
-}
-
-void Arm::Handle()
-{
-    // m_Pivot->Handle();
-    // m_Telescope->Handle();
-    m_Claw->Handle();
 }
 
 void Arm::CheckMinMax()
 {
-    m_CurrentConfig.angle
-        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
-
-    if (m_CurrentConfig.angle < m_MinAngle)
-    {
-        m_MinAngle = m_CurrentConfig.angle;
-    }
-
-    if (m_CurrentConfig.angle > m_MaxAngle)
-    {
-        m_MaxAngle = m_CurrentConfig.angle;
-    }
+    return;
 }
 
-void Arm::ZeroSensors()
+void Arm::RequestPosition(double angle, double extension)
 {
-    // Find the angle that is arm straight up
-    double zeroAngle = m_MinAngle + ((m_MaxAngle - m_MinAngle) / 2.0);
+    m_Pivot->RequestAngle(GetSafeAngle(angle));
+    GetSafeExt(extension);
+}
 
-    // Want to ensure current angle is up to date
-    m_CurrentConfig.angle
-        = CowLib::Conversions::FalconToDegrees(m_RotationMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+void Arm::Handle()
+{
+    // PID update check
+    if (m_LoopCount++ % 10 == 0) // fires every 200ms
+    {
+        m_Pivot->UpdatePID(m_Telescope->GetPosition());
+        // m_Telescope->UpdatePID();
+        m_LoopCount = 1;
+    }
 
-    // Set to current angle - straight up angle, changing scope
-    m_RotationMotor->SetSensorPosition(
-        CowLib::Conversions::DegreesToFalcon(m_CurrentConfig.angle - zeroAngle, CONSTANT("ARM_ROTATION_GEAR_RATIO")));
+    m_Pivot->Handle();
+    // m_Telescope->Handle();
+    m_Claw->Handle();
 }

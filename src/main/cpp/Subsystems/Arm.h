@@ -24,23 +24,32 @@ class Arm : public ArmInterface
 {
 private:
     /**
-     * @brief Will rotate the arm to the specified angle
+     * @brief Will safely set m_CurrentConfig with the specified angle
      * 
-     * @param angle The desired angle in degrees to rotate to
+     * @param angle The angle to set the arm to
      */
-    void SetArmAngle(const double angle) override;
+    double GetSafeAngle(double angle);
 
     /**
-     * @brief Will set the telescoping position of the arm
+     * @brief Will safely set m_CurrentConfig with the specified position
      * 
-     * @param position The desired position of the arm in inches
+     * @param extension 
      */
-    void SetArmPosition(const double pos) override;
+    double GetSafeExt(double extension);
 
-    std::shared_ptr<CowLib::CowMotorController> m_RotationMotor;
-    std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
+    /**
+     * @brief Will set the angle rotation motor's angle
+     * 
+     * @param angle The angle to set to
+     */
+    virtual void SetArmAngle(double angle) = 0;
 
-    CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
+    /**
+     * @brief Will set the telescope motor's position
+     * 
+     * @param ext The ext to set to
+     */
+    virtual void SetArmExtension(double ext) = 0;
 
     std::unique_ptr<Telescope> m_Telescope;
     std::unique_ptr<Pivot> m_Pivot;
@@ -49,6 +58,8 @@ private:
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
     bool m_Orientation;
+
+    int m_LoopCount;
 
 public:
     /**
@@ -96,14 +107,10 @@ public:
     void UpdateClawState();
 
     /**
-     * @brief requests update to angle of pivot
+     * @brief requests update to overall position of the arm
+     * this includes the current angle of the pivot and the extension of the telescope
     */
-    void RequestAngle(double angle);
-
-    /**
-     * @brief requests update to position of telescope
-    */
-    void RequestPosition(double position);
+    void RequestPosition(double angle, double extension);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
@@ -111,12 +118,6 @@ public:
      * 
      */
     void ResetConstants() override;
-
-    /**
-     * @brief Will set the motors to their specified values
-     * 
-     */
-    void Handle() override;
 
     /**
      * @brief Will set the minimum or maximum angle depending on the current position
@@ -132,7 +133,13 @@ public:
      * This method assumes that the min and max angles are set correctly.
      * 
      */
-    void ZeroSensors() override;
+    //void ZeroSensors() override;
+
+    /**
+     * @brief Will set the motors to their specified values
+     * 
+     */
+    void Handle() override;
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */

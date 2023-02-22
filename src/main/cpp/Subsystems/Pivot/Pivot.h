@@ -18,13 +18,28 @@ class Pivot : public PivotInterface
 {
 public:
     Pivot(const int MotorId);
-    virtual void SetAngle() override;
-    virtual void RequestAngle(double pos) override;
 
-    virtual void ResetConstants() override;
+    /**
+     * sets variable in current position request to angle
+    */
+    void RequestAngle(double angle) override;
+
+    /**
+     * returns the current angle read from the motor
+     * converted to degrees
+    */
+    double GetAngle() override;
+
+    /**
+     * update PID of pivot based on currrent arm extension
+    */
+    void UpdatePID(double);
+
+    void ResetConstants() override;
+
+    void Handle();
 
 private:
     std::shared_ptr<CowLib::CowMotorController> m_PivotMotor;
-    CowLib::CowMotorController::PositionPercentOutput m_MotorRequest;
-    int m_LoopCount;
+    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
 };
