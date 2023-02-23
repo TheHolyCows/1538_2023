@@ -1,9 +1,5 @@
 #include "PathplannerSwerveTrajectoryCommand.h"
 
-#include "pathplanner/lib/PathPlannerTrajectory.h"
-
-#include <algorithm>
-
 PathplannerSwerveTrajectoryCommand::PathplannerSwerveTrajectoryCommand(const std::string &trajectoryName,
                                                                        double maxSpeed,
                                                                        double maxAccel,
@@ -150,7 +146,10 @@ void PathplannerSwerveTrajectoryCommand::Finish(CowRobot *robot)
 
     for (Event event : m_Events)
     {
-        event.command->Finish(robot);
+        if (!event.done && event.started)
+        {
+            event.command->Finish(robot);
+        }
     }
 
     m_Timer->Stop();
