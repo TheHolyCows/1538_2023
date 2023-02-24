@@ -20,20 +20,19 @@
 
 class Vision
 {
-public:
-    enum GamePiece
-    {
-        CUBE,
-        CONE
-    };
-
 private:
     static Vision *s_Instance;
 
     Vision();
 
-    frc2::PIDController m_ScoringYPID;
-    frc2::PIDController m_ScoringYawPID;
+    frc2::PIDController m_CubeYPID;
+    frc2::PIDController m_CubeYawPID;
+    frc2::PIDController m_ConeYPID;
+
+    void UpdatePipeline(std::string limelightName, int id);
+    int GetPipeline(std::string limelightName);
+
+    std::string DetermineCorrectPosition();
 
 public:
     static Vision *GetInstance();
@@ -45,11 +44,15 @@ public:
      */
     void Reset();
 
-    double ScoringYPID(GamePiece type);
-    double ScoringYawPID();
+    double CubeYPID();
+    double CubeYawPID();
 
-    bool ScoringYAligned(GamePiece type);
-    bool ScoringYawAligned();
+    bool CubeYAligned();
+    bool CubeYawAligned();
+
+    double ConeYPID();
+
+    bool ConeYAligned();
 };
 
 #endif /* __VISION_H__ */

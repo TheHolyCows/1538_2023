@@ -6,17 +6,16 @@
 
 #include <memory>
 
-class AprilTagAlignCommand : public RobotCommand
+class CubeAlignCommand : public RobotCommand
 {
 private:
     std::unique_ptr<CowLib::CowTimer> m_Timer;
 
-    Vision::GamePiece m_GamePiece;
     const double m_Timeout;
 
 public:
-    AprilTagAlignCommand(Vision::GamePiece gamePiece, const double timeout);
-    ~AprilTagAlignCommand() = default;
+    CubeAlignCommand(const double timeout);
+    ~CubeAlignCommand() = default;
 
     bool IsComplete() override;
 

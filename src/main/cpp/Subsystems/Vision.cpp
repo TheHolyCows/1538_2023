@@ -13,42 +13,42 @@ Vision *Vision::GetInstance()
 }
 
 Vision::Vision()
-    : m_ScoringYPID(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D")),
-      m_ScoringYawPID(CONSTANT("SCORING_YAW_P"), CONSTANT("SCORING_YAW_I"), CONSTANT("SCORING_YAW_D"))
+    : m_CubeYPID(CONSTANT("CUBE_Y_P"), CONSTANT("CUBE_Y_I"), CONSTANT("CUBE_Y_D")),
+      m_CubeYawPID(CONSTANT("CUBE_YAW_P"), CONSTANT("CUBE_YAW_I"), CONSTANT("CUBE_YAW_D")),
+      m_ConeYPID(CONSTANT("CONE_Y_P"), CONSTANT("CONE_Y_I"), CONSTANT("CONE_Y_D"))
 {
 }
 
 void Vision::Reset()
 {
-    m_ScoringYPID.SetPID(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D"));
-    m_ScoringYawPID.SetPID(CONSTANT("SCORING_YAW_P"), CONSTANT("SCORING_YAW_I"), CONSTANT("SCORING_YAW_D"));
+    m_CubeYPID.SetPID(CONSTANT("CUBE_Y_P"), CONSTANT("CUBE_Y_I"), CONSTANT("CUBE_Y_D"));
+    m_CubeYawPID.SetPID(CONSTANT("CUBE_YAW_P"), CONSTANT("CUBE_YAW_I"), CONSTANT("CUBE_YAW_D"));
+    m_ConeYPID.SetPID(CONSTANT("CONE_Y_P"), CONSTANT("CONE_Y_I"), CONSTANT("CONE_Y_D"));
 
-    m_ScoringYPID.Reset();
-    m_ScoringYawPID.Reset();
-
-    // TODO: find out why this was disabled. may have crashed
-    // m_ScoringYPID->UpdateConstants(CONSTANT("SCORING_Y_P"), CONSTANT("SCORING_Y_I"), CONSTANT("SCORING_Y_D"), 0);
-    // m_ScoringYawPID->UpdateConstants(CONSTANT("SCORING_YAW_P"),
-    //                                  CONSTANT("SCORING_YAW_I"),
-    //                                  CONSTANT("SCORING_YAW_D"),
-    //                                  0);
-
-    // m_ScoringYPID->Reset();
-    // m_ScoringYawPID->Reset();
+    m_CubeYPID.Reset();
+    m_CubeYawPID.Reset();
+    m_ConeYPID.Reset();
 }
 
-double Vision::ScoringYPID(GamePiece type)
+double Vision::CubeYPID()
 {
-    // bool targetFound = LimelightHelpers::GetTV();
-    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
-    if (!targetFound)
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return 0;
     }
 
+    UpdatePipeline(limelightName, 0);
+
+    if (GetPipeline(limelightName) != 0)
+    {
+        return 0;
+    }
+
     auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
-                             .GetTable("limelight")
+                             .GetTable(limelightName)
                              ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
     // auto targetPoseVec = LimelightHelpers::GetTargetPose_RobotSpace();
 
@@ -63,19 +63,7 @@ double Vision::ScoringYPID(GamePiece type)
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
     double targetX = targetPoseVec[0];
 
-    if (type == GamePiece::CONE)
-    {
-        if (targetX > 0)
-        {
-            targetX -= 0.47;
-        }
-        else
-        {
-            targetX += 0.47;
-        }
-    }
-
-    double yOutput = m_ScoringYPID.Calculate(targetX, 0.0);
+    double yOutput = m_CubeYPID.Calculate(targetX, 0.0);
     frc::SmartDashboard::PutNumber("april tag/y/target x", targetX);
     frc::SmartDashboard::PutNumber("april tag/y/y output", yOutput);
 
@@ -90,17 +78,25 @@ double Vision::ScoringYPID(GamePiece type)
     return yOutput;
 }
 
-double Vision::ScoringYawPID()
+double Vision::CubeYawPID()
 {
-    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
-    if (!targetFound)
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return 0;
     }
 
+    UpdatePipeline(limelightName, 0);
+
+    if (GetPipeline(limelightName) != 0)
+    {
+        return 0;
+    }
+
     auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
-                             .GetTable("limelight")
+                             .GetTable(limelightName)
                              ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
 
     if (targetPoseVec.size() != 6)
@@ -114,7 +110,7 @@ double Vision::ScoringYawPID()
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "vec length: %d", targetPoseVec.size());
     double targetYaw = targetPoseVec[4];
 
-    double yawOutput = m_ScoringYawPID.Calculate(targetYaw, 0.0);
+    double yawOutput = m_CubeYawPID.Calculate(targetYaw, 0.0);
 
     frc::SmartDashboard::PutNumber("april tag/yaw/target yaw", targetYaw);
     frc::SmartDashboard::PutNumber("april tag/yaw/yaw output", yawOutput);
@@ -129,17 +125,25 @@ double Vision::ScoringYawPID()
     return yawOutput;
 }
 
-bool Vision::ScoringYAligned(GamePiece type)
+bool Vision::CubeYAligned()
 {
-    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
-    if (!targetFound)
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return false;
     }
 
+    UpdatePipeline(limelightName, 0);
+
+    if (GetPipeline(limelightName) != 0)
+    {
+        return false;
+    }
+
     auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
-                             .GetTable("limelight")
+                             .GetTable(limelightName)
                              ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
 
     if (targetPoseVec.size() != 6)
@@ -153,20 +157,28 @@ bool Vision::ScoringYAligned(GamePiece type)
 
     double targetX = targetPoseVec[0];
 
-    return fabs(targetX) < CONSTANT("SCORING_Y_TOLERANCE");
+    return fabs(targetX) < CONSTANT("CUBE_Y_TOLERANCE");
 }
 
-bool Vision::ScoringYawAligned()
+bool Vision::CubeYawAligned()
 {
-    bool targetFound = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv", 0) == 1;
-    if (!targetFound)
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
         return false;
     }
 
+    UpdatePipeline(limelightName, 0);
+
+    if (GetPipeline(limelightName) != 0)
+    {
+        return false;
+    }
+
     auto targetPoseVec = nt::NetworkTableInstance::GetDefault()
-                             .GetTable("limelight")
+                             .GetTable(limelightName)
                              ->GetNumberArray("targetpose_robotspace", std::vector<double>(6));
 
     if (targetPoseVec.size() != 6)
@@ -180,5 +192,70 @@ bool Vision::ScoringYawAligned()
 
     double targetYaw = targetPoseVec[4];
 
-    return fabs(targetYaw) < CONSTANT("SCORING_YAW_TOLERANCE");
+    return fabs(targetYaw) < CONSTANT("CUBE_YAW_TOLERANCE");
+}
+
+double Vision::ConeYPID()
+{
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return 0;
+    }
+
+    // get tx
+    double tx     = nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("tx", 0.0);
+    double output = m_ConeYPID.Calculate(0, tx);
+
+    return output;
+}
+
+bool Vision::ConeYAligned()
+{
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return 0;
+    }
+
+    // get tx
+    double tx = nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("tx", 0.0);
+
+    return fabs(tx) < CONSTANT("CONE_Y_TOLERANCE");
+}
+
+// Only updates if it is different
+void Vision::UpdatePipeline(std::string limelightName, int id)
+{
+    if (GetPipeline(limelightName) != id)
+    {
+        nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->PutNumber("pipeline", id);
+    }
+}
+
+int Vision::GetPipeline(std::string limelightName)
+{
+    return nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("pipeline", -1);
+}
+
+std::string Vision::DetermineCorrectPosition()
+{
+    std::string positions[2] = { "front", "rear" };
+
+    for (auto position : positions)
+    {
+        // get tv for each limelight
+        int tv = nt::NetworkTableInstance::GetDefault().GetTable(position)->GetNumber("tv", 0);
+
+        if (tv == 1)
+        {
+            return position;
+        }
+    }
+
+    return "none";
 }

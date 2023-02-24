@@ -16,7 +16,7 @@ public:
 
     void Drive(double x, double y, double rotation, bool fieldRelative);
 
-    void AlignToScore(double x, Vision::GamePiece gamePiece);
+    void CubeAlign(double x);
 
     void ResetConstants();
 

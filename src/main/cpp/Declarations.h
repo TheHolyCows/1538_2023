@@ -7,7 +7,7 @@
 
 #define ROBOT_HZ 400
 
-#define COWCONSTANTS_DEFAULT_FILE "/home/lvuser/constants.ini"
+#define COWCONSTANTS_DEFAULT_FILE "./constants.ini"
 
 // Number of accumulation periods to be summed
 #define COWGYRO_RING_SIZE 5

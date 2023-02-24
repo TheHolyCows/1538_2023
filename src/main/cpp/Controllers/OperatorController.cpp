@@ -11,7 +11,7 @@ void OperatorController::Handle(CowRobot *bot)
     // vision align
     if (m_CB->GetVisionTargetButton())
     {
-        bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickY(), Vision::GamePiece::CUBE);
+        bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
     }
     else
     {

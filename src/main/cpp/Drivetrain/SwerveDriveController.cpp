@@ -127,19 +127,19 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
-void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
+void SwerveDriveController::CubeAlign(double x)
 {
     double y     = 0;
     double omega = 0;
 
-    if (!Vision::GetInstance()->ScoringYawAligned())
+    if (!Vision::GetInstance()->CubeYawAligned())
     {
-        omega = Vision::GetInstance()->ScoringYawPID();
+        omega = Vision::GetInstance()->CubeYawPID();
     }
     else
     {
         m_TargetHeading = m_Drivetrain.GetPoseRot();
-        y               = Vision::GetInstance()->ScoringYPID(gamePiece);
+        y               = Vision::GetInstance()->CubeYPID();
     }
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
