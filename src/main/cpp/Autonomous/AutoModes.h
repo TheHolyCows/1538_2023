@@ -5,11 +5,14 @@
 #ifndef __AUTO_MODES_H__
 #define __AUTO_MODES_H__
 
+#include "Commands/AprilTagAlignCommand.h"
 #include "Commands/HoldPositionCommand.h"
 #include "Commands/LambdaCommand.h"
+#include "Commands/PathplannerSwerveTrajectoryCommand.h"
 #include "Commands/RaceCommand.h"
 #include "Commands/SeriesCommand.h"
 #include "Commands/SwerveTrajectoryCommand.h"
+#include "Commands/UpdateArmStateCommand.h"
 #include "Commands/WaitCommand.h"
 
 #include <deque>
