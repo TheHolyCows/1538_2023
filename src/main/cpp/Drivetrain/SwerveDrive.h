@@ -96,6 +96,8 @@ public:
 
     void ResetOdometry(frc::Pose2d pose = frc::Pose2d{ 0_m, 0_m, 0_deg });
 
+    void AddVisionMeasurement(frc::Pose2d pose, double timestamp);
+
     void Handle();
 };
 

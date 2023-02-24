@@ -40,9 +40,9 @@ double Vision::CubeYPID()
         return 0;
     }
 
-    UpdatePipeline(limelightName, 0);
+    UpdatePipeline(limelightName, LL_PIPELINE_APRIL_TAG);
 
-    if (GetPipeline(limelightName) != 0)
+    if (GetPipeline(limelightName) != LL_PIPELINE_APRIL_TAG)
     {
         return 0;
     }
@@ -88,9 +88,9 @@ double Vision::CubeYawPID()
         return 0;
     }
 
-    UpdatePipeline(limelightName, 0);
+    UpdatePipeline(limelightName, LL_PIPELINE_APRIL_TAG);
 
-    if (GetPipeline(limelightName) != 0)
+    if (GetPipeline(limelightName) != LL_PIPELINE_APRIL_TAG)
     {
         return 0;
     }
@@ -135,9 +135,9 @@ bool Vision::CubeYAligned()
         return false;
     }
 
-    UpdatePipeline(limelightName, 0);
+    UpdatePipeline(limelightName, LL_PIPELINE_APRIL_TAG);
 
-    if (GetPipeline(limelightName) != 0)
+    if (GetPipeline(limelightName) != LL_PIPELINE_APRIL_TAG)
     {
         return false;
     }
@@ -170,9 +170,9 @@ bool Vision::CubeYawAligned()
         return false;
     }
 
-    UpdatePipeline(limelightName, 0);
+    UpdatePipeline(limelightName, LL_PIPELINE_APRIL_TAG);
 
-    if (GetPipeline(limelightName) != 0)
+    if (GetPipeline(limelightName) != LL_PIPELINE_APRIL_TAG)
     {
         return false;
     }
@@ -205,6 +205,13 @@ double Vision::ConeYPID()
         return 0;
     }
 
+    UpdatePipeline(limelightName, LL_PIPELINE_REFLECTIVE_TAPE);
+
+    if (GetPipeline(limelightName) != LL_PIPELINE_REFLECTIVE_TAPE)
+    {
+        return 0;
+    }
+
     // get tx
     double tx     = nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("tx", 0.0);
     double output = m_ConeYPID.Calculate(0, tx);
@@ -219,6 +226,13 @@ bool Vision::ConeYAligned()
     if (limelightName == "none")
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "no target found");
+        return 0;
+    }
+
+    UpdatePipeline(limelightName, LL_PIPELINE_REFLECTIVE_TAPE);
+
+    if (GetPipeline(limelightName) != LL_PIPELINE_REFLECTIVE_TAPE)
+    {
         return 0;
     }
 
@@ -244,7 +258,7 @@ int Vision::GetPipeline(std::string limelightName)
 
 std::string Vision::DetermineCorrectPosition()
 {
-    std::string positions[2] = { "front", "rear" };
+    std::string positions[2] = { LL_NAME_FRONT, LL_NAME_BACK };
 
     for (auto position : positions)
     {
@@ -258,4 +272,45 @@ std::string Vision::DetermineCorrectPosition()
     }
 
     return "none";
+}
+
+std::optional<Vision::BotPoseResult> Vision::GetBotPose()
+{
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
+    {
+        return std::nullopt;
+    }
+
+    UpdatePipeline(limelightName, LL_PIPELINE_APRIL_TAG);
+
+    if (GetPipeline(limelightName) != LL_PIPELINE_APRIL_TAG)
+    {
+        return std::nullopt;
+    }
+
+    auto botPoseVec = nt::NetworkTableInstance::GetDefault()
+                          .GetTable(limelightName)
+                          ->GetNumberArray("botpose", std::vector<double>(7));
+
+    if (botPoseVec.size() != 7)
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
+                                  "bot pose array has incorrect length %f",
+                                  botPoseVec.size());
+
+        return std::nullopt;
+    }
+
+    // TODO: match up these indices with the what they actually do. This is a guess rn
+    frc::Translation2d translation
+        = frc::Translation2d(units::meter_t{ botPoseVec[0] }, units::meter_t{ botPoseVec[1] });
+    frc::Rotation2d rotation = frc::Rotation2d(units::degree_t{ botPoseVec[5] });
+
+    frc::Pose2d pose = frc::Pose2d(translation, rotation);
+
+    double timestamp = frc::Timer::GetFPGATimestamp().value() - (botPoseVec[6] / 1000.0);
+
+    return BotPoseResult{ pose, timestamp };
 }

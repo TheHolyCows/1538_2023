@@ -14,9 +14,15 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/NetworkTableValue.h>
+#include <optional>
 #include <pathplanner/lib/PathPlanner.h>
 #include <units/length.h>
 #include <vector>
+
+#define LL_PIPELINE_APRIL_TAG 0
+#define LL_PIPELINE_REFLECTIVE_TAPE 1
+#define LL_NAME_FRONT "limelight-front"
+#define LL_NAME_BACK "limelight-back"
 
 class Vision
 {
@@ -53,6 +59,14 @@ public:
     double ConeYPID();
 
     bool ConeYAligned();
+
+    struct BotPoseResult
+    {
+        frc::Pose2d pose;
+        double timestamp;
+    };
+
+    std::optional<BotPoseResult> GetBotPose();
 };
 
 #endif /* __VISION_H__ */
