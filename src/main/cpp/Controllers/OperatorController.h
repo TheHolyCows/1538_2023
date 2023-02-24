@@ -5,6 +5,7 @@
 #ifndef __OPERATOR_CONTROLLER_H__
 #define __OPERATOR_CONTROLLER_H__
 
+#include "../ControlBoards/ButtonMap.h"
 #include "../ControlBoards/GenericControlBoard.h"
 #include "../CowConstants.h"
 #include "../CowLib/CowExponentialFilter.h"

@@ -192,6 +192,7 @@ void Arm::UpdateClawState()
     }
 
     // set intake on off state - will add exfil state for scoring in future
+    // potentially need to add another if for stow so cargo does not fall out?
     if (m_State == ARM_IN)
     {
         m_Claw->SetIntakeSpeed(1);

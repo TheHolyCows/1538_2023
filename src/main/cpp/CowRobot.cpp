@@ -142,8 +142,8 @@ void CowRobot::ArmSM()
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
-        m_Arm->RequestPosition(0, 0);
         m_Arm->UpdateClawState();
+        m_Arm->RequestPosition(0, 0);
         break;
     case ARM_IN :
         m_Arm->UpdateClawState();
@@ -151,7 +151,8 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(CONSTANT("ARM_IN_ANGLE"), CONSTANT("ARM_IN_EXT"));
         break;
     case ARM_STOW :
-        m_Arm->UpdateClawState(); // also need to override current angle of claw
+        m_Arm->UpdateClawState();
+        m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
         break;

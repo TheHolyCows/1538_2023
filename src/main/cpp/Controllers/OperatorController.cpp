@@ -22,5 +22,22 @@ void OperatorController::Handle(CowRobot *bot)
                                          !m_CB->GetRobotRelativeButton());
     }
 
-    // bot->ArmSM();
+    // ARM STATES
+    // TODO: handler for flipping arm orientation
+    if (m_CB->GetOperatorButton(BT_CONE))
+    {
+        bot->SetArmState(ARM_IN, ST_CONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_CUBE))
+    {
+        bot->SetArmState(ARM_IN, ST_CUBE);
+    }
+    else if (m_CB->GetOperatorButton(BT_STOW))
+    {
+        // only ARM_IN and ARM_NONE will change cargo within Arm subsystem code
+        // safe to put none here, it will be ignored
+        bot->SetArmState(ARM_STOW, ST_NONE);
+    }
+
+    bot->ArmSM();
 }
