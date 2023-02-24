@@ -12,8 +12,13 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     // Set ArmInterface Members
     m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
     m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
-    m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
-    m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
+    m_MinPos   = CONSTANT("ARM_MIN_EXT");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXT");
+
+    m_WristMaxAngle = CONSTANT("WRIST_MAX_ANGLE");
+
+    m_FrameHeight = CONSTANT("AFRAME_HEIGHT");
+    m_ClawLen     = CONSTANT("CLAW_LEN");
 
     m_LoopCount = 0;
 
@@ -91,8 +96,8 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
     {
         double curAngleRads = (reqAngle - 90) * M_PI / 180;
 
-        // should subtract this by claw length depending on orientation of claw?
-        maxExtAllowed = std::min(CONSTANT("AFRAME_HEIGHT") / std::sin(curAngleRads), m_MaxPos);
+        // TODO: should subtract this by claw length depending on orientation of claw?
+        maxExtAllowed = std::min(m_FrameHeight / std::sin(curAngleRads), m_MaxPos);
     }
 
     // check against max and min
@@ -107,6 +112,42 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
     }
 
     return position;
+}
+
+double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
+{
+    // determines safe wrist angle from requested pivot angle
+    // this code assumes 0 degrees on wrist is directly in line with arm - THIS MAY NOT BE THE CASE IN REALITY
+    // generally, this will be horizontal to the floor
+    // there are 3 cases where that does not follow however
+    //  1. when intaking and the flip wrist button has been pressed for cone pickup
+    //       and wrist is perpendicular to the floor (TODO: this should also change safe pivot angle by a few degrees)
+    //  2. when inside bot perimeter
+    //  3. when arm is between around 20 to -20 degrees (above bot) as not not cause major issues
+    //       when flipping arm orientation
+
+    if (curPivotAngle < 20 && curPivotAngle > -20)
+    {
+        return 0;
+    }
+    else if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    {
+        // theoretically, wrist angle should be opposite to pivot angle?
+        return reqPivotAngle > 0 ? m_WristMaxAngle * -1 : m_WristMaxAngle;
+    }
+
+    // in the standard case 90 - anglePivot = angleWrist - assuming we have our +/- correct
+    double angle = 90 - reqPivotAngle;
+
+    // I don't think that it's possible to come up with a number outside the range of the wrist
+    // but check just in case
+    if (fabs(angle) > m_WristMaxAngle)
+    {
+        // carries over sign
+        angle = (m_WristMaxAngle * angle / fabs(angle));
+    }
+
+    return angle;
 }
 
 /**
@@ -189,8 +230,14 @@ void Arm::ResetConstants()
     m_State    = ARM_NONE;
     m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE");
     m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
-    m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
-    m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
+    m_MinPos   = CONSTANT("ARM_MIN_EXT");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXT");
+
+    m_WristMaxAngle = CONSTANT("WRIST_MAX_ANGLE");
+
+    m_FrameHeight = CONSTANT("AFRAME_HEIGHT");
+    m_ClawLen     = CONSTANT("CLAW_LEN");
+
     m_Pivot->ResetConstants();
     m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
@@ -209,7 +256,7 @@ void Arm::RequestPosition(double angle, double extension)
     double safeAngle = GetSafeAngle(angle, curAngle, curExt);
     m_Pivot->RequestAngle(safeAngle);
     m_Telescope->RequestPosition(GetSafeExt(extension, safeAngle, curExt));
-    //m_Claw->RequestWristAngle(GetSafeWristAngle());
+    m_Claw->RequestWristAngle(GetSafeWristAngle(curAngle, safeAngle));
 }
 
 void Arm::Handle()
@@ -218,8 +265,8 @@ void Arm::Handle()
     if (m_LoopCount++ % 10 == 0) // fires every 200ms
     {
         double telescopePos = m_Telescope->GetPosition();
-        m_Pivot->UpdatePID(telescopePos);
-        m_Telescope->UpdatePID(telescopePos);
+        // m_Pivot->UpdatePID(telescopePos);
+        // m_Telescope->UpdatePID(telescopePos);
         m_LoopCount = 1;
     }
 

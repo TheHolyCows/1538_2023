@@ -43,6 +43,12 @@ private:
     double GetSafeExt(double extension, const double reqAngle, const double curExt);
 
     /**
+     * @brief 
+     * 
+     */
+    double GetSafeWristAngle(double curPivotAngle, double reqPivotAngle);
+
+    /**
      * @brief Will set the angle rotation motor's angle
      * 
      * @param angle The angle to set to

@@ -17,24 +17,25 @@ Pivot::Pivot(const int motorID)
 
 void Pivot::RequestAngle(double angle)
 {
-    m_MotorRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    m_MotorRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 double Pivot::GetAngle()
 {
-    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetPosition(), CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 void Pivot::UpdatePID(double armExt)
 {
-    double p = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * armExt) + (CONSTANT("ARM_P_ANGLE") * armExt);
+    double p
+        = CONSTANT("PIVOT_P_BASE") + (CONSTANT("PIVOT_P_EXTENSION") * armExt) + (CONSTANT("PIVOT_P_ANGLE") * armExt);
 
-    m_PivotMotor->SetPID(p, CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    m_PivotMotor->SetPID(p, CONSTANT("PIVOT_I"), CONSTANT("PIVOT_D"), CONSTANT("PIVOT_F"));
 }
 
 void Pivot::ResetConstants()
 {
-    m_PivotMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    m_PivotMotor->SetPID(CONSTANT("PIVOT_P"), CONSTANT("PIVOT_I"), CONSTANT("PIVOT_D"), CONSTANT("PIVOT_F"));
 }
 
 void Pivot::Handle()

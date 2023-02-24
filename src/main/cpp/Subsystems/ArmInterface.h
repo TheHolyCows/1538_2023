@@ -110,14 +110,12 @@ protected:
     double m_MinPos;
     // The Maximum Pos of the Arm
     double m_MaxPos;
+    // max angle of Wrist
+    double m_WristMaxAngle;
 
-    double m_MaxPosAtMaxAngle;
-    double m_MaxPosAtMinAngle;
-
-    // The Height of the rotation motor relative to the ground
-    double m_ArmHeight;
-    // The height of the claw
-    double m_ClawHeight;
+    // constants for calculations
+    double m_FrameHeight;
+    double m_ClawLen;
 
 private:
     /**
