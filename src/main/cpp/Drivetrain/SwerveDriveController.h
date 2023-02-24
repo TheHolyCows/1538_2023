@@ -18,6 +18,8 @@ public:
 
     void CubeAlign(double x);
 
+    void ConeAlign(double x, double yInput, bool armFlipped);
+
     void ResetConstants();
 
 private:

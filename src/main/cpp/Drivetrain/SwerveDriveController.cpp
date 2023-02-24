@@ -147,6 +147,37 @@ void SwerveDriveController::CubeAlign(double x)
     m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
 }
 
+void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
+{
+    double y     = 0;
+    double omega = 0;
+
+    // TODO: confirm this logic is correct
+    double targetHeading = armFlipped ? 0 : 180;
+
+    if (fabs(m_Gyro.GetYawDegrees() - targetHeading) < CONSTANT("CONE_YAW_THRESHOLD"))
+    {
+        if (!Vision::GetInstance()->ConeYAligned())
+        {
+            y = Vision::GetInstance()->ConeYPID();
+        }
+    }
+    else
+    {
+        omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), targetHeading);
+    }
+
+    // Override if yInput is above override threshold
+    if (fabs(yInput) > CONSTANT("CONE_Y_OVERRIDE_THRESHOLD"))
+    {
+        y = ProcessDriveAxis(yInput, CONSTANT("DESIRED_MAX_SPEED"), false);
+    }
+
+    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
+
+    m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
+}
+
 double SwerveDriveController::ProcessDriveAxis(double input, double scale, bool reverse)
 {
     return m_ExponentialFilter->Filter(CowLib::Deadband(input, CONSTANT("STICK_DEADBAND"))) * scale
