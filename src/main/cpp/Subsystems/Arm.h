@@ -17,6 +17,7 @@
 #include "Pivot/Pivot.h"
 #include "Telescope/Telescope.h"
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -27,15 +28,17 @@ private:
      * @brief Will safely set m_CurrentConfig with the specified angle
      * 
      * @param angle The angle to set the arm to
+     * @param curAngle - current angle of the pivot
+     * @param curExt - current extension of the telescope
      */
-    double GetSafeAngle(double angle);
+    double GetSafeAngle(double angle, const double curAngle, const double curExt);
 
     /**
      * @brief Will safely set m_CurrentConfig with the specified position
      * 
      * @param extension 
      */
-    double GetSafeExt(double extension);
+    double GetSafeExt(double extension, const double curAngle, const double curExt);
 
     /**
      * @brief Will set the angle rotation motor's angle
@@ -58,6 +61,9 @@ private:
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
     bool m_Orientation;
+
+    bool m_PivotLockout;
+    bool m_ExtLockout;
 
     int m_LoopCount;
 

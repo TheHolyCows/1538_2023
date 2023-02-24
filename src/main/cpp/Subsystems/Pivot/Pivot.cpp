@@ -10,6 +10,7 @@
 Pivot::Pivot(const int motorID)
 {
     m_PivotMotor.reset(new CowLib::CowMotorController(motorID));
+    m_PivotMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
     ResetConstants();
 }

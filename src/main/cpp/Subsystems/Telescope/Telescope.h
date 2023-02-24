@@ -18,7 +18,7 @@ class Telescope : public TelescopeInterface
 {
 public:
     Telescope(const int MotorId);
-    void SetPosition() override;
+
     void RequestPosition(double pos) override;
 
     void ResetConstants() override;

@@ -17,6 +17,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_LoopCount = 0;
 
+    m_PivotLockout = false;
+    m_ExtLockout   = false;
+
     // check these
     // m_RotatorMotor->SetInverted(true);
     // m_TelescopeMotor->SetInverted(false);
@@ -28,41 +31,75 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     ResetConstants();
 }
 
-double Arm::GetSafeAngle(double angle)
+double Arm::GetSafeAngle(double angle, const double curAngle, const double curExt)
 {
+    // if arm extended and change in angle is large, do not move pivot
+    // this should not be the same as ARM_MIN_EXT? but both should allow us to move within bot perimeter
+    if (curExt > CONSTANT("SAFE_EXT_FOR_PIVOT") * 1.05)
+    {
+        m_PivotLockout = true;
+        return curAngle;
+    }
+
+    m_PivotLockout = false;
+
     // If Arm Angle is greater >= Max
     if (angle >= m_MaxAngle)
     {
         // Set the current angle to MaxAngle
-        return m_MaxAngle;
+        angle = m_MaxAngle;
     }
     // If Arm Angle is greater <= Min
     else if (angle <= m_MinAngle)
     {
         // Set the current angle to MinAngle and position to MaxPosAtMinAngle
-        return m_MinAngle;
+        angle = m_MinAngle;
+    }
+
+    if (curAngle > angle * 0.95 && curAngle < angle * 1.05)
+    {
+        m_ExtLockout = false;
+    }
+    else
+    {
+        m_ExtLockout = true;
     }
 
     return angle;
 }
 
-double Arm::GetSafeExt(double position)
+double Arm::GetSafeExt(double position, const double curAngle, const double curExt)
 {
-    double curAngle = m_Pivot->GetAngle();
-
-    // TODO: check this math
-    double totalHeight          = m_ArmHeight + m_ClawHeight;
-    double MaxPosAtCurrentAngle = totalHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
-
-    // do not extend into the bot
     if (fabs(curAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
     {
         return m_MinPos;
     }
-
-    if (position > MaxPosAtCurrentAngle)
+    else if (m_PivotLockout)
     {
-        position = MaxPosAtCurrentAngle;
+        return CONSTANT("SAFE_EXT_FOR_PIVOT");
+    }
+    else if (m_ExtLockout)
+    {
+        return curExt;
+    }
+
+    double maxExtAllowed = m_MaxPos;
+
+    // TODO: check this math - also take claw into account
+    if (curAngle > 90) // potential to point into ground
+    {
+        double curAngleRads = (curAngle - 90) * M_PI / 180;
+        maxExtAllowed       = std::min(CONSTANT("AFRAME_HEIGHT") / std::sin(curAngleRads), m_MaxPos);
+    }
+
+    if (position > maxExtAllowed)
+    {
+        position = maxExtAllowed;
+    }
+
+    if (position < m_MinPos)
+    {
+        position = m_MinPos;
     }
 
     return position;
@@ -154,8 +191,11 @@ void Arm::CheckMinMax()
 
 void Arm::RequestPosition(double angle, double extension)
 {
-    m_Pivot->RequestAngle(GetSafeAngle(angle));
-    GetSafeExt(extension);
+    double curAngle = m_Pivot->GetAngle();
+    double curExt   = m_Telescope->GetPosition();
+
+    m_Pivot->RequestAngle(GetSafeAngle(angle, curAngle, curExt));
+    m_Telescope->RequestPosition(GetSafeExt(extension, curAngle, curExt));
     //m_Claw->RequestWristAngle(GetSafeWristAngle());
 }
 

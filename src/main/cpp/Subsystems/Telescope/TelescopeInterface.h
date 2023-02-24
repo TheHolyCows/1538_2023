@@ -10,7 +10,6 @@
 class TelescopeInterface
 {
 public:
-    virtual void SetPosition()               = 0;
     virtual void RequestPosition(double pos) = 0;
 
     inline double GetPosition() const { return m_Position; }

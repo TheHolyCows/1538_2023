@@ -15,16 +15,9 @@ Telescope::Telescope(const int MotorId)
     m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 }
 
-void Telescope::SetPosition()
-{
-    m_TelescopeMotor->Set(m_MotorRequest);
-
-    m_Position = m_TelescopeMotor->GetPosition() / CONSTANT("TELESCOPE_RATIO");
-}
-
 void Telescope::RequestPosition(double pos)
 {
-    m_MotorRequest.Position = pos * CONSTANT("TELESCOPE_RATIO");
+    m_MotorRequest.Position = pos * CONSTANT("TELESCOPE_GEARING_RATIO");
 }
 
 void Telescope::ResetConstants()
