@@ -59,8 +59,8 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force
     m_PreviousAngle = targetAngle;
 
     m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
-    m_RotationControlRequest.FeedForward
-        = state.omega * 12 * 0.3 / (360 * (6380 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) / 60);
+    // m_RotationControlRequest.FeedForward
+    // = state.omega * 12 * 0.3 / (360 * (6380 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) / 60);
     frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/feedforward",
                                    m_RotationControlRequest.FeedForward);
     frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/omega", state.omega);

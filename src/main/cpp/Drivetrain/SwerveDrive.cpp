@@ -18,11 +18,7 @@ SwerveDrive::SwerveDrive(ModuleConstants moduleConstants[4], double wheelBase)
     {
         for (int i = 0; i < 4; i++)
         {
-            m_Modules[i] = new SwerveModuleSim(i,
-                                               CONSTANT("MODULE_MAX_ACCEL"),
-                                               CONSTANT("MODULE_MAX_ANGULAR_VELOCITY"),
-                                               0,
-                                               moduleConstants[i].encoderOffset);
+            m_Modules[i] = new SwerveModuleSim(i, 8, 500, 0, moduleConstants[i].encoderOffset);
         }
     }
     else
