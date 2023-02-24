@@ -12,10 +12,10 @@ class TelescopeInterface
 public:
     virtual void RequestPosition(double pos) = 0;
 
-    inline double GetPosition() const { return m_Position; }
+    virtual inline double GetPosition() { return m_Position; }
 
     virtual void ResetConstants() = 0;
 
 protected:
-    double m_Position;
+    double m_Position = 0;
 };

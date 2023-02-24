@@ -10,14 +10,24 @@
 Telescope::Telescope(const int MotorId)
 {
     m_TelescopeMotor.reset(new CowLib::CowMotorController(MotorId));
-    // don't think we want the rotator to be in brake mode so we can check max and min
-    // m_RotatorMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+
+    ResetConstants();
 }
 
 void Telescope::RequestPosition(double pos)
 {
     m_MotorRequest.Position = pos * CONSTANT("TELESCOPE_GEARING_RATIO");
+}
+
+double Telescope::GetPosition()
+{
+    return m_TelescopeMotor->GetPosition();
+}
+
+void Telescope::UpdatePID(double armExt)
+{
+    // todo
 }
 
 void Telescope::ResetConstants()
@@ -26,4 +36,9 @@ void Telescope::ResetConstants()
                              CONSTANT("TELESCOPE_I"),
                              CONSTANT("TELESCOPE_D"),
                              CONSTANT("TELESCOPE_F"));
+}
+
+void Telescope::Handle()
+{
+    m_TelescopeMotor->Set(m_MotorRequest);
 }

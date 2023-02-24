@@ -37,8 +37,10 @@ private:
      * @brief Will safely set m_CurrentConfig with the specified position
      * 
      * @param extension 
+     * @param reqAngle - angle requested by the state
+     * @param curExt - current extension of the telescope
      */
-    double GetSafeExt(double extension, const double curAngle, const double curExt);
+    double GetSafeExt(double extension, const double reqAngle, const double curExt);
 
     /**
      * @brief Will set the angle rotation motor's angle
@@ -60,7 +62,7 @@ private:
 
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
-    bool m_Orientation;
+    bool m_RevOrientation;
 
     bool m_PivotLockout;
     bool m_ExtLockout;
@@ -105,6 +107,11 @@ public:
      * @brief returns current state of arm 
     */
     ARM_STATE GetArmState();
+
+    /**
+     * @brief sets positive/negative values for angle and claw based on switch
+    */
+    void SetArmOrientation(bool value);
 
     /**
      * @brief Update the Claw state

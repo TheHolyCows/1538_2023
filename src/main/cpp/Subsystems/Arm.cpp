@@ -17,6 +17,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_LoopCount = 0;
 
+    m_RevOrientation = false;
+
     m_PivotLockout = false;
     m_ExtLockout   = false;
 
@@ -31,11 +33,10 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     ResetConstants();
 }
 
-double Arm::GetSafeAngle(double angle, const double curAngle, const double curExt)
+double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double curExt)
 {
-    // if arm extended and change in angle is large, do not move pivot
-    // this should not be the same as ARM_MIN_EXT? but both should allow us to move within bot perimeter
-    if (curExt > CONSTANT("SAFE_EXT_FOR_PIVOT") * 1.05)
+    // if arm extended and change in angle is large?, do not move pivot
+    if (curExt > m_MinPos * 1.05)
     {
         m_PivotLockout = true;
         return curAngle;
@@ -44,41 +45,40 @@ double Arm::GetSafeAngle(double angle, const double curAngle, const double curEx
     m_PivotLockout = false;
 
     // If Arm Angle is greater >= Max
-    if (angle >= m_MaxAngle)
+    if (reqAngle > m_MaxAngle)
     {
         // Set the current angle to MaxAngle
-        angle = m_MaxAngle;
+        reqAngle = m_MaxAngle;
     }
     // If Arm Angle is greater <= Min
-    else if (angle <= m_MinAngle)
+    else if (reqAngle < m_MinAngle)
     {
         // Set the current angle to MinAngle and position to MaxPosAtMinAngle
-        angle = m_MinAngle;
+        reqAngle = m_MinAngle;
     }
 
-    if (curAngle > angle * 0.95 && curAngle < angle * 1.05)
-    {
-        m_ExtLockout = false;
-    }
-    else
+    // lock out extension until we reach desired angle +/- a few degrees
+    if (curAngle < reqAngle * 0.95 || curAngle > reqAngle * 1.05)
     {
         m_ExtLockout = true;
     }
+    else
+    {
+        m_ExtLockout = false;
+    }
 
-    return angle;
+    return reqAngle;
 }
 
-double Arm::GetSafeExt(double position, const double curAngle, const double curExt)
+double Arm::GetSafeExt(double position, const double reqAngle, const double curExt)
 {
-    if (fabs(curAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    // if pivot is locked out or we would pivot inside bot (not sure if this one really works)
+    // set bot arm to minimum extension
+    if (fabs(reqAngle) > CONSTANT("PIVOT_WITHIN_BOT") || m_PivotLockout)
     {
         return m_MinPos;
     }
-    else if (m_PivotLockout)
-    {
-        return CONSTANT("SAFE_EXT_FOR_PIVOT");
-    }
-    else if (m_ExtLockout)
+    else if (m_ExtLockout) // if we are locked out from extending, return current extension
     {
         return curExt;
     }
@@ -86,12 +86,16 @@ double Arm::GetSafeExt(double position, const double curAngle, const double curE
     double maxExtAllowed = m_MaxPos;
 
     // TODO: check this math - also take claw into account
-    if (curAngle > 90) // potential to point into ground
+    // if the telescope would potentially point at the ground - check distance to ground
+    if (reqAngle > 90) // potential to point into ground
     {
-        double curAngleRads = (curAngle - 90) * M_PI / 180;
-        maxExtAllowed       = std::min(CONSTANT("AFRAME_HEIGHT") / std::sin(curAngleRads), m_MaxPos);
+        double curAngleRads = (reqAngle - 90) * M_PI / 180;
+
+        // should subtract this by claw length depending on orientation of claw?
+        maxExtAllowed = std::min(CONSTANT("AFRAME_HEIGHT") / std::sin(curAngleRads), m_MaxPos);
     }
 
+    // check against max and min
     if (position > maxExtAllowed)
     {
         position = maxExtAllowed;
@@ -119,6 +123,14 @@ ARM_CARGO Arm::GetArmCargo()
 ARM_STATE Arm::GetArmState()
 {
     return m_State;
+}
+
+/**
+ * @brief swap +/- for arm rotation
+*/
+void Arm::SetArmOrientation(bool value)
+{
+    m_RevOrientation = value;
 }
 
 /**
@@ -180,7 +192,7 @@ void Arm::ResetConstants()
     m_MinPos   = CONSTANT("ARM_MIN_EXTENSION");
     m_MaxPos   = CONSTANT("ARM_MAX_EXTENSION");
     m_Pivot->ResetConstants();
-    // m_Telescope->ResetConstants();
+    m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
 }
 
@@ -194,8 +206,9 @@ void Arm::RequestPosition(double angle, double extension)
     double curAngle = m_Pivot->GetAngle();
     double curExt   = m_Telescope->GetPosition();
 
-    m_Pivot->RequestAngle(GetSafeAngle(angle, curAngle, curExt));
-    m_Telescope->RequestPosition(GetSafeExt(extension, curAngle, curExt));
+    double safeAngle = GetSafeAngle(angle, curAngle, curExt);
+    m_Pivot->RequestAngle(safeAngle);
+    m_Telescope->RequestPosition(GetSafeExt(extension, safeAngle, curExt));
     //m_Claw->RequestWristAngle(GetSafeWristAngle());
 }
 
@@ -204,12 +217,13 @@ void Arm::Handle()
     // PID update check
     if (m_LoopCount++ % 10 == 0) // fires every 200ms
     {
-        m_Pivot->UpdatePID(m_Telescope->GetPosition());
-        // m_Telescope->UpdatePID();
+        double telescopePos = m_Telescope->GetPosition();
+        m_Pivot->UpdatePID(telescopePos);
+        m_Telescope->UpdatePID(telescopePos);
         m_LoopCount = 1;
     }
 
     m_Pivot->Handle();
-    // m_Telescope->Handle();
+    m_Telescope->Handle();
     m_Claw->Handle();
 }
