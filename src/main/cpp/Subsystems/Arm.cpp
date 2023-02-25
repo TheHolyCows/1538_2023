@@ -95,9 +95,9 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
 
     // TODO: check this math - also take claw into account
     // if the telescope would potentially point at the ground - check distance to ground
-    if (reqAngle > 90) // potential to point into ground
+    if (reqAngle > 90 || reqAngle < -90) // potential to point into ground
     {
-        double curAngleRads = (reqAngle - 90) * M_PI / 180;
+        double curAngleRads = fabs((reqAngle - 90) * M_PI / 180);
 
         // TODO: should subtract this by claw length depending on orientation of claw?
         maxExtAllowed = std::min(m_FrameHeight / std::sin(curAngleRads), m_MaxPos);
@@ -147,7 +147,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
         flipOffset = 90;
     }
     // depending on the angle of the pivot, our math changes slightly
-    double angle = reqPivotAngle > 0 ? (90 - reqPivotAngle + flipOffset) : (-90 - reqPivotAngle + flipOffset);
+    double angle = reqPivotAngle > 0 ? ((90 + flipOffset) - reqPivotAngle) : (-(90 + flipOffset) - reqPivotAngle);
 
     // I don't think that it's possible to come up with a number outside the range of the wrist
     // but check just in case
