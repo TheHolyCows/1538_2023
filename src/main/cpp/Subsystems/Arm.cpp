@@ -44,7 +44,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double curExt)
 {
     // if arm extended and change in angle is large?, do not move pivot
-    if (curExt > m_MinPos * 1.05 && (curAngle < reqAngle * 0.95 || curAngle > reqAngle * 1.05))
+    if (curExt > m_MinPos * 1.05 && (fabs(curAngle) < fabs(reqAngle) * 0.95 || fabs(curAngle) > fabs(reqAngle) * 1.05))
     {
         m_PivotLockout = true;
         return curAngle;
@@ -66,7 +66,7 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     }
 
     // lock out extension until we reach desired angle +/- a few degrees
-    if (curAngle < reqAngle * 0.95 || curAngle > reqAngle * 1.05)
+    if (fabs(curAngle) < fabs(reqAngle) * 0.95 || fabs(curAngle) > fabs(reqAngle) * 1.05)
     {
         m_ExtLockout = true;
     }
@@ -97,7 +97,7 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
     // if the telescope would potentially point at the ground - check distance to ground
     if (reqAngle > 90 || reqAngle < -90) // potential to point into ground
     {
-        double curAngleRads = fabs((reqAngle - 90) * M_PI / 180);
+        double curAngleRads = (fabs(reqAngle) - 90) * M_PI / 180;
 
         // TODO: should subtract this by claw length depending on orientation of claw?
         maxExtAllowed = std::min(m_FrameHeight / std::sin(curAngleRads), m_MaxPos);
