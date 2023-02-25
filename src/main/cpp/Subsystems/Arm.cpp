@@ -7,6 +7,8 @@
 
 #include "Arm.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, int solenoidChannel)
 {
     // Set ArmInterface Members
@@ -41,7 +43,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double curExt)
 {
     // if arm extended and change in angle is large?, do not move pivot
-    if (curExt > m_MinPos * 1.05)
+    if (curExt > m_MinPos * 1.05 && (curAngle < reqAngle * 0.95 || curAngle > reqAngle * 1.05))
     {
         m_PivotLockout = true;
         return curAngle;
@@ -229,8 +231,8 @@ void Arm::ResetConstants()
 {
     m_Cargo    = ST_NONE;
     m_State    = ARM_NONE;
-    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE");
-    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
+    m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
+    m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
     m_MinPos   = CONSTANT("ARM_MIN_EXT");
     m_MaxPos   = CONSTANT("ARM_MAX_EXT");
 
@@ -256,8 +258,20 @@ void Arm::RequestPosition(double angle, double extension)
 
     double safeAngle = GetSafeAngle(angle, curAngle, curExt);
     m_Pivot->RequestAngle(safeAngle);
-    m_Telescope->RequestPosition(GetSafeExt(extension, safeAngle, curExt));
-    m_Claw->RequestWristAngle(GetSafeWristAngle(curAngle, safeAngle));
+    double safeExt = GetSafeExt(extension, safeAngle, curExt);
+    m_Telescope->RequestPosition(safeExt);
+    double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
+    m_Claw->RequestWristAngle(safeWrist);
+
+    static char *translateArr[8] = { "none", "in", "stow", "L3", "L2", "L1", "score", "manual" };
+    frc::SmartDashboard::PutString("arm/state", translateArr[m_State]);
+    frc::SmartDashboard::PutNumber("arm/pivot req", safeAngle);
+    frc::SmartDashboard::PutNumber("arm/telescope req", safeExt);
+    frc::SmartDashboard::PutNumber("arm/wrist req", safeWrist);
+    frc::SmartDashboard::PutNumber("arm/pivot before safe", angle);
+    frc::SmartDashboard::PutNumber("arm/ext before safe", extension);
+    frc::SmartDashboard::PutNumber("arm/ext cur", curExt);
+    frc::SmartDashboard::PutNumber("arm/pivot cur", curAngle);
 }
 
 void Arm::Handle()
