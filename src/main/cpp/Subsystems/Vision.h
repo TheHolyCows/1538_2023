@@ -56,6 +56,8 @@ public:
     bool CubeYAligned();
     bool CubeYawAligned();
 
+    std::optional<pathplanner::PathPlannerTrajectory> GenerateTrajectoryToCube();
+
     double ConeYPID();
 
     bool ConeYAligned();

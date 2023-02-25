@@ -314,3 +314,52 @@ std::optional<Vision::BotPoseResult> Vision::GetBotPose()
 
     return BotPoseResult{ pose, timestamp };
 }
+
+std::optional<pathplanner::PathPlannerTrajectory> Vision::GenerateTrajectoryToCube()
+{
+    // Get current botpose
+    // TODO: make this from odometry
+    auto botPoseResult = GetBotPose();
+    if (!botPoseResult.has_value())
+    {
+        return std::nullopt;
+    }
+
+    frc::Pose2d pose = (*botPoseResult).pose;
+
+    // Get tag id
+    // Botpose will already fail if incorrect pipeline so no need to check
+    std::string limelightName = DetermineCorrectPosition();
+
+    if (limelightName == "none")
+    {
+        return std::nullopt;
+    }
+
+    int tagId = nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("tid", -1);
+
+    if (tagId == -1)
+    {
+        return std::nullopt;
+    }
+
+    // use wpilib to get april tag location
+    static frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout();
+    auto tagLocationResult = fieldLayout.GetTagPose(tagId);
+    if (!tagLocationResult.has_value())
+    {
+        return std::nullopt;
+    }
+
+    frc::Pose2d tagLocation = (*tagLocationResult).ToPose2d();
+
+    frc::Translation2d targetTranslation = frc::Translation2d(pose.X(), tagLocation.Y());
+
+    frc::Rotation2d targetRotation = frc::Rotation2d();
+
+
+
+    // Make path from current position to april tag (with same x as current)
+
+    return std::nullopt;
+}
