@@ -25,6 +25,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_LoopCount = 0;
 
     m_RevOrientation = false;
+    m_WristState     = false;
 
     m_PivotLockout = false;
     m_ExtLockout   = false;
@@ -138,8 +139,15 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
         return reqPivotAngle > 0 ? m_WristMaxAngle * -1 : m_WristMaxAngle;
     }
 
-    // in the standard case 90 - anglePivot = angleWrist - assuming we have our +/- correct
-    double angle = 90 - reqPivotAngle;
+    // in the standard case 90 - anglePivot + flippedOffset = angleWrist - assuming we have our +/- correct
+    double flipOffset = 0;
+    if (m_WristState)
+    {
+        // add an additional 90 degrees to handle when wrist is vertical
+        flipOffset = 90;
+    }
+    // depending on the angle of the pivot, our math changes slightly
+    double angle = reqPivotAngle > 0 ? (90 - reqPivotAngle + flipOffset) : (-90 - reqPivotAngle + flipOffset);
 
     // I don't think that it's possible to come up with a number outside the range of the wrist
     // but check just in case
@@ -205,6 +213,11 @@ void Arm::UpdateClawState()
     }
 }
 
+void Arm::FlipWristState()
+{
+    m_WristState = !m_WristState;
+}
+
 /**
  * @brief sets current cargo of the arm
  * PLEASE CALL AFTER YOU SET STATE
@@ -222,6 +235,11 @@ void Arm::SetArmState(ARM_STATE state)
     if (state == ARM_MANUAL && m_State != ARM_MANUAL)
     {
         // manual control, may change control modes
+    }
+    // reset wrist position when transitioning states
+    if (state != ARM_IN && state != ARM_MANUAL)
+    {
+        m_WristState = false;
     }
 
     m_State = state;
@@ -256,6 +274,13 @@ void Arm::RequestPosition(double angle, double extension)
     double curAngle = m_Pivot->GetAngle();
     double curExt   = m_Telescope->GetPosition();
 
+    if (m_WristState && m_State == ARM_IN)
+    {
+        // modify setpoints slightly TODO: figure these out
+        angle     = angle > 0 ? angle - 3 : angle + 3;
+        extension = extension + 3;
+    }
+
     double safeAngle = GetSafeAngle(angle, curAngle, curExt);
     m_Pivot->RequestAngle(safeAngle);
     double safeExt = GetSafeExt(extension, safeAngle, curExt);
@@ -263,15 +288,18 @@ void Arm::RequestPosition(double angle, double extension)
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
     m_Claw->RequestWristAngle(safeWrist);
 
+    double wristAngle = m_Claw->GetWristAngle();
+
     static char *translateArr[8] = { "none", "in", "stow", "L3", "L2", "L1", "score", "manual" };
     frc::SmartDashboard::PutString("arm/state", translateArr[m_State]);
-    frc::SmartDashboard::PutNumber("arm/pivot req", safeAngle);
-    frc::SmartDashboard::PutNumber("arm/telescope req", safeExt);
-    frc::SmartDashboard::PutNumber("arm/wrist req", safeWrist);
-    frc::SmartDashboard::PutNumber("arm/pivot before safe", angle);
-    frc::SmartDashboard::PutNumber("arm/ext before safe", extension);
-    frc::SmartDashboard::PutNumber("arm/ext cur", curExt);
-    frc::SmartDashboard::PutNumber("arm/pivot cur", curAngle);
+    frc::SmartDashboard::PutNumber("arm/pivot safe angle", safeAngle);
+    frc::SmartDashboard::PutNumber("arm/telescope safe ext", safeExt);
+    frc::SmartDashboard::PutNumber("arm/wrist safe angle", safeWrist);
+    frc::SmartDashboard::PutNumber("arm/pivot orig angle", angle);
+    frc::SmartDashboard::PutNumber("arm/telescope orig ext", extension);
+    frc::SmartDashboard::PutNumber("arm/telescope ext", curExt);
+    frc::SmartDashboard::PutNumber("arm/pivot angle", curAngle);
+    frc::SmartDashboard::PutNumber("arm/wrist angle", wristAngle);
 }
 
 void Arm::Handle()

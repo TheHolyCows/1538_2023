@@ -27,13 +27,7 @@ private:
     OperatorController();
     GenericControlBoard *m_CB;
 
-    enum DriverButtonMap
-    {
-    };
-
-    enum OperatorButtonMap
-    {
-    };
+    bool m_WristFlipCheck;
 
     // enum Wheel
     // {

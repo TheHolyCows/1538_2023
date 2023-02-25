@@ -60,7 +60,9 @@ private:
 
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
+
     bool m_RevOrientation;
+    bool m_WristState;
 
     bool m_PivotLockout;
     bool m_ExtLockout;
@@ -116,6 +118,11 @@ public:
      * controls claw open or close and intake on or off
      */
     void UpdateClawState();
+
+    /**
+     * @brief flips current state of wrist (horizontal or vertical)
+    */
+    void FlipWristState();
 
     /**
      * @brief requests update to overall position of the arm

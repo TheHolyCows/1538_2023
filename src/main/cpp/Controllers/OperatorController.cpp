@@ -23,7 +23,19 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // ARM STATES
-    // TODO: handler for flipping arm orientation
+    if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
+    {
+        if (!m_WristFlipCheck)
+        {
+            bot->GetArm()->FlipWristState();
+        }
+        m_WristFlipCheck = true;
+    }
+    else
+    {
+        m_WristFlipCheck = false;
+    }
+
     if (m_CB->GetOperatorButton(BT_CONE))
     {
         bot->SetArmState(ARM_IN, ST_CONE);
