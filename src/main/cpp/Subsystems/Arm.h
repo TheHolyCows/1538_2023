@@ -61,7 +61,7 @@ private:
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
 
-    bool m_RevOrientation;
+    bool m_ArmInvert;
     bool m_WristState;
 
     bool m_PivotLockout;
@@ -111,7 +111,7 @@ public:
     /**
      * @brief sets positive/negative values for angle and claw based on switch
     */
-    void SetArmOrientation(bool value);
+    void InvertArm(bool value);
 
     /**
      * @brief Update the Claw state

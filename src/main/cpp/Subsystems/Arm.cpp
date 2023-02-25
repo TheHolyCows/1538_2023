@@ -24,8 +24,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_LoopCount = 0;
 
-    m_RevOrientation = false;
-    m_WristState     = false;
+    m_ArmInvert  = false;
+    m_WristState = false;
 
     m_PivotLockout = false;
     m_ExtLockout   = false;
@@ -179,9 +179,9 @@ ARM_STATE Arm::GetArmState()
 /**
  * @brief swap +/- for arm rotation
 */
-void Arm::SetArmOrientation(bool value)
+void Arm::InvertArm(bool value)
 {
-    m_RevOrientation = value;
+    m_ArmInvert = value;
 }
 
 /**
@@ -279,6 +279,10 @@ void Arm::RequestPosition(double angle, double extension)
         // modify setpoints slightly TODO: figure these out
         angle     = angle > 0 ? angle - 3 : angle + 3;
         extension = extension + 3;
+    }
+    if (m_ArmInvert)
+    {
+        angle = angle * -1;
     }
 
     double safeAngle = GetSafeAngle(angle, curAngle, curExt);

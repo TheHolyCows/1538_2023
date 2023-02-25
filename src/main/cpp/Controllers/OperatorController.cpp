@@ -36,6 +36,8 @@ void OperatorController::Handle(CowRobot *bot)
         m_WristFlipCheck = false;
     }
 
+    bot->GetArm()->InvertArm(m_CB->GetOperatorButton(SW_ORIENT));
+
     if (m_CB->GetOperatorButton(BT_CONE))
     {
         bot->SetArmState(ARM_IN, ST_CONE);
