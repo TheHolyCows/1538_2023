@@ -129,9 +129,15 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
 void SwerveDriveController::QuickTurn(double x, double y, double headingX, double headingY, bool fieldRelative)
 {
+    headingX = CowLib::Deadband(headingX, 0.5);
+    headingY = CowLib::Deadband(headingY, 0.5);
+
     double heading = atan2(headingY, headingX) * 180 / M_PI;
 
     double omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), heading);
+
+    frc::SmartDashboard::PutNumber("quick turn/heading", heading);
+    frc::SmartDashboard::PutNumber("quick turn/omega", omega);
 
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
@@ -162,6 +168,8 @@ void SwerveDriveController::CubeAlign(double x)
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
     m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
+
+    m_HeadingLocked = false;
 }
 
 void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)

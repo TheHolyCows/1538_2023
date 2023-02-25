@@ -8,6 +8,19 @@ OperatorController::OperatorController(GenericControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
+    // FORCE VISION AND GYRO RESET
+    if (m_CB->GetDriveAxis(2) > 0.5 && m_CB->GetDriveAxis(3) > 0.5 && m_CB->GetDriveAxis(5) > 0.5 && m_CB->GetDriveAxis(6) > 0.5)
+    {
+        std::optional<Vision::BotPoseResult> botpose = Vision::GetInstance()->GetBotPose();
+        if (botpose.has_value())
+        {
+            CowPigeon::GetInstance()->SetYaw((*botpose).pose.Rotation().Degrees().value());
+            bot->GetDrivetrain()->ResetOdometry((*botpose).pose);
+        }
+
+        return;
+    }
+
     // vision align
     if (m_CB->GetVisionTargetButton())
     {
@@ -43,17 +56,6 @@ void OperatorController::Handle(CowRobot *bot)
                                          m_CB->GetLeftDriveStickX(),
                                          m_CB->GetRightDriveStickX(),
                                          !m_CB->GetRobotRelativeButton());
-    }
-
-    // FORCE VISION AND GYRO RESET
-    if (m_CB->GetDriveAxis(2) && m_CB->GetDriveAxis(3) && m_CB->GetDriveAxis(5) && m_CB->GetDriveAxis(6))
-    {
-        std::optional<Vision::BotPoseResult> botpose = Vision::GetInstance()->GetBotPose();
-        if (botpose.has_value())
-        {
-            CowPigeon::GetInstance()->SetYaw((*botpose).pose.Rotation().Degrees().value());
-            bot->GetDrivetrain()->ResetOdometry((*botpose).pose);
-        }
     }
 
     // bot->ArmSM();
