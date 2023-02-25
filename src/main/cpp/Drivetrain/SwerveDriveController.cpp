@@ -127,6 +127,23 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
+void SwerveDriveController::QuickTurn(double x, double y, double headingX, double headingY, bool fieldRelative)
+{
+    double heading = atan2(headingY, headingX) * 180 / M_PI;
+
+    double omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), heading);
+
+    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
+                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
+                             omega,
+                             fieldRelative,
+                             0,
+                             0);
+
+    m_TargetHeading = heading;
+    m_HeadingLocked = true;
+}
+
 void SwerveDriveController::CubeAlign(double x)
 {
     double y     = 0;

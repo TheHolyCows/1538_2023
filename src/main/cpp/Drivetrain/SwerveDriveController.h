@@ -16,6 +16,8 @@ public:
 
     void Drive(double x, double y, double rotation, bool fieldRelative);
 
+    void QuickTurn(double x, double y, double headingX, double headingY, bool fieldRelative);
+
     void CubeAlign(double x);
 
     void ConeAlign(double x, double yInput, bool armFlipped);
