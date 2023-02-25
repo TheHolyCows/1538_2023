@@ -48,19 +48,11 @@ private:
      */
     double GetSafeWristAngle(double curPivotAngle, double reqPivotAngle);
 
-    /**
-     * @brief Will set the angle rotation motor's angle
-     * 
-     * @param angle The angle to set to
-     */
-    virtual void SetArmAngle(double angle) = 0;
+    // TODO: figure out if these need to exist or change them
+    // Also, you can't do pure virtual functions
+    void SetArmAngle(double angle) override {}
 
-    /**
-     * @brief Will set the telescope motor's position
-     * 
-     * @param ext The ext to set to
-     */
-    virtual void SetArmExtension(double ext) = 0;
+    void SetArmExtension(double ext) override {}
 
     std::unique_ptr<Telescope> m_Telescope;
     std::unique_ptr<Pivot> m_Pivot;
