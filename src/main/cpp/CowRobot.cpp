@@ -159,6 +159,7 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
+        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE"), CONSTANT("ARM_L3_EXT"));
         break;
     case ARM_L2 :
         break;

@@ -120,7 +120,7 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
 double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
 {
     // determines safe wrist angle from requested pivot angle
-    // this code assumes 0 degrees on wrist is directly in line with arm - THIS MAY NOT BE THE CASE IN REALITY
+    // this code assumes 0 degrees on wrist is at a right angle to the arm
     // generally, this will be horizontal to the floor
     // there are 3 cases where that does not follow however
     //  1. when intaking and the flip wrist button has been pressed for cone pickup
@@ -136,7 +136,12 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     else if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
     {
         // theoretically, wrist angle should be opposite to pivot angle?
-        return reqPivotAngle > 0 ? m_WristMaxAngle * -1 : m_WristMaxAngle;
+        return reqPivotAngle > 0 ? 20 : m_WristMaxAngle - 20;
+    }
+    else if (m_State == ARM_L1 || m_State == ARM_L2 || m_State == ARM_L3)
+    {
+        // TODO: make these constants
+        return reqPivotAngle > 0 ? 50 : m_WristMaxAngle - 50;
     }
 
     // in the standard case 90 - anglePivot + flippedOffset = angleWrist - assuming we have our +/- correct
@@ -147,14 +152,17 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
         flipOffset = 90;
     }
     // depending on the angle of the pivot, our math changes slightly
-    double angle = reqPivotAngle > 0 ? ((90 + flipOffset) - reqPivotAngle) : (-(90 + flipOffset) - reqPivotAngle);
+    double angle = reqPivotAngle > 0 ? (180 - reqPivotAngle + flipOffset) : (fabs(reqPivotAngle) - flipOffset);
 
     // I don't think that it's possible to come up with a number outside the range of the wrist
     // but check just in case
-    if (fabs(angle) > m_WristMaxAngle)
+    if (angle > m_WristMaxAngle)
     {
-        // carries over sign
-        angle = (m_WristMaxAngle * angle / fabs(angle));
+        angle = m_WristMaxAngle;
+    }
+    else if (angle < 0)
+    {
+        angle = 0;
     }
 
     return angle;
@@ -292,18 +300,18 @@ void Arm::RequestPosition(double angle, double extension)
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
     m_Claw->RequestWristAngle(safeWrist);
 
-    double wristAngle = m_Claw->GetWristAngle();
+    // double wristAngle = m_Claw->GetWristAngle();
 
-    static char *translateArr[8] = { "none", "in", "stow", "L3", "L2", "L1", "score", "manual" };
-    frc::SmartDashboard::PutString("arm/state", translateArr[m_State]);
-    frc::SmartDashboard::PutNumber("arm/pivot safe angle", safeAngle);
-    frc::SmartDashboard::PutNumber("arm/telescope safe ext", safeExt);
-    frc::SmartDashboard::PutNumber("arm/wrist safe angle", safeWrist);
-    frc::SmartDashboard::PutNumber("arm/pivot orig angle", angle);
-    frc::SmartDashboard::PutNumber("arm/telescope orig ext", extension);
-    frc::SmartDashboard::PutNumber("arm/telescope ext", curExt);
-    frc::SmartDashboard::PutNumber("arm/pivot angle", curAngle);
-    frc::SmartDashboard::PutNumber("arm/wrist angle", wristAngle);
+    // static char *translateArr[8] = { "none", "in", "stow", "L3", "L2", "L1", "score", "manual" };
+    // frc::SmartDashboard::PutString("arm/state", translateArr[m_State]);
+    // frc::SmartDashboard::PutNumber("arm/pivot safe angle", safeAngle);
+    // frc::SmartDashboard::PutNumber("arm/telescope safe ext", safeExt);
+    // frc::SmartDashboard::PutNumber("arm/wrist safe angle", safeWrist);
+    // frc::SmartDashboard::PutNumber("arm/pivot orig angle", angle);
+    // frc::SmartDashboard::PutNumber("arm/telescope orig ext", extension);
+    // frc::SmartDashboard::PutNumber("arm/telescope ext", curExt);
+    // frc::SmartDashboard::PutNumber("arm/pivot angle", curAngle);
+    // frc::SmartDashboard::PutNumber("arm/wrist angle", wristAngle);
 }
 
 void Arm::ManualPosition(double value, bool pivotOrTelescope)
