@@ -56,6 +56,10 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->SetArmState(ARM_L3, ST_NONE);
     }
+    else if (m_CB->GetOperatorButton(BT_SCORE))
+    {
+        bot->SetArmState(ARM_SCORE, ST_NONE);
+    }
 
     // manual control - not sure if this will be final implementation
     // deadband is higher because I really don't want to accidentally hit it
