@@ -166,6 +166,7 @@ void CowRobot::ArmSM()
     case ARM_L1 :
         break;
     case ARM_SCORE :
+        m_Arm->UpdateClawState();
         break;
     case ARM_MANUAL : // handled in OperatorController
         break;

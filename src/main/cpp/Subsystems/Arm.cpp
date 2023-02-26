@@ -208,12 +208,20 @@ void Arm::UpdateClawState()
     {
         m_Claw->SetOpen(false);
     }
+    else if (m_Cargo == ST_CONE && m_State == ARM_SCORE)
+    {
+        m_Claw->SetOpen(true);
+    }
 
     // set intake on off state - will add exfil state for scoring in future
     // potentially need to add another if for stow so cargo does not fall out?
     if (m_State == ARM_IN)
     {
         m_Claw->SetIntakeSpeed(1);
+    }
+    else if (m_State == ARM_SCORE && m_Cargo == ST_CUBE)
+    {
+        m_Claw->SetIntakeSpeed(-1);
     }
     else
     {
