@@ -131,6 +131,13 @@ public:
     void RequestPosition(double angle, double extension);
 
     /**
+     * @brief manually set the position of the arm
+     * this will bound the position within max and min, but will not automatically retract arm when moving
+     * it will however, update wrist to be in line with angle and extension
+    */
+    void ManualPosition(double value, bool pivotOrTelesope);
+
+    /**
      * @brief Will reset the PID values for both rotation and telescope motors
      * with the values defined in the CowConstants
      * 

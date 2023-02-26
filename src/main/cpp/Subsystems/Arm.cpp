@@ -306,6 +306,37 @@ void Arm::RequestPosition(double angle, double extension)
     frc::SmartDashboard::PutNumber("arm/wrist angle", wristAngle);
 }
 
+void Arm::ManualPosition(double value, bool pivotOrTelescope)
+{
+    double curAngle = m_Pivot->GetAngle();
+    double curExt   = m_Telescope->GetPosition();
+
+    if (pivotOrTelescope) // pivot
+    {
+        curAngle += value;
+        if (fabs(curAngle) > m_MaxAngle)
+        {
+            curAngle = m_MaxAngle * curAngle / fabs(curAngle);
+        }
+    }
+    else
+    {
+        curExt += value;
+        if (curExt > m_MaxPos)
+        {
+            curExt = m_MaxPos;
+        }
+        if (curExt < m_MinPos)
+        {
+            curExt = m_MinPos;
+        }
+    }
+    m_Pivot->RequestAngle(curAngle);
+    m_Telescope->RequestPosition(curExt);
+    double safeWrist = GetSafeWristAngle(curAngle, curAngle);
+    m_Claw->RequestWristAngle(safeWrist);
+}
+
 void Arm::Handle()
 {
     // PID update check

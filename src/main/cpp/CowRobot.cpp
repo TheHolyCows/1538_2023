@@ -29,10 +29,10 @@ CowRobot::CowRobot()
         SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
         SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
     };
-//    4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
-//    SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
-//    SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
-//    SwerveDrive::ModuleConstants{ 8, 7, 28, BR
+    //    4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 8, 7, 28, BR
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
@@ -166,7 +166,7 @@ void CowRobot::ArmSM()
         break;
     case ARM_SCORE :
         break;
-    case ARM_MANUAL :
+    case ARM_MANUAL : // handled in OperatorController
         break;
     default :
         break;
