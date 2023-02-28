@@ -91,9 +91,11 @@ void CowRobot::Handle()
         return;
     }
 
+    ArmSM();
+
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
-    // m_Arm->Handle();
+    m_Arm->Handle();
 
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();

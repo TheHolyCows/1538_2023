@@ -75,5 +75,7 @@ void OperatorController::Handle(CowRobot *bot)
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(2), true);
         }
     }
-    bot->ArmSM();
+
+    // Moved to CowRobot.cpp handle
+    // bot->ArmSM();
 }
