@@ -67,12 +67,14 @@ namespace CowLib
         void Handle();
         void Reset();
 
+        static void LogMotor(uint32_t, double, double);
+
     private:
         CowLogger();
         void ResetConstants();
         static int SendLog(void *, size_t);
         static void LogPID(uint32_t, double, double, double, double, double);
-        static void LogMotor(uint32_t, double, double);
+        // static void LogMotor(uint32_t, double, double);
 
         static CowLogger *m_Instance;
         struct sockaddr_in m_LogServer;
