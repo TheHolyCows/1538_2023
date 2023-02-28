@@ -291,27 +291,27 @@ namespace CowLib
             GetInstance();
         }
 
-        if (CONSTANT("DEBUG_MOTOR_PID") >= 0) // every cycle
-        {
-            int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
-            if (m_RegisteredMotors[debugMotorID] != NULL)
-            {
-                double setPoint;
-                double procVar;
-                double P;
-                double I;
-                double D;
-                m_RegisteredMotors[debugMotorID]->GetPIDData(&setPoint, &procVar, &P, &I, &D);
+        // if (CONSTANT("DEBUG_MOTOR_PID") >= 0) // every cycle
+        // {
+        //     int debugMotorID = CONSTANT("DEBUG_MOTOR_PID");
+        //     if (m_RegisteredMotors[debugMotorID] != NULL)
+        //     {
+        //         double setPoint;
+        //         double procVar;
+        //         double P;
+        //         double I;
+        //         double D;
+        //         m_RegisteredMotors[debugMotorID]->GetPIDData(&setPoint, &procVar, &P, &I, &D);
 
-                LogPID(debugMotorID, setPoint, procVar, P, I, D);
-            }
-        }
+        //         LogPID(debugMotorID, setPoint, procVar, P, I, D);
+        //     }
+        // }
 
         if (m_TickCount++ % 10 == 0) // 200 miliseconds
         {
             m_TickCount = 1;
 
-            uint32_t logsThisTick = 4;
+            uint32_t logsThisTick = 2;
             while (m_IdToLog < REGISTERED_MOTORS_MAX && logsThisTick != 0)
             {
                 if (m_RegisteredMotors[m_IdToLog] != NULL)
