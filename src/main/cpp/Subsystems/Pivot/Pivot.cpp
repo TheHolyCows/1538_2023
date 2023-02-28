@@ -7,12 +7,15 @@
 
 #include "Pivot.h"
 
+#include "../../CowLib/CowLogger.h"
+
 Pivot::Pivot(const int motorID)
 {
     m_PivotMotor = std::make_shared<ctre::phoenix::motorcontrol::can::TalonFX>(motorID, "");
     m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
 
     m_TargetAngle = 0;
+    m_TickCount   = 0;
 
     ResetConstants();
 }
@@ -24,7 +27,8 @@ void Pivot::RequestAngle(double angle)
 
 double Pivot::GetAngle()
 {
-    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048, CONSTANT("PIVOT_GEAR_RATIO"));
+    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048,
+                                                CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 void Pivot::UpdatePID(double armExt)
@@ -49,5 +53,12 @@ void Pivot::ResetConstants()
 
 void Pivot::Handle()
 {
-    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, m_TargetAngle * 2048);
+    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, m_TargetAngle * 2048);
+
+    if (m_TickCount++ % 10 == 0) // 200 miliseconds
+    {
+        m_TickCount = 1;
+
+        CowLib::CowLogger::LogMotor(9, 0, m_PivotMotor->GetSelectedSensorPosition() / 2048);
+    }
 }

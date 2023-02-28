@@ -10,8 +10,8 @@
 #include "../../CowConstants.h"
 #include "../../CowLib/Conversions.h"
 #include "PivotInterface.h"
-#include <ctre/Phoenix.h>
 
+#include <ctre/Phoenix.h>
 #include <memory>
 
 class Pivot : public PivotInterface
@@ -42,4 +42,5 @@ public:
 private:
     std::shared_ptr<ctre::phoenix::motorcontrol::can::TalonFX> m_PivotMotor;
     double m_TargetAngle;
+    int m_TickCount;
 };
