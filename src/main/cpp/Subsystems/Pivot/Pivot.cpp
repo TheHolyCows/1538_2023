@@ -9,20 +9,22 @@
 
 Pivot::Pivot(const int motorID)
 {
-    m_PivotMotor.reset(new CowLib::CowMotorController(motorID, ""));
-    m_PivotMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    m_PivotMotor = std::make_shared<ctre::phoenix::motorcontrol::can::TalonFX>(motorID, "");
+    m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
+
+    m_TargetAngle = 0;
 
     ResetConstants();
 }
 
 void Pivot::RequestAngle(double angle)
 {
-    m_MotorRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO"));
+    m_TargetAngle = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 double Pivot::GetAngle()
 {
-    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetPosition(), CONSTANT("PIVOT_GEAR_RATIO"));
+    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048, CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 void Pivot::UpdatePID(double armExt)
@@ -30,15 +32,22 @@ void Pivot::UpdatePID(double armExt)
     double p
         = CONSTANT("PIVOT_P_BASE") + (CONSTANT("PIVOT_P_EXTENSION") * armExt) + (CONSTANT("PIVOT_P_ANGLE") * armExt);
 
-    m_PivotMotor->SetPID(p, CONSTANT("PIVOT_I"), CONSTANT("PIVOT_D"), CONSTANT("PIVOT_F"));
+    m_PivotMotor->Config_kP(0, p, 100);
+    m_PivotMotor->Config_kI(0, CONSTANT("PIVOT_I"), 100);
+    m_PivotMotor->Config_kD(0, CONSTANT("PIVOT_D"), 100);
+    m_PivotMotor->Config_kF(0, CONSTANT("PIVOT_F"), 100);
 }
 
 void Pivot::ResetConstants()
 {
-    m_PivotMotor->SetPID(CONSTANT("PIVOT_P"), CONSTANT("PIVOT_I"), CONSTANT("PIVOT_D"), CONSTANT("PIVOT_F"));
+    // rewrite
+    m_PivotMotor->Config_kP(0, CONSTANT("PIVOT_P"), 100);
+    m_PivotMotor->Config_kI(0, CONSTANT("PIVOT_I"), 100);
+    m_PivotMotor->Config_kD(0, CONSTANT("PIVOT_D"), 100);
+    m_PivotMotor->Config_kF(0, CONSTANT("PIVOT_F"), 100);
 }
 
 void Pivot::Handle()
 {
-    m_PivotMotor->Set(m_MotorRequest);
+    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, m_TargetAngle * 2048);
 }

@@ -9,8 +9,8 @@
 
 #include "../../CowConstants.h"
 #include "../../CowLib/Conversions.h"
-#include "../../CowLib/CowMotorController.h"
 #include "PivotInterface.h"
+#include <ctre/Phoenix.h>
 
 #include <memory>
 
@@ -40,6 +40,6 @@ public:
     void Handle();
 
 private:
-    std::shared_ptr<CowLib::CowMotorController> m_PivotMotor;
-    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
+    std::shared_ptr<ctre::phoenix::motorcontrol::can::TalonFX> m_PivotMotor;
+    double m_TargetAngle;
 };
