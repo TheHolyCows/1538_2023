@@ -17,12 +17,12 @@ Telescope::Telescope(const int MotorId)
 
 void Telescope::RequestPosition(double pos)
 {
-    m_MotorRequest.Position = pos;
+    m_MotorRequest.Position = pos * -1;
 }
 
 double Telescope::GetPosition()
 {
-    return m_TelescopeMotor->GetPosition();
+    return m_TelescopeMotor->GetPosition() * -1;
 }
 
 void Telescope::UpdatePID(double armExt)
@@ -36,6 +36,7 @@ void Telescope::ResetConstants()
                              CONSTANT("TELESCOPE_I"),
                              CONSTANT("TELESCOPE_D"),
                              CONSTANT("TELESCOPE_F"));
+    m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_V"), CONSTANT("TELESCOPE_A"));
 }
 
 void Telescope::Handle()

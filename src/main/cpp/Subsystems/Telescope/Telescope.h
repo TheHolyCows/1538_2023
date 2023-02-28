@@ -41,5 +41,5 @@ public:
 
 private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
-    CowLib::CowMotorController::PositionPercentOutput m_MotorRequest = { 0 };
+    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
 };
