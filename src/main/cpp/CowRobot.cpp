@@ -54,6 +54,7 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     m_DriveController->ResetConstants();
+    m_Arm->ResetConstants();
     // m_Controller->ResetConstants(); TODO: error
 
     Vision::GetInstance()->Reset();
@@ -155,10 +156,12 @@ void CowRobot::ArmSM()
         m_Arm->UpdateClawState();
         // scott mentioned doing this as X,Y positions from bot, might be easier to derive?
         m_Arm->RequestPosition(CONSTANT("ARM_IN_ANGLE"), CONSTANT("ARM_IN_EXT"));
+        m_Arm->RequestWristPosition(CONSTANT("WRIST_IN_POS"));
         break;
     case ARM_STOW :
         m_Arm->UpdateClawState();
         m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
+        m_Arm->RequestWristPosition(CONSTANT("WRIST_STOW_POS"));
         break;
     case ARM_L3 :
         m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE"), CONSTANT("ARM_L3_EXT"));

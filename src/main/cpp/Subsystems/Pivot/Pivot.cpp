@@ -49,11 +49,13 @@ void Pivot::ResetConstants()
     m_PivotMotor->Config_kI(0, CONSTANT("PIVOT_I"), 100);
     m_PivotMotor->Config_kD(0, CONSTANT("PIVOT_D"), 100);
     m_PivotMotor->Config_kF(0, CONSTANT("PIVOT_F"), 100);
+    m_PivotMotor->ConfigMotionAcceleration(CONSTANT("PIVOT_A"), 10);
+    m_PivotMotor->ConfigMotionCruiseVelocity(CONSTANT("PIVOT_V"), 10);
 }
 
 void Pivot::Handle()
 {
-    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, m_TargetAngle * 2048);
+    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, m_TargetAngle * 2048);
 
     if (m_TickCount++ % 10 == 0) // 200 miliseconds
     {

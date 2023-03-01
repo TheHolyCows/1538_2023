@@ -28,12 +28,12 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
 void Claw::RequestWristAngle(double angle)
 {
-    m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO"));
+    m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
 double Claw::GetWristAngle()
 {
-    return CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO"));
+    return CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
 void Claw::SetIntakeSpeed(double percent)

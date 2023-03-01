@@ -68,11 +68,11 @@ void OperatorController::Handle(CowRobot *bot)
         bot->SetArmState(ARM_MANUAL, ST_NONE);
         if (m_CB->GetOperatorAxis(2) > 0.85)
         {
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(2), false);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
         }
         else
         {
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(2), true);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
         }
     }
 

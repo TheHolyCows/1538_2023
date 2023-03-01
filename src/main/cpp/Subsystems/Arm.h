@@ -10,6 +10,7 @@
 
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
+#include "../CowLib/CowLogger.h"
 #include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
 #include "ArmState.h"
@@ -136,6 +137,11 @@ public:
      * it will however, update wrist to be in line with angle and extension
     */
     void ManualPosition(double value, bool pivotOrTelesope);
+
+    /**
+     * please do not use, for testing only
+    */
+    void RequestWristPosition(double pos);
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
