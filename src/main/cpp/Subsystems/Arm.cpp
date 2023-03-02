@@ -371,7 +371,7 @@ void Arm::Handle()
     // PID update check
     if (m_LoopCount++ % 10 == 0) // fires every 200ms
     {
-        double telescopePos = m_Telescope->GetPosition();
+        // double telescopePos = m_Telescope->GetPosition();
         // m_Pivot->UpdatePID(telescopePos);
         // m_Telescope->UpdatePID(telescopePos);
         m_LoopCount = 1;

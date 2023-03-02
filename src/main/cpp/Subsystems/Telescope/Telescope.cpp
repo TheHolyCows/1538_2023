@@ -17,12 +17,12 @@ Telescope::Telescope(const int MotorId)
 
 void Telescope::RequestPosition(double pos)
 {
-    m_MotorRequest.Position = pos * -1;
+    m_MotorRequest.Position = pos;
 }
 
 double Telescope::GetPosition()
 {
-    return m_TelescopeMotor->GetPosition() * -1;
+    return m_TelescopeMotor->GetPosition();
 }
 
 void Telescope::UpdatePID(double armExt)
