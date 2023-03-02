@@ -29,7 +29,7 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 5, 1, true, true));
+    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 4, 3, true, true));
 
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
