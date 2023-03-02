@@ -149,12 +149,12 @@ void CowRobot::ArmSM()
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
+        // this state is only reachable from toggling intake
+        // should only turn intake off?
         m_Arm->UpdateClawState();
-        m_Arm->RequestPosition(0, 0);
         break;
     case ARM_IN :
         m_Arm->UpdateClawState();
-        // scott mentioned doing this as X,Y positions from bot, might be easier to derive?
         break;
     case ARM_STOW :
         m_Arm->UpdateClawState();
@@ -166,8 +166,11 @@ void CowRobot::ArmSM()
     case ARM_L2 :
         m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE"), CONSTANT("ARM_L2_EXT"));
         break;
-    case ARM_L1 :
+    case ARM_GND :
         m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"));
+        break;
+    case ARM_HUMAN :
+        m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"));
         break;
     case ARM_SCORE :
         m_Arm->UpdateClawState();

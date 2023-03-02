@@ -40,40 +40,52 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetOperatorButton(BT_CONE))
     {
-        bot->SetArmState(ARM_IN, ST_CONE);
+        bot->SetArmState(ARM_IN, CG_CONE);
     }
     else if (m_CB->GetOperatorButton(BT_CUBE))
     {
-        bot->SetArmState(ARM_IN, ST_CUBE);
+        bot->SetArmState(ARM_IN, CG_CUBE);
     }
-    else if (m_CB->GetOperatorButton(BT_STOW))
+    else if (bot->GetArm()->GetArmState() == ARM_IN)
     {
-        // only ARM_IN and ARM_NONE will change cargo within Arm subsystem code
-        // safe to put none here, it will be ignored
-        bot->SetArmState(ARM_STOW, ST_NONE);
+        // neither button is pressed, we default to off state
+        // this is really an idle state that is only reachable
+        // when going from holding the intake buttons to releasing them
+        bot->SetArmState(ARM_NONE, CG_NONE);
+    }
+
+    // only ARM_IN will change cargo within Arm subsystem code
+    // safe to put CG_NONE for the remaining states, it will be ignored
+    if (m_CB->GetOperatorButton(BT_STOW))
+    {
+        bot->SetArmState(ARM_STOW, CG_NONE);
     }
     else if (m_CB->GetOperatorButton(BT_L3))
     {
-        bot->SetArmState(ARM_L3, ST_NONE);
+        bot->SetArmState(ARM_L3, CG_NONE);
     }
     else if (m_CB->GetOperatorButton(BT_L2))
     {
-        bot->SetArmState(ARM_L2, ST_NONE);
+        bot->SetArmState(ARM_L2, CG_NONE);
     }
     else if (m_CB->GetOperatorButton(BT_GND))
     {
-        bot->SetArmState(ARM_L1, ST_NONE);
+        bot->SetArmState(ARM_GND, CG_NONE);
     }
     else if (m_CB->GetOperatorButton(BT_SCORE))
     {
-        bot->SetArmState(ARM_SCORE, ST_NONE);
+        bot->SetArmState(ARM_SCORE, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_HUMAN))
+    {
+        bot->SetArmState(ARM_HUMAN, CG_NONE);
     }
 
     // manual control - not sure if this will be final implementation
     // deadband is higher because I really don't want to accidentally hit it
     if (fabs(m_CB->GetOperatorAxis(1)) > 0.15) //CONSTANT("STICK_DEADBAND"))
     {
-        bot->SetArmState(ARM_MANUAL, ST_NONE);
+        bot->SetArmState(ARM_MANUAL, CG_NONE);
         if (m_CB->GetOperatorAxis(2) > 0.85)
         {
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
