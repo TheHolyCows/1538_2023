@@ -62,6 +62,7 @@ void Claw::SetOpen(bool open)
 void Claw::ResetConstants()
 {
     m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
+    m_WristMotor->SetMotionMagic(CONSTANT("WRIST_V"), CONSTANT("WRIST_A"));
     // m_IntakeMotor->SetPID(CONSTANT("INTK_P"), CONSTANT("INTK_I"), CONSTANT("INTK_D"), CONSTANT("INTK_F"));
 }
 

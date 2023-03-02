@@ -122,7 +122,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     //  1. when intaking and the flip wrist button has been pressed for cone pickup
     //       and wrist is perpendicular to the floor (TODO: this should also change safe pivot angle by a few degrees)
     //  2. when inside bot perimeter
-    if (curPivotAngle < 20 && curPivotAngle > -20) // keep in temporarily
+    if (reqPivotAngle < 20 && reqPivotAngle > -20) // keep in temporarily
     {
         return 90;
     }
@@ -131,11 +131,11 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
         // theoretically, wrist angle should be opposite to pivot angle?
         return reqPivotAngle > 0 ? m_WristMaxAngle - 20 : 20;
     }
-    else if (m_State == ARM_L1 || m_State == ARM_L2 || m_State == ARM_L3)
-    {
-        // TODO: make these constants
-        return reqPivotAngle > 0 ? m_WristMaxAngle - 50 : 50;
-    }
+    // else if (m_State == ARM_L1 || m_State == ARM_L2 || m_State == ARM_L3)
+    // {
+    //     // TODO: make these constants
+    //     return reqPivotAngle > 0 ? m_WristMaxAngle - 50 : 50;
+    // }
 
     // in the standard case 90 - anglePivot + flippedOffset = angleWrist - assuming we have our +/- correct
     double flipOffset = 0;
@@ -295,21 +295,18 @@ void Arm::RequestPosition(double angle, double extension)
         angle = angle * -1;
     }
 
-    double safeAngle = GetSafeAngle(angle, curAngle, curExt);
-    // m_Pivot->RequestAngle(safeAngle);
-    double safeExt = GetSafeExt(extension, safeAngle, curExt);
+    double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
+    m_Pivot->RequestAngle(safeAngle);
+    double safeExt = GetSafeExt(extension, safeAngle, 0);
     // m_Telescope->RequestPosition(safeExt);
-    // double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
-    // m_Claw->RequestWristAngle(safeWrist);
+    double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
+    m_Claw->RequestWristAngle(safeWrist);
 
-    if (m_LoopCount++ % 10 == 0) // fires every 200ms
+    if (m_LoopCount++ % 20 == 0) // fires every 200ms
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
     }
-
-    m_Pivot->RequestAngle(angle);
-    m_Telescope->RequestPosition(extension);
-    // m_Claw->RequestWristAngle(wrist);
 
     // double wristAngle = m_Claw->GetWristAngle();
 
@@ -359,13 +356,18 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
     // }
 
     double safeWrist = GetSafeWristAngle(curAngle, curAngle);
-    // m_Claw->RequestWristAngle(safeWrist);
+    if (m_LoopCount++ % 10 == 0) // fires every 200ms
+    {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "manual wrist: %f\n", safeWrist);
+    }
+
+    m_Claw->RequestWristAngle(safeWrist);
 }
 
-void Arm::RequestWristPosition(double pos)
-{
-    m_Claw->RequestWristAngle(pos);
-}
+// void Arm::RequestWristPosition(double pos)
+// {
+//     m_Claw->RequestWristAngle(pos);
+// }
 
 void Arm::Handle()
 {

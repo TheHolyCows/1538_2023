@@ -56,6 +56,14 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->SetArmState(ARM_L3, ST_NONE);
     }
+    else if (m_CB->GetOperatorButton(BT_L2))
+    {
+        bot->SetArmState(ARM_L2, ST_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_GND))
+    {
+        bot->SetArmState(ARM_L1, ST_NONE);
+    }
     else if (m_CB->GetOperatorButton(BT_SCORE))
     {
         bot->SetArmState(ARM_SCORE, ST_NONE);
