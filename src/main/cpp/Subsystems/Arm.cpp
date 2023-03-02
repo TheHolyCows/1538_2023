@@ -89,15 +89,15 @@ double Arm::GetSafeExt(double position, const double reqAngle, const double curE
 
     double maxExtAllowed = m_MaxPos;
 
-    // TODO: check this math - also take claw into account
+    // TODO: redo or check this math - ext is based on encoder units and not inches
     // if the telescope would potentially point at the ground - check distance to ground
-    if (reqAngle > 90 || reqAngle < -90) // potential to point into ground
-    {
-        double curAngleRads = (fabs(reqAngle) - 90) * M_PI / 180;
+    // if (reqAngle > 90 || reqAngle < -90) // potential to point into ground
+    // {
+    //     double curAngleRads = (fabs(reqAngle) - 90) * M_PI / 180;
 
-        // TODO: should subtract this by claw length depending on orientation of claw?
-        maxExtAllowed = std::min(m_FrameHeight / std::sin(curAngleRads), m_MaxPos);
-    }
+    //     // TODO: should subtract this by claw length depending on orientation of claw?
+    //     maxExtAllowed = std::min(m_FrameHeight / std::sin(curAngleRads), m_MaxPos);
+    // }
 
     // check against max and min
     if (position > maxExtAllowed)
@@ -131,7 +131,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
         // theoretically, wrist angle should be opposite to pivot angle?
         return reqPivotAngle > 0 ? m_WristMaxAngle - 20 : 20;
     }
-    // else if (m_State == ARM_L1 || m_State == ARM_L2 || m_State == ARM_L3)
+    // else if (m_State == ARM_GND || m_State == ARM_L2 || m_State == ARM_L3)
     // {
     //     // TODO: make these constants
     //     return reqPivotAngle > 0 ? m_WristMaxAngle - 50 : 50;
@@ -189,20 +189,20 @@ void Arm::InvertArm(bool value)
 /**
  * @brief state controller for Claw/Intake
  * should be relatively simple logic control based on current state
- * ST_NONE for cargo should not change solenoid
+ * CG_NONE for cargo should not change solenoid
  */
 void Arm::UpdateClawState()
 {
     // set cargo open/close state
-    if (m_Cargo == ST_CUBE)
+    if (m_Cargo == CG_CUBE)
     {
         m_Claw->SetOpen(true);
     }
-    else if (m_Cargo == ST_CONE)
+    else if (m_Cargo == CG_CONE)
     {
         m_Claw->SetOpen(false);
     }
-    else if (m_Cargo == ST_CONE && m_State == ARM_SCORE)
+    else if (m_Cargo == CG_CONE && m_State == ARM_SCORE)
     {
         m_Claw->SetOpen(true);
     }
@@ -213,7 +213,7 @@ void Arm::UpdateClawState()
     {
         m_Claw->SetIntakeSpeed(1);
     }
-    else if (m_State == ARM_SCORE && m_Cargo == ST_CUBE)
+    else if (m_State == ARM_SCORE && m_Cargo == CG_CUBE)
     {
         m_Claw->SetIntakeSpeed(-1);
     }
@@ -234,7 +234,7 @@ void Arm::FlipWristState()
 */
 void Arm::SetArmCargo(ARM_CARGO cargo)
 {
-    if (m_State == ARM_NONE || m_State == ARM_IN)
+    if (m_State == ARM_IN)
         m_Cargo = cargo;
 }
 
@@ -257,7 +257,7 @@ void Arm::SetArmState(ARM_STATE state)
 
 void Arm::ResetConstants()
 {
-    m_Cargo    = ST_NONE;
+    m_Cargo    = CG_NONE;
     m_State    = ARM_NONE;
     m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
     m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
@@ -295,6 +295,7 @@ void Arm::RequestPosition(double angle, double extension)
         angle = angle * -1;
     }
 
+    // todo add extension back in
     double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
     m_Pivot->RequestAngle(safeAngle);
     double safeExt = GetSafeExt(extension, safeAngle, 0);
@@ -302,7 +303,7 @@ void Arm::RequestPosition(double angle, double extension)
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
     m_Claw->RequestWristAngle(safeWrist);
 
-    if (m_LoopCount++ % 20 == 0) // fires every 200ms
+    if (m_LoopCount % 20 == 0) // fires every 400ms
     {
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
@@ -327,7 +328,7 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
     double curAngle = m_Pivot->GetAngle();
     double curExt   = m_Telescope->GetPosition();
 
-    if (pivotOrTelescope) // pivot
+    if (pivotOrTelescope) // pivot = true
     {
         curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL");
         if (fabs(curAngle) > m_MaxAngle)
@@ -350,14 +351,10 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
         m_Telescope->RequestPosition(curExt);
     }
 
-    // if (m_LoopCount++ % 10 == 0) // fires every 200ms
-    // {
-    //     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", curAngle, curExt);
-    // }
-
     double safeWrist = GetSafeWristAngle(curAngle, curAngle);
-    if (m_LoopCount++ % 10 == 0) // fires every 200ms
+    if (m_LoopCount % 20 == 0) // fires every 400ms
     {
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", curAngle, curExt);
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "manual wrist: %f\n", safeWrist);
     }
 
