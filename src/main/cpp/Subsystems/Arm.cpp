@@ -308,7 +308,7 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
 
     double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
 
-    if (m_PrevState != GetArmState())
+    if (fabs(curExt - safeExt) < CONSTANT("TELESCOPE_PID_SWAP_THRESHOLD"))
     {
         if (curExt >= safeExt)
         {
