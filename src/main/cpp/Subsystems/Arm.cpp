@@ -34,6 +34,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_Pivot     = std::make_unique<Pivot>(pivotMotor);
     m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
+    m_PrevState = ARM_NONE;
+
     ResetConstants();
 }
 
@@ -303,8 +305,24 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     // todo add extension back in
     double safeAngle = GetSafeAngle(angle, curAngle, curExt); // curExt);
     m_Pivot->RequestAngle(safeAngle);
+
     double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
+
+    if (m_PrevState != GetArmState())
+    {
+        if (curExt >= safeExt)
+        {
+            // Use down constants
+            m_Telescope->UsePIDSet(Telescope::RETRACTING);
+        }
+        else
+        {
+            // Use up constants
+            m_Telescope->UsePIDSet(Telescope::EXTENDING);
+        }
+    }
     m_Telescope->RequestPosition(safeExt);
+
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
 
     if (!m_WristState)
@@ -332,6 +350,8 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     // frc::SmartDashboard::PutNumber("arm/telescope ext", curExt);
     // frc::SmartDashboard::PutNumber("arm/pivot angle", curAngle);
     // frc::SmartDashboard::PutNumber("arm/wrist angle", wristAngle);
+
+    m_PrevState = GetArmState();
 }
 
 void Arm::ManualPosition(double value, bool pivotOrTelescope)

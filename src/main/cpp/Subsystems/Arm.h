@@ -70,6 +70,8 @@ private:
 
     int m_LoopCount;
 
+    ARM_STATE m_PrevState;
+
 public:
     /**
      * @brief Arm Constructor

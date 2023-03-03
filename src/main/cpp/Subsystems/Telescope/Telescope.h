@@ -18,6 +18,11 @@
 class Telescope : public TelescopeInterface
 {
 public:
+    enum PIDSet {
+        EXTENDING,
+        RETRACTING,
+    };
+
     Telescope(const int MotorId);
 
     /**
@@ -36,13 +41,15 @@ public:
     */
     void UpdatePID(double);
 
+    void UsePIDSet(PIDSet set);
+
     void ResetConstants() override;
 
     void Handle();
 
 private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
-    CowLib::CowMotorController::PositionPercentOutput m_MotorRequest = { 0 };
+    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
 
-    // CowLib::CowMotorController::PercentOutput m_MotorRequest = {0};
+//     CowLib::CowMotorController::PercentOutput m_MotorRequest = {0};
 };
