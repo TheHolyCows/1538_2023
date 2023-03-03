@@ -43,7 +43,6 @@ void CowBase::RobotInit()
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
-    m_Bot->Reset();
     printf("DISABLED INIT -------------------\n");
 }
 
