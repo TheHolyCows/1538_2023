@@ -281,33 +281,33 @@ void Arm::CheckMinMax()
 
 void Arm::RequestPosition(double angle, double extension)
 {
-    double curAngle = m_Pivot->GetAngle();
-    double curExt   = m_Telescope->GetPosition();
-
-    // if (m_WristState && m_State == ARM_IN)
-    // {
-    //     // modify setpoints slightly TODO: figure these out
-    //     angle     = angle > 0 ? angle - 3 : angle + 3;
-    //     extension = extension + 3;
-    // }
-    if (m_ArmInvert)
-    {
-        angle = angle * -1;
-    }
-
-    // todo add extension back in
-    double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
-    m_Pivot->RequestAngle(safeAngle);
-    double safeExt = GetSafeExt(extension, safeAngle, 0);
-    // m_Telescope->RequestPosition(safeExt);
-    double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
-    m_Claw->RequestWristAngle(safeWrist);
-
-    if (m_LoopCount % 20 == 0) // fires every 400ms
-    {
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
-    }
+//    double curAngle = m_Pivot->GetAngle();
+//    double curExt   = m_Telescope->GetPosition();
+//
+//    // if (m_WristState && m_State == ARM_IN)
+//    // {
+//    //     // modify setpoints slightly TODO: figure these out
+//    //     angle     = angle > 0 ? angle - 3 : angle + 3;
+//    //     extension = extension + 3;
+//    // }
+//    if (m_ArmInvert)
+//    {
+//        angle = angle * -1;
+//    }
+//
+//    // todo add extension back in
+//    double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
+//    m_Pivot->RequestAngle(safeAngle);
+//    double safeExt = GetSafeExt(extension, safeAngle, 0);
+//    // m_Telescope->RequestPosition(safeExt);
+//    double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
+//    m_Claw->RequestWristAngle(safeWrist);
+//
+//    if (m_LoopCount % 20 == 0) // fires every 400ms
+//    {
+//        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
+//        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
+//    }
 
     // double wristAngle = m_Claw->GetWristAngle();
 
@@ -339,16 +339,16 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
     }
     else
     {
-        curExt += value * CONSTANT("EXT_MANUAL_CTRL");
-        if (curExt > m_MaxPos)
-        {
-            curExt = m_MaxPos;
-        }
-        if (curExt < m_MinPos)
-        {
-            curExt = m_MinPos;
-        }
-        m_Telescope->RequestPosition(curExt);
+//        curExt += value * CONSTANT("EXT_MANUAL_CTRL");
+//        if (curExt > m_MaxPos)
+//        {
+//            curExt = m_MaxPos;
+//        }
+//        if (curExt < m_MinPos)
+//        {
+//            curExt = m_MinPos;
+//        }
+        m_Telescope->RequestPosition(value);
     }
 
     double safeWrist = GetSafeWristAngle(curAngle, curAngle);
