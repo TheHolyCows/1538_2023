@@ -17,7 +17,7 @@ Telescope::Telescope(const int MotorId)
 
 void Telescope::RequestPosition(double pos)
 {
-    m_MotorRequest.PercentOut = pos * -1;
+    m_MotorRequest.Position = pos * -1;
 }
 
 double Telescope::GetPosition()

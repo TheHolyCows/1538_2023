@@ -142,7 +142,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     if (m_WristState)
     {
         // add an additional 90 degrees to handle when wrist is vertical
-        flipOffset = 90;
+        flipOffset = CONSTANT("WRIST_FLIP_OFFSET");
     }
     // depending on the angle of the pivot, our math changes slightly
     // double angle = reqPivotAngle > 0 ? (180 - reqPivotAngle + flipOffset) : (fabs(reqPivotAngle) - flipOffset);
@@ -193,6 +193,19 @@ void Arm::InvertArm(bool value)
  */
 void Arm::UpdateClawState()
 {
+    if (m_State == ARM_SCORE)
+    {
+        if (m_Cargo == CG_CUBE)
+        {
+            m_Claw->SetIntakeSpeed(-1);
+        }
+        else if (m_Cargo == CG_CONE)
+        {
+            m_Claw->SetOpen(true);
+        }
+        return;
+    }
+
     // set cargo open/close state
     if (m_Cargo == CG_CUBE)
     {
@@ -202,20 +215,12 @@ void Arm::UpdateClawState()
     {
         m_Claw->SetOpen(false);
     }
-    else if (m_Cargo == CG_CONE && m_State == ARM_SCORE)
-    {
-        m_Claw->SetOpen(true);
-    }
 
     // set intake on off state - will add exfil state for scoring in future
     // potentially need to add another if for stow so cargo does not fall out?
     if (m_State == ARM_IN)
     {
         m_Claw->SetIntakeSpeed(1);
-    }
-    else if (m_State == ARM_SCORE && m_Cargo == CG_CUBE)
-    {
-        m_Claw->SetIntakeSpeed(-1);
     }
     else
     {
@@ -247,7 +252,7 @@ void Arm::SetArmState(ARM_STATE state)
         // manual control, may change control modes
     }
     // reset wrist position when transitioning states
-    if (state != ARM_IN && state != ARM_MANUAL)
+    if (state != ARM_IN && state != ARM_MANUAL && state != ARM_GND)
     {
         m_WristState = false;
     }
@@ -279,12 +284,12 @@ void Arm::CheckMinMax()
     return;
 }
 
-void Arm::RequestPosition(double angle, double extension)
+void Arm::RequestPosition(double angle, double extension, double clawOffset)
 {
     double curAngle = m_Pivot->GetAngle();
     double curExt   = m_Telescope->GetPosition();
 
-    if (m_WristState && m_State == ARM_IN)
+    if (m_WristState && m_State == ARM_GND)
     {
         // modify setpoints slightly TODO: figure these out
         angle = angle > 0 ? angle - CONSTANT("PIVOT_WHEN_VERT") : angle + CONSTANT("PIVOT_WHEN_VERT");
@@ -296,11 +301,17 @@ void Arm::RequestPosition(double angle, double extension)
     }
 
     // todo add extension back in
-    double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
+    double safeAngle = GetSafeAngle(angle, curAngle, curExt); // curExt);
     m_Pivot->RequestAngle(safeAngle);
-    double safeExt = GetSafeExt(extension, safeAngle, 0); // curExt);
-    // m_Telescope->RequestPosition(safeExt);
+    double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
+    m_Telescope->RequestPosition(safeExt);
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
+
+    if (!m_WristState)
+    {
+        safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
+    }
+
     m_Claw->RequestWristAngle(safeWrist);
 
     if (m_LoopCount % 20 == 0) // fires every 400ms
@@ -339,15 +350,15 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
     }
     else
     {
-        //        curExt += value * CONSTANT("EXT_MANUAL_CTRL");
-        //        if (curExt > m_MaxPos)
-        //        {
-        //            curExt = m_MaxPos;
-        //        }
-        //        if (curExt < m_MinPos)
-        //        {
-        //            curExt = m_MinPos;
-        //        }
+        curExt += value * CONSTANT("EXT_MANUAL_CTRL");
+        if (curExt > m_MaxPos)
+        {
+            curExt = m_MaxPos;
+        }
+        if (curExt < m_MinPos)
+        {
+            curExt = m_MinPos;
+        }
         m_Telescope->RequestPosition(value);
     }
 

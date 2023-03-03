@@ -95,10 +95,10 @@ void OperatorController::Handle(CowRobot *bot)
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
         }
     }
-    else
-    {
-        bot->GetArm()->ManualPosition(0, false);
-    }
+    // else
+    // {
+    //     bot->GetArm()->ManualPosition(0, false);
+    // }
 
     // Moved to CowRobot.cpp handle
     // bot->ArmSM();

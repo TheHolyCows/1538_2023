@@ -161,13 +161,13 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE"), CONSTANT("ARM_L3_EXT"));
+        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE"), CONSTANT("ARM_L3_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
         break;
     case ARM_L2 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE"), CONSTANT("ARM_L2_EXT"));
+        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE"), CONSTANT("ARM_L2_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
         break;
     case ARM_GND :
-        m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"));
+        m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"), CONSTANT("WRIST_OFFSET_IN"));
         break;
     case ARM_HUMAN :
         m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"));

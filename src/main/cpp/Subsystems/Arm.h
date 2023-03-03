@@ -129,7 +129,7 @@ public:
      * @brief requests update to overall position of the arm
      * this includes the current angle of the pivot and the extension of the telescope
     */
-    void RequestPosition(double angle, double extension);
+    void RequestPosition(double angle, double extension, double clawOffset = 0);
 
     /**
      * @brief manually set the position of the arm
