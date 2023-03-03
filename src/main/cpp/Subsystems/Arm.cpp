@@ -298,7 +298,7 @@ void Arm::RequestPosition(double angle, double extension)
     // todo add extension back in
     double safeAngle = GetSafeAngle(angle, curAngle, 0); // curExt);
     m_Pivot->RequestAngle(safeAngle);
-    double safeExt = GetSafeExt(extension, safeAngle, 0);
+    double safeExt = GetSafeExt(extension, safeAngle, 0); // curExt);
     // m_Telescope->RequestPosition(safeExt);
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);
     m_Claw->RequestWristAngle(safeWrist);
