@@ -83,7 +83,7 @@ void OperatorController::Handle(CowRobot *bot)
 
     // manual control - not sure if this will be final implementation
     // deadband is higher because I really don't want to accidentally hit it
-    if (fabs(m_CB->GetOperatorAxis(1)) > 0.15) //CONSTANT("STICK_DEADBAND"))
+    if (fabs(m_CB->GetOperatorAxis(1)) > 0.10) //CONSTANT("STICK_DEADBAND"))
     {
         bot->SetArmState(ARM_MANUAL, CG_NONE);
         if (m_CB->GetOperatorAxis(2) > 0.85)
