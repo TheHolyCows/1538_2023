@@ -11,6 +11,7 @@
 #include "../../CowLib/Conversions.h"
 #include "../../CowLib/CowMotorController.h"
 #include "TelescopeInterface.h"
+#include <frc/trajectory/TrapezoidProfile.h>
 
 #include <memory>
 
@@ -41,6 +42,7 @@ public:
 
 private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
-    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
+    CowLib::CowMotorController::PositionPercentOutput m_MotorRequest = { 0 };
+
     // CowLib::CowMotorController::PercentOutput m_MotorRequest = {0};
 };
