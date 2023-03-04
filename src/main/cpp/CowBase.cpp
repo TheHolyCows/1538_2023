@@ -88,7 +88,8 @@ void CowBase::DisabledPeriodic()
 
     if (m_ControlBoard->GetConstantsResetButton())
     {
-        printf("RESETTING CONSTANTS");
+        printf("RESETTING CONSTANTS\n");
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "RESETTING CONSTANTS");
         m_Constants->RestoreData();
         m_Bot->Reset();
     }
@@ -101,6 +102,7 @@ void CowBase::DisabledPeriodic()
          */
         AutoModes::GetInstance()->NextMode();
         CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
+        printf("%s\n", AutoModes::GetInstance()->GetName().c_str());
     }
 
     if (m_Bot)
