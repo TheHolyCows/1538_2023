@@ -18,7 +18,7 @@ void OperatorController::Handle(CowRobot *bot)
         // standard drive with field/bot relative option
         bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickY(),
                                          m_CB->GetLeftDriveStickX(),
-                                         m_CB->GetRightDriveStickX(),
+                                         m_CB->GetRightDriveStickX() * -1,
                                          !m_CB->GetRobotRelativeButton());
     }
 
@@ -36,7 +36,7 @@ void OperatorController::Handle(CowRobot *bot)
         m_WristFlipCheck = false;
     }
 
-    bot->GetArm()->InvertArm(m_CB->GetOperatorButton(SW_ORIENT));
+    bot->GetArm()->InvertArm(!m_CB->GetOperatorButton(SW_ORIENT));
 
     if (m_CB->GetOperatorButton(BT_CONE))
     {

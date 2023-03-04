@@ -53,7 +53,11 @@ void Telescope::UpdatePID(double armExt)
 
 void Telescope::ResetConstants()
 {
-    UsePIDSet(RETRACTING);
+    m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_DOWN_P"),
+                             CONSTANT("TELESCOPE_DOWN_I"),
+                             CONSTANT("TELESCOPE_DOWN_D"),
+                             CONSTANT("TELESCOPE_DOWN_F"));
+    m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_DOWN_V"), CONSTANT("TELESCOPE_DOWN_A"));
 }
 
 void Telescope::Handle()
@@ -63,25 +67,32 @@ void Telescope::Handle()
 
 void Telescope::UsePIDSet(Telescope::PIDSet set)
 {
-    switch (set)
+    if (set != m_PrevPIDSet)
     {
-    case EXTENDING :
-        m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_UP_P"),
-                                 CONSTANT("TELESCOPE_UP_I"),
-                                 CONSTANT("TELESCOPE_UP_D"),
-                                 CONSTANT("TELESCOPE_UP_F"));
-        m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_UP_V"), CONSTANT("TELESCOPE_UP_A"));
+        switch (set)
+        {
+        case EXTENDING :
+            m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_UP_P"),
+                                     CONSTANT("TELESCOPE_UP_I"),
+                                     CONSTANT("TELESCOPE_UP_D"),
+                                     CONSTANT("TELESCOPE_UP_F"));
+            m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_UP_V"), CONSTANT("TELESCOPE_UP_A"));
+            printf("UP telescope constants\n");
 
-        break;
-    case RETRACTING :
-        m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_DOWN_P"),
-                                 CONSTANT("TELESCOPE_DOWN_I"),
-                                 CONSTANT("TELESCOPE_DOWN_D"),
-                                 CONSTANT("TELESCOPE_DOWN_F"));
-        m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_DOWN_V"), CONSTANT("TELESCOPE_DOWN_A"));
+            break;
+        case RETRACTING :
+            m_TelescopeMotor->SetPID(CONSTANT("TELESCOPE_DOWN_P"),
+                                     CONSTANT("TELESCOPE_DOWN_I"),
+                                     CONSTANT("TELESCOPE_DOWN_D"),
+                                     CONSTANT("TELESCOPE_DOWN_F"));
+            m_TelescopeMotor->SetMotionMagic(CONSTANT("TELESCOPE_DOWN_V"), CONSTANT("TELESCOPE_DOWN_A"));
+            printf("DOWN telescope constants\n");
 
-        break;
-    default :
-        break;
+            break;
+        default :
+            break;
+        }
     }
+
+    m_PrevPIDSet = set;
 }

@@ -308,19 +308,19 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
 
     double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
 
-    if (fabs(curExt - safeExt) < CONSTANT("TELESCOPE_PID_SWAP_THRESHOLD"))
-    {
-        if (curExt >= safeExt)
-        {
-            // Use down constants
-            m_Telescope->UsePIDSet(Telescope::RETRACTING);
-        }
-        else
-        {
-            // Use up constants
-            m_Telescope->UsePIDSet(Telescope::EXTENDING);
-        }
-    }
+    // if (fabs(curExt - safeExt) < CONSTANT("TELESCOPE_PID_SWAP_THRESHOLD"))
+    // {
+    //     if (curExt >= safeExt)
+    //     {
+    //         // Use down constants
+    //         m_Telescope->UsePIDSet(Telescope::RETRACTING);
+    //     }
+    //     else
+    //     {
+    //         // Use up constants
+    //         m_Telescope->UsePIDSet(Telescope::EXTENDING);
+    //     }
+    // }
     m_Telescope->RequestPosition(safeExt);
 
     double safeWrist = GetSafeWristAngle(curAngle, safeAngle);

@@ -51,5 +51,7 @@ private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
     CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
 
+    PIDSet m_PrevPIDSet = RETRACTING;
+
 //     CowLib::CowMotorController::PercentOutput m_MotorRequest = {0};
 };
