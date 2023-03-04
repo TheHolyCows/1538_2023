@@ -29,7 +29,12 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 5, 1, true, true));
+    m_Modes["Test"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->InvertArm(true); }));
+    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true));
+    m_Modes["Test"].push_back(new WaitCommand(2, false));
+    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
+    m_Modes["Test"].push_back(new WaitCommand(2, false));
+    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_STOW));
 
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE));
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));

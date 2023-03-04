@@ -13,6 +13,12 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickY(), Vision::GamePiece::CUBE);
     }
+    else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
+    {
+        bot->GetDriveController()->LockHeadingToScore(m_CB->GetLeftDriveStickY(),
+                                                      m_CB->GetLeftDriveStickX(),
+                                                      !m_CB->GetOperatorButton(SW_ORIENT));
+    }
     else
     {
         // standard drive with field/bot relative option

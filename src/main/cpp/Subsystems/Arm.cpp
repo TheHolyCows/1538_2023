@@ -124,7 +124,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     //  1. when intaking and the flip wrist button has been pressed for cone pickup
     //       and wrist is perpendicular to the floor (TODO: this should also change safe pivot angle by a few degrees)
     //  2. when inside bot perimeter
-    if (reqPivotAngle < 20 && reqPivotAngle > -20) // keep in temporarily
+    if (reqPivotAngle < 20 && reqPivotAngle > -20 && m_State != ARM_HUMAN) // keep in temporarily
     {
         return 90;
     }
@@ -203,6 +203,10 @@ void Arm::UpdateClawState()
         }
         else if (m_Cargo == CG_CONE)
         {
+            if (m_State == ARM_L3)
+            {
+                m_Claw->SetIntakeSpeed(-0.5);
+            }
             m_Claw->SetOpen(true);
         }
         return;
@@ -226,7 +230,7 @@ void Arm::UpdateClawState()
     }
     else
     {
-        m_Claw->SetIntakeSpeed(0);
+        m_Claw->SetIntakeSpeed(CONSTANT("INTAKE_OFF_SPEED"));
     }
 }
 
@@ -328,6 +332,11 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     if (!m_WristState)
     {
         safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
+    }
+
+    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
+    {
+        curext
     }
 
     m_Claw->RequestWristAngle(safeWrist);
