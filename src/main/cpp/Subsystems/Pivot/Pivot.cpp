@@ -7,32 +7,60 @@
 
 #include "Pivot.h"
 
-Pivot::Pivot(const int MotorId)
+#include "../../CowLib/CowLogger.h"
+
+Pivot::Pivot(const int motorID)
 {
-    m_PivotMotor.reset(new CowLib::CowMotorController(MotorId));
-}
+    m_PivotMotor = std::make_shared<ctre::phoenix::motorcontrol::can::TalonFX>(motorID, "");
+    m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
 
-void Pivot::SetAngle()
-{
-    if (m_LoopCount++ % 20 == 0)
-    {
-        double p
-            = CONSTANT("ARM_P_BASE") + (CONSTANT("ARM_P_EXTENSION") * m_Angle) + (CONSTANT("ARM_P_ANGLE") * m_Angle);
+    m_TargetAngle = 0;
+    m_TickCount   = 0;
 
-        m_PivotMotor->SetPID(p, CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
-    }
-
-    m_PivotMotor->Set(m_MotorRequest);
-
-    m_Angle = CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetPosition(), CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    ResetConstants();
 }
 
 void Pivot::RequestAngle(double angle)
 {
-    m_MotorRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("ARM_ROTATION_GEAR_RATIO"));
+    m_TargetAngle = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO"));
+}
+
+double Pivot::GetAngle()
+{
+    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048,
+                                                CONSTANT("PIVOT_GEAR_RATIO"));
+}
+
+void Pivot::UpdatePID(double armExt)
+{
+    double p
+        = CONSTANT("PIVOT_P_BASE") + (CONSTANT("PIVOT_P_EXTENSION") * armExt) + (CONSTANT("PIVOT_P_ANGLE") * armExt);
+
+    m_PivotMotor->Config_kP(0, p, 100);
+    m_PivotMotor->Config_kI(0, CONSTANT("PIVOT_I"), 100);
+    m_PivotMotor->Config_kD(0, CONSTANT("PIVOT_D"), 100);
+    m_PivotMotor->Config_kF(0, CONSTANT("PIVOT_F"), 100);
 }
 
 void Pivot::ResetConstants()
 {
-    m_PivotMotor->SetPID(CONSTANT("ARM_P"), CONSTANT("ARM_I"), CONSTANT("ARM_D"), CONSTANT("ARM_F"));
+    // rewrite
+    m_PivotMotor->Config_kP(0, CONSTANT("PIVOT_P"), 100);
+    m_PivotMotor->Config_kI(0, CONSTANT("PIVOT_I"), 100);
+    m_PivotMotor->Config_kD(0, CONSTANT("PIVOT_D"), 100);
+    m_PivotMotor->Config_kF(0, CONSTANT("PIVOT_F"), 100);
+    m_PivotMotor->ConfigMotionAcceleration(CONSTANT("PIVOT_A"), 10);
+    m_PivotMotor->ConfigMotionCruiseVelocity(CONSTANT("PIVOT_V"), 10);
+}
+
+void Pivot::Handle()
+{
+    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, m_TargetAngle * 2048);
+
+    if (m_TickCount++ % 10 == 0) // 200 miliseconds
+    {
+        m_TickCount = 1;
+
+        CowLib::CowLogger::LogMotor(9, 0, m_PivotMotor->GetSelectedSensorPosition() / 2048);
+    }
 }

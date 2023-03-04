@@ -8,13 +8,15 @@
 class UpdateArmStateCommand : public RobotCommand
 {
 private:
-    std::optional<ARM_STATE> m_State;
-    std::optional<ARM_CARGO> m_CargoType;
+    std::optional<ARM_STATE> m_State = std::nullopt;
+    std::optional<ARM_CARGO> m_CargoType = std::nullopt;
+    std::optional<bool> m_Invert = std::nullopt;
 
 public:
     UpdateArmStateCommand(ARM_STATE state);
     UpdateArmStateCommand(ARM_CARGO cargoType);
     UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType);
+    UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType, bool invert);
     ~UpdateArmStateCommand() = default;
 
     bool IsComplete() override;

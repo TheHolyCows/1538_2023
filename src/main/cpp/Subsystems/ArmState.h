@@ -7,14 +7,15 @@ enum ARM_STATE
     ARM_STOW,
     ARM_L3,
     ARM_L2,
-    ARM_L1,
+    ARM_GND,
     ARM_SCORE,
-    ARM_MANUAL
+    ARM_HUMAN,
+    ARM_MANUAL,
 };
 
 enum ARM_CARGO
 {
-    ST_NONE = 0,
-    ST_CONE,
-    ST_CUBE
+    CG_NONE = 0,
+    CG_CONE,
+    CG_CUBE
 };

@@ -49,7 +49,7 @@ public:
      * This method assumes that the min and max angles are set correctly.
      * 
      */
-    void ZeroSensors() override { CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Zeroing Sensors"); }
+    // void ZeroSensors() override { CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Zeroing Sensors"); }
 
 private:
     /**

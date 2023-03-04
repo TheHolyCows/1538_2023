@@ -127,17 +127,22 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
-void SwerveDriveController::QuickTurn(double x, double y, double headingX, double headingY, bool fieldRelative)
+void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipped)
 {
-    headingX = CowLib::Deadband(headingX, 0.5);
-    headingY = CowLib::Deadband(headingY, 0.5);
+    double omega = 0;
 
-    double heading = atan2(headingY, headingX) * 180 / M_PI;
+    if (armFlipped)
+    {
+        m_TargetHeading = 180;
+    } else {
+        m_TargetHeading = 0;
+    }
+    m_HeadingLocked = true;
 
-    double omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), heading);
+    // idk if this makes a difference but should ensure no weird PID to past heading things
+    m_PrevHeading = m_TargetHeading;
 
-    frc::SmartDashboard::PutNumber("quick turn/heading", heading);
-    frc::SmartDashboard::PutNumber("quick turn/omega", omega);
+    omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), m_TargetHeading);
 
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),

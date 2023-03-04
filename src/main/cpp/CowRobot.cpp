@@ -24,11 +24,15 @@ CowRobot::CowRobot()
     // fl, fr, bl, br
     // drive motor, angle motor, encoder canId's
     SwerveDrive::ModuleConstants swerveModuleConstants[4]{
-        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
+        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
     };
+    //    4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 8, 7, 28, BR
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
@@ -36,7 +40,7 @@ CowRobot::CowRobot()
 
     m_DriveController = new SwerveDriveController(*m_Drivetrain);
 
-    // m_Arm = new Arm(9, 10, 11, 12, 4);
+    m_Arm = new Arm(9, 10, 11, 12, 4);
 }
 
 /**
@@ -50,6 +54,7 @@ void CowRobot::Reset()
 
     m_Drivetrain->ResetConstants();
     m_DriveController->ResetConstants();
+    m_Arm->ResetConstants();
     // m_Controller->ResetConstants(); TODO: error
 
     Vision::GetInstance()->Reset();
@@ -87,9 +92,11 @@ void CowRobot::Handle()
         return;
     }
 
+    ArmSM();
+
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
-    // m_Arm->Handle();
+    m_Arm->Handle();
 
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
@@ -146,11 +153,17 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 */
 void CowRobot::ArmSM()
 {
+    double scorePivotOffset  = 0;
+    if (m_Arm->GetArmCargo() == CG_CUBE)
+    {
+        scorePivotOffset = CONSTANT("CUBE_PIVOT_OFFSET");
+    }
+
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
-        // m_Arm->SetAngle(0);
-        // m_Arm->SetTelescopePosition(0);
+        // this state is only reachable from toggling intake
+        // should only turn intake off?
         m_Arm->UpdateClawState();
         break;
     case ARM_IN :
@@ -158,16 +171,24 @@ void CowRobot::ArmSM()
         break;
     case ARM_STOW :
         m_Arm->UpdateClawState();
+        m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
+        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE") + scorePivotOffset, CONSTANT("ARM_L3_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
         break;
     case ARM_L2 :
+        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE") + scorePivotOffset, CONSTANT("ARM_L2_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
         break;
-    case ARM_L1 :
+    case ARM_GND :
+        m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"), CONSTANT("WRIST_OFFSET_IN"));
+        break;
+    case ARM_HUMAN :
+        m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
         break;
     case ARM_SCORE :
+        m_Arm->UpdateClawState();
         break;
-    case ARM_MANUAL :
+    case ARM_MANUAL : // handled in OperatorController
         break;
     default :
         break;

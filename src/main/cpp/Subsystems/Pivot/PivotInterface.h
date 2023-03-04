@@ -10,13 +10,12 @@
 class PivotInterface
 {
 public:
-    virtual void SetAngle()               = 0;
     virtual void RequestAngle(double pos) = 0;
 
-    inline double GetAngle() const { return m_Angle; }
+    virtual inline double GetAngle() { return m_Angle; }
 
     virtual void ResetConstants() = 0;
 
 protected:
-    double m_Angle;
+    double m_Angle = 0;
 };

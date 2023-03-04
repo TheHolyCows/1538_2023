@@ -11,19 +11,47 @@
 #include "../../CowLib/Conversions.h"
 #include "../../CowLib/CowMotorController.h"
 #include "TelescopeInterface.h"
+#include <frc/trajectory/TrapezoidProfile.h>
 
 #include <memory>
 
 class Telescope : public TelescopeInterface
 {
 public:
+    enum PIDSet {
+        EXTENDING,
+        RETRACTING,
+    };
+
     Telescope(const int MotorId);
-    void SetPosition() override;
+
+    /**
+     * sets variable in current position request to pos
+    */
     void RequestPosition(double pos) override;
+
+    /**
+     * returns the current encoder read from the motor
+     * not currently converted
+    */
+    double GetPosition() override;
+
+    /**
+     * update PID of pivot based on currrent arm extension
+    */
+    void UpdatePID(double);
+
+    void UsePIDSet(PIDSet set);
 
     void ResetConstants() override;
 
+    void Handle();
+
 private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
-    CowLib::CowMotorController::PositionPercentOutput m_MotorRequest;
+    CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };
+
+    PIDSet m_PrevPIDSet = RETRACTING;
+
+//     CowLib::CowMotorController::PercentOutput m_MotorRequest = {0};
 };

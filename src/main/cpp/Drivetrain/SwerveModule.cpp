@@ -27,10 +27,12 @@ SwerveModule::SwerveModule(const int id,
     ResetEncoders();
 
     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "Module %d abs encoder angle: %f  motor angle %f  \n",
+                              "Module %d abs encoder angle: %f  motor angle %f\n",
                               id,
                               m_Encoder->GetAbsolutePosition(),
                               m_RotationMotor->GetPosition());
+    frc::SmartDashboard::PutNumber("swerve/module " + std::to_string(m_Id) + "/absolute encoder angle",
+                                   m_Encoder->GetAbsolutePosition());
 }
 
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force)
