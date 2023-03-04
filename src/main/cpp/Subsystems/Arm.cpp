@@ -212,6 +212,18 @@ void Arm::InvertArm(bool value)
  */
 void Arm::UpdateClawState()
 {
+    bool open = false;
+
+    // set cargo open/close state
+    if (m_Cargo == CG_CUBE)
+    {
+        open = true;
+    }
+    else if (m_Cargo == CG_CONE)
+    {
+        open = false;
+    }
+
     switch (m_ClawState)
     {
     case CLAW_OFF :
@@ -235,20 +247,12 @@ void Arm::UpdateClawState()
             {
                 m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
             }
-            m_Claw->SetOpen(true);
+            open = true;
         }
         break;
     }
 
-    // set cargo open/close state
-    if (m_Cargo == CG_CUBE)
-    {
-        m_Claw->SetOpen(true);
-    }
-    else if (m_Cargo == CG_CONE)
-    {
-        m_Claw->SetOpen(false);
-    }
+    m_Claw->SetOpen(open);
 }
 
 void Arm::FlipWristState()
