@@ -35,7 +35,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     m_PrevState = ARM_NONE;
-    m_Cargo = CG_CONE;
+    m_Cargo     = CG_CONE;
 
     m_UpdateArmLPF = false;
     m_ReInitArmLPF = false;
@@ -335,7 +335,7 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
 
     if (m_WristState && m_State == ARM_GND)
     {
-        // modify setpoints slightly TODO: figure these out
+        // modify setpoints slightly when wrist is vertical TODO: figure these out
         angle = angle > 0 ? angle - CONSTANT("PIVOT_WHEN_VERT") : angle + CONSTANT("PIVOT_WHEN_VERT");
         // extension = extension + 3;
     }
@@ -344,12 +344,12 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         angle = angle * -1;
     }
 
-    // todo add extension back in
     double safeAngle = GetSafeAngle(angle, curAngle, curExt);
 
     if (m_ReInitArmLPF)
     {
         // this is set true by SetArmState() when state changes
+        printf("re init lpf\n");
         m_ArmLPF->ReInit(curAngle, curAngle);
         m_ReInitArmLPF = false;
     }
@@ -418,11 +418,33 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
 
     if (pivotOrTelescope) // pivot = true
     {
-        curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL");
-//        if (fabs(curAngle) > m_MaxAngle)
-//        {
-//            curAngle = m_MaxAngle * curAngle / fabs(curAngle);
-//        }
+        if (curAngle > 0)
+        {
+            if (value < 0)
+            {
+                curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL") * 3;
+            }
+            else
+            {
+                curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL");
+            }
+        }
+        else
+        {
+            if (value > 0)
+            {
+                curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL") * 3;
+            }
+            else
+            {
+                curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL");
+            }
+        }
+
+        if (fabs(curAngle) > m_MaxAngle)
+        {
+            curAngle = m_MaxAngle * curAngle / fabs(curAngle);
+        }
         m_Pivot->RequestAngle(curAngle);
     }
     else
@@ -446,7 +468,7 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "manual wrist: %f\n", safeWrist);
     }
 
-//    m_Claw->RequestWristAngle(safeWrist);
+    //    m_Claw->RequestWristAngle(safeWrist);
 }
 
 // void Arm::RequestWristPosition(double pos)
