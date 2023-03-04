@@ -1,31 +1,40 @@
 #include "UpdateArmStateCommand.h"
 
-UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state)
+UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, bool waitForCompletion)
 {
-    m_State = state;
+    m_State             = state;
+    m_WaitForCompletion = waitForCompletion;
 }
 
-UpdateArmStateCommand::UpdateArmStateCommand(ARM_CARGO cargoType)
+UpdateArmStateCommand::UpdateArmStateCommand(ARM_CARGO cargoType, bool waitForCompletion)
 {
-    m_CargoType = cargoType;
+    m_CargoType         = cargoType;
+    m_WaitForCompletion = waitForCompletion;
 }
 
-UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType)
+UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType, bool waitForCompletion)
 {
-    m_State     = state;
-    m_CargoType = cargoType;
+    m_State             = state;
+    m_CargoType         = cargoType;
+    m_WaitForCompletion = waitForCompletion;
 }
 
-UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType, bool invert)
+UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoType, bool waitForCompletion, bool invert)
 {
-    m_State = state;
-    m_CargoType = cargoType;
-    m_Invert = true;
+    m_State             = state;
+    m_CargoType         = cargoType;
+    m_WaitForCompletion = waitForCompletion;
+    m_Invert            = true;
 }
 
-bool UpdateArmStateCommand::IsComplete()
+bool UpdateArmStateCommand::IsComplete(CowRobot *robot)
 {
-    return true;
+    if (!m_WaitForCompletion)
+    {
+        return true;
+    }
+
+    return robot->GetArm()->AtTarget();
 }
 
 void UpdateArmStateCommand::Start(CowRobot *robot)

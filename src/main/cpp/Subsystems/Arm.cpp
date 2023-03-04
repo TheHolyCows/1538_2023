@@ -36,6 +36,12 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_PrevState = ARM_NONE;
 
+    m_UpdateArmLPF = false;
+    m_ReInitArmLPF = false;
+    m_ArmLPF       = new CowLib::CowLPF(CONSTANT("ARM_LPF_BETA"));
+
+    m_ClawState = CLAW_OFF;
+
     ResetConstants();
 }
 
@@ -66,7 +72,8 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     // lock out extension until we reach desired angle +/- a few degrees
     if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5)
     {
-        m_ExtLockout = true;
+        m_ExtLockout   = true;
+        m_UpdateArmLPF = false;
     }
     else
     {
@@ -180,11 +187,20 @@ ARM_STATE Arm::GetArmState()
     return m_State;
 }
 
+CLAW_STATE Arm::GetClawState()
+{
+    return m_ClawState;
+}
+
 /**
  * @brief swap +/- for arm rotation
 */
 void Arm::InvertArm(bool value)
 {
+    if (value != m_ArmInvert)
+    {
+        m_UpdateArmLPF = true;
+    }
     m_ArmInvert = value;
 }
 
@@ -195,8 +211,15 @@ void Arm::InvertArm(bool value)
  */
 void Arm::UpdateClawState()
 {
-    if (m_State == ARM_SCORE)
+    switch (m_ClawState)
     {
+    case CLAW_OFF :
+        m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
+        break;
+    case CLAW_INTAKE :
+        m_Claw->SetIntakeSpeed(1);
+        break;
+    case CLAW_EXHAUST :
         if (m_Cargo == CG_CUBE)
         {
             m_Claw->SetIntakeSpeed(-1);
@@ -209,7 +232,7 @@ void Arm::UpdateClawState()
             }
             m_Claw->SetOpen(true);
         }
-        return;
+        break;
     }
 
     // set cargo open/close state
@@ -220,17 +243,6 @@ void Arm::UpdateClawState()
     else if (m_Cargo == CG_CONE)
     {
         m_Claw->SetOpen(false);
-    }
-
-    // set intake on off state - will add exfil state for scoring in future
-    // potentially need to add another if for stow so cargo does not fall out?
-    if (m_State == ARM_IN)
-    {
-        m_Claw->SetIntakeSpeed(1);
-    }
-    else
-    {
-        m_Claw->SetIntakeSpeed(CONSTANT("INTAKE_OFF_SPEED"));
     }
 }
 
@@ -245,7 +257,7 @@ void Arm::FlipWristState()
 */
 void Arm::SetArmCargo(ARM_CARGO cargo)
 {
-    if (m_State == ARM_IN)
+    if (m_ClawState == CLAW_INTAKE)
         m_Cargo = cargo;
 }
 
@@ -258,12 +270,22 @@ void Arm::SetArmState(ARM_STATE state)
         // manual control, may change control modes
     }
     // reset wrist position when transitioning states
-    if (state != ARM_IN && state != ARM_MANUAL && state != ARM_GND)
+    if (m_ClawState != CLAW_INTAKE && state != ARM_MANUAL && state != ARM_GND)
     {
         m_WristState = false;
     }
 
+    if (m_State != state)
+    {
+        m_ReInitArmLPF = true;
+    }
+
     m_State = state;
+}
+
+void Arm::SetClawState(CLAW_STATE state)
+{
+    m_ClawState = state;
 }
 
 void Arm::ResetConstants()
@@ -283,11 +305,18 @@ void Arm::ResetConstants()
     m_Pivot->ResetConstants();
     m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
+
+    m_ArmLPF->ReInit(m_Pivot->GetSetpoint(), m_Pivot->GetSetpoint());
 }
 
 void Arm::CheckMinMax()
 {
     return;
+}
+
+bool Arm::AtTarget()
+{
+    return m_Pivot->AtTarget() && m_Telescope->AtTarget() && m_Claw->WristAtTarget();
 }
 
 void Arm::RequestPosition(double angle, double extension, double clawOffset)
@@ -307,10 +336,25 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     }
 
     // todo add extension back in
-    double safeAngle = GetSafeAngle(angle, curAngle, curExt); // curExt);
+    double safeAngle = GetSafeAngle(angle, curAngle, curExt);
+
+    if (m_ReInitArmLPF)
+    {
+        // this is set true by SetArmState() when state changes
+        m_ArmLPF->ReInit(curAngle, curAngle);
+        m_ReInitArmLPF = false;
+    }
+    double lpfAngle = m_ArmLPF->Calculate(safeAngle);
+    if (m_UpdateArmLPF)
+    {
+        // this is set to true by InvertArm() when state changes
+        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
+        safeAngle = lpfAngle;
+    }
+
     m_Pivot->RequestAngle(safeAngle);
 
-    double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
+    double safeExt = GetSafeExt(extension, safeAngle, curExt);
 
     // if (fabs(curExt - safeExt) < CONSTANT("TELESCOPE_PID_SWAP_THRESHOLD"))
     // {
@@ -332,11 +376,6 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     if (!m_WristState)
     {
         safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
-    }
-
-    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
-    {
-//        curext
     }
 
     m_Claw->RequestWristAngle(safeWrist);

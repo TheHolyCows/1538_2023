@@ -5,7 +5,7 @@
 #include "../Subsystems/Vision.h"
 #include "SwerveDrive.h"
 
-#include <frc/controller/PIDController.h>
+#include <frc/controller/ProfiledPIDController.h>
 #include <memory>
 
 class SwerveDriveController
@@ -33,7 +33,7 @@ private:
 
     std::unique_ptr<CowLib::CowExponentialFilter> m_ExponentialFilter;
 
-    std::unique_ptr<frc2::PIDController> m_HeadingPIDController;
+    std::unique_ptr<frc::ProfiledPIDController<units::meters>> m_HeadingPIDController;
 
     bool m_HeadingLocked;
     double m_TargetHeading;

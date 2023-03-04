@@ -8,20 +8,16 @@ OperatorController::OperatorController(GenericControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
-    // FORCE VISION AND GYRO RESET
-    if (m_CB->GetDriveAxis(2) > 0.5 && m_CB->GetDriveAxis(3) > 0.5 && m_CB->GetDriveAxis(5) > 0.5 && m_CB->GetDriveAxis(6) > 0.5)
+    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(7) > 0.8)
     {
-        std::optional<Vision::BotPoseResult> botpose = Vision::GetInstance()->GetBotPose();
-        if (botpose.has_value())
-        {
-            CowPigeon::GetInstance()->SetYaw((*botpose).pose.Rotation().Degrees().value());
-            bot->GetDrivetrain()->ResetOdometry((*botpose).pose);
-        }
-
-        return;
+        bot->GetDrivetrain()->SetLocked(true);
+        bot->GetDrivetrain()->SetVelocity(0, 0, 0);
+    }
+    else
+    {
+        bot->GetDrivetrain()->SetLocked(false);
     }
 
-    // vision align
     if (m_CB->GetVisionTargetButton())
     {
         double stickY = m_CB->GetLeftDriveStickY();
@@ -72,20 +68,28 @@ void OperatorController::Handle(CowRobot *bot)
 
     bot->GetArm()->InvertArm(!m_CB->GetOperatorButton(SW_ORIENT));
 
+    // New claw logic
     if (m_CB->GetOperatorButton(BT_CONE))
     {
-        bot->SetArmState(ARM_IN, CG_CONE);
+        bot->GetArm()->SetClawState(CLAW_INTAKE);
+        bot->GetArm()->SetArmCargo(CG_CONE);
+        bot->GetArm()->UpdateClawState();
     }
     else if (m_CB->GetOperatorButton(BT_CUBE))
     {
-        bot->SetArmState(ARM_IN, CG_CUBE);
+        bot->GetArm()->SetClawState(CLAW_INTAKE);
+        bot->GetArm()->SetArmCargo(CG_CUBE);
+        bot->GetArm()->UpdateClawState();
     }
-    else if (bot->GetArm()->GetArmState() == ARM_IN)
+    else if (m_CB->GetOperatorButton(BT_SCORE))
     {
-        // neither button is pressed, we default to off state
-        // this is really an idle state that is only reachable
-        // when going from holding the intake buttons to releasing them
-        bot->SetArmState(ARM_NONE, CG_NONE);
+        bot->GetArm()->SetClawState(CLAW_EXHAUST);
+        bot->GetArm()->UpdateClawState();
+    }
+    else
+    {
+        bot->GetArm()->SetClawState(CLAW_OFF);
+        bot->GetArm()->UpdateClawState();
     }
 
     // only ARM_IN will change cargo within Arm subsystem code
@@ -106,10 +110,6 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->SetArmState(ARM_GND, CG_NONE);
     }
-    else if (m_CB->GetOperatorButton(BT_SCORE))
-    {
-        bot->SetArmState(ARM_SCORE, CG_NONE);
-    }
     else if (m_CB->GetOperatorButton(BT_HUMAN))
     {
         bot->SetArmState(ARM_HUMAN, CG_NONE);
@@ -122,18 +122,11 @@ void OperatorController::Handle(CowRobot *bot)
         bot->SetArmState(ARM_MANUAL, CG_NONE);
         if (m_CB->GetOperatorAxis(2) > 0.85)
         {
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
         }
         else
         {
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
         }
     }
-    // else
-    // {
-    //     bot->GetArm()->ManualPosition(0, false);
-    // }
-
-    // Moved to CowRobot.cpp handle
-    // bot->ArmSM();
 }

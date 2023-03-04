@@ -31,6 +31,16 @@ void Claw::RequestWristAngle(double angle)
     m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
+double Claw::GetWristSetpoint()
+{
+    return CowLib::Conversions::FalconToDegrees(m_WristControlRequest.Position, CONSTANT("WRIST_GEAR_RATIO")) * -1;
+}
+
+bool Claw::WristAtTarget()
+{
+    return fabs(GetWristSetpoint() - GetWristAngle() < CONSTANT("WRIST_TOLERANCE"));
+}
+
 double Claw::GetWristAngle()
 {
     return CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1;

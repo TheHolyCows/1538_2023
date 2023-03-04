@@ -63,6 +63,8 @@ private:
     double m_MatchTime;
     double m_StartTime;
 
+    ARM_STATE m_PrevArmState;
+
 public:
     CowRobot();
     void Reset();

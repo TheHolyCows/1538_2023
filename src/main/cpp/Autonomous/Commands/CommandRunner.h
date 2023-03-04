@@ -36,6 +36,8 @@ public:
     CommandRunner(RobotCommand &command, double timeout = 0);
     ~CommandRunner() = default;
 
+    bool IsComplete(CowRobot* robot);
+
     void Start(CowRobot *robot);
     void Handle(CowRobot *robot);
     void Finish(CowRobot *robot);

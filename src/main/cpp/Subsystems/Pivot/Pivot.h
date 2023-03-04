@@ -24,6 +24,10 @@ public:
     */
     void RequestAngle(double angle) override;
 
+    double GetSetpoint();
+
+    bool AtTarget();
+
     /**
      * returns the current angle read from the motor
      * converted to degrees

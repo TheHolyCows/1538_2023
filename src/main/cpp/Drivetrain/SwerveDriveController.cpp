@@ -8,9 +8,15 @@ SwerveDriveController::SwerveDriveController(SwerveDrive &drivetrain)
 {
     m_ExponentialFilter = std::make_unique<CowLib::CowExponentialFilter>(CONSTANT("STICK_EXPONENTIAL_MODIFIER"));
 
-    m_HeadingPIDController
-        = std::make_unique<frc2::PIDController>(CONSTANT("HEADING_P"), CONSTANT("HEADING_I"), CONSTANT("HEADING_D"));
-    m_HeadingPIDController->EnableContinuousInput(0, 360);
+    m_HeadingPIDController = std::make_unique<frc::ProfiledPIDController<units::meters>>(
+        CONSTANT("HEADING_P"),
+        CONSTANT("HEADING_I"),
+        CONSTANT("HEADING_D"),
+        frc::TrapezoidProfile<units::meters>::Constraints{
+            units::meters_per_second_t{ CONSTANT("HEADING_V") },
+            units::meters_per_second_squared_t{ CONSTANT("HEADING_A") } });
+
+    m_HeadingPIDController->EnableContinuousInput(units::meter_t{ 0 }, units::meter_t{ 360 });
 }
 
 void SwerveDriveController::ResetConstants()
@@ -108,14 +114,15 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
                 m_HeadingLocked = true;
             }
 
-            omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), m_TargetHeading);
-            frc::SmartDashboard::PutNumber("heading pid error", m_HeadingPIDController->GetPositionError());
-            frc::SmartDashboard::PutNumber("heading pid output", omega);
+            omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
+                                                      units::meter_t{ m_TargetHeading });
+            //            frc::SmartDashboard::PutNumber("heading pid error", m_HeadingPIDController->GetPositionError());
+            //            frc::SmartDashboard::PutNumber("heading pid output", omega);
         }
     }
 
-    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
-    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
+    //    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
+    //    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
@@ -134,7 +141,9 @@ void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipp
     if (armFlipped)
     {
         m_TargetHeading = 180;
-    } else {
+    }
+    else
+    {
         m_TargetHeading = 0;
     }
     m_HeadingLocked = true;
@@ -142,7 +151,8 @@ void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipp
     // idk if this makes a difference but should ensure no weird PID to past heading things
     m_PrevHeading = m_TargetHeading;
 
-    omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), m_TargetHeading);
+    omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
+                                              units::meter_t{ m_TargetHeading });
 
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),

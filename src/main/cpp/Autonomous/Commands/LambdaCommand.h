@@ -18,7 +18,7 @@ public:
     explicit LambdaCommand(std::function<void(CowRobot*)> lambda);
     ~LambdaCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

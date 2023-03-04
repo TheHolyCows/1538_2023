@@ -17,7 +17,7 @@ public:
     explicit WaitCommand(double timeToWait, bool doNothing);
     ~WaitCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

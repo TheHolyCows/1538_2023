@@ -11,6 +11,7 @@
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowLogger.h"
+#include "../CowLib/CowLPF.h"
 #include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
 #include "ArmState.h"
@@ -61,6 +62,7 @@ private:
 
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
+    CLAW_STATE m_ClawState;
 
     bool m_ArmInvert;
     bool m_WristState;
@@ -71,6 +73,10 @@ private:
     int m_LoopCount;
 
     ARM_STATE m_PrevState;
+
+    bool m_UpdateArmLPF;
+    bool m_ReInitArmLPF;
+    CowLib::CowLPF *m_ArmLPF;
 
 public:
     /**
@@ -101,6 +107,8 @@ public:
     */
     void SetArmState(ARM_STATE);
 
+    void SetClawState(CLAW_STATE);
+
     /**
      * @brief returns current cargo of arm 
     */
@@ -110,6 +118,10 @@ public:
      * @brief returns current state of arm 
     */
     ARM_STATE GetArmState();
+
+    CLAW_STATE GetClawState();
+
+    bool AtTarget();
 
     /**
      * @brief sets positive/negative values for angle and claw based on switch
@@ -173,6 +185,12 @@ public:
      * 
      */
     void Handle() override;
+
+    Pivot &GetPivot() const { return *m_Pivot; }
+
+    Telescope &GetTelescope() const { return *m_Telescope; }
+
+    Claw &GetClaw() const { return *m_Claw; }
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */
