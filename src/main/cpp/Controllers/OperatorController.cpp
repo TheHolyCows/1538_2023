@@ -124,7 +124,7 @@ void OperatorController::Handle(CowRobot *bot)
         }
         else
         {
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1) * -1, true);
         }
     }
 }

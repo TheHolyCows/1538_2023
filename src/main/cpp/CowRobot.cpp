@@ -43,6 +43,8 @@ CowRobot::CowRobot()
     m_Arm = new Arm(9, 10, 11, 12, 4);
 
     m_PrevArmState = ARM_NONE;
+
+    m_Arm->SetArmCargo(CG_CONE);
 }
 
 /**

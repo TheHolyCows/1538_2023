@@ -35,6 +35,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
     m_PrevState = ARM_NONE;
+    m_Cargo = CG_CONE;
 
     m_UpdateArmLPF = false;
     m_ReInitArmLPF = false;
@@ -232,7 +233,7 @@ void Arm::UpdateClawState()
             }
             else
             {
-                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"))
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
             }
             m_Claw->SetOpen(true);
         }
@@ -414,10 +415,10 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
     if (pivotOrTelescope) // pivot = true
     {
         curAngle += value * CONSTANT("PIVOT_MANUAL_CTRL");
-        if (fabs(curAngle) > m_MaxAngle)
-        {
-            curAngle = m_MaxAngle * curAngle / fabs(curAngle);
-        }
+//        if (fabs(curAngle) > m_MaxAngle)
+//        {
+//            curAngle = m_MaxAngle * curAngle / fabs(curAngle);
+//        }
         m_Pivot->RequestAngle(curAngle);
     }
     else
@@ -431,7 +432,7 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
         {
             curExt = m_MinPos;
         }
-        m_Telescope->RequestPosition(value);
+        m_Telescope->RequestPosition(curExt);
     }
 
     double safeWrist = GetSafeWristAngle(curAngle, curAngle);
@@ -441,7 +442,7 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
         CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "manual wrist: %f\n", safeWrist);
     }
 
-    m_Claw->RequestWristAngle(safeWrist);
+//    m_Claw->RequestWristAngle(safeWrist);
 }
 
 // void Arm::RequestWristPosition(double pos)
