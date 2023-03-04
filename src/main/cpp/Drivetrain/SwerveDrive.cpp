@@ -223,6 +223,11 @@ void SwerveDrive::ResetOdometry(frc::Pose2d pose)
     m_Gyro->SetYaw(pose.Rotation().Degrees().value());
 }
 
+void SwerveDrive::AddVisionMeasurement(frc::Pose2d pose, double timestamp)
+{
+    m_Odometry->GetInternalPoseEstimator()->AddVisionMeasurement(pose, units::second_t{ timestamp });
+}
+
 void SwerveDrive::Handle()
 {
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};

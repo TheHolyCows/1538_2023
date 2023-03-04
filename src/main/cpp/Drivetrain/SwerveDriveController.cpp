@@ -162,19 +162,52 @@ void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipp
                              0);
 }
 
-void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
+void SwerveDriveController::CubeAlign(double x)
 {
     double y     = 0;
     double omega = 0;
 
-    if (!Vision::GetInstance()->ScoringYawAligned())
+    if (!Vision::GetInstance()->CubeYawAligned())
     {
-        omega = Vision::GetInstance()->ScoringYawPID();
+        omega = Vision::GetInstance()->CubeYawPID();
     }
     else
     {
         m_TargetHeading = m_Drivetrain.GetPoseRot();
-        y               = Vision::GetInstance()->ScoringYPID(gamePiece);
+        y               = Vision::GetInstance()->CubeYPID();
+    }
+
+    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
+
+    m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
+
+    m_HeadingLocked = false;
+}
+
+void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
+{
+    double y     = 0;
+    double omega = 0;
+
+    // TODO: confirm this logic is correct
+    double targetHeading = armFlipped ? 0 : 180;
+
+    if (fabs(m_Gyro.GetYawDegrees() - targetHeading) < CONSTANT("CONE_YAW_THRESHOLD"))
+    {
+        if (!Vision::GetInstance()->ConeYAligned())
+        {
+            y = Vision::GetInstance()->ConeYPID();
+        }
+    }
+    else
+    {
+        omega = m_HeadingPIDController->Calculate(units::meter_t{m_Gyro.GetYawDegrees()}, units::meter_t{targetHeading});
+    }
+
+    // Override if yInput is above override threshold
+    if (fabs(yInput) > CONSTANT("CONE_Y_OVERRIDE_THRESHOLD"))
+    {
+        y = ProcessDriveAxis(yInput, CONSTANT("DESIRED_MAX_SPEED"), false);
     }
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);

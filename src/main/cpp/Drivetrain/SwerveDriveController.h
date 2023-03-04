@@ -16,9 +16,11 @@ public:
 
     void Drive(double x, double y, double rotation, bool fieldRelative);
 
-    void LockHeadingToScore(double x, double y, bool armFlipped);
+    void CubeAlign(double x);
 
-    void AlignToScore(double x, Vision::GamePiece gamePiece);
+    void ConeAlign(double x, double yInput, bool armFlipped);
+
+    void LockHeadingToScore(double x, double y, bool armFlipped);
 
     void ResetConstants();
 

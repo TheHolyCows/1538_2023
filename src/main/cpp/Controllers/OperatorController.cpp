@@ -20,7 +20,22 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
-        bot->GetDriveController()->AlignToScore(m_CB->GetLeftDriveStickY(), Vision::GamePiece::CUBE);
+        double stickY = m_CB->GetLeftDriveStickY();
+
+        bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+        // TODO: re-enable this after testing
+
+        //        switch (bot->GetArm()->GetArmCargo())
+        //        {
+        //        case ST_CONE :
+        //            bot->GetDriveController()->ConeAlign(stickY);
+        //            break;
+        //        case ST_CUBE :
+        //            bot->GetDriveController()->CubeAlign(stickY);
+        //            break;
+        //        case ST_NONE :
+        //            break;
+        //        }
     }
     else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
     {
