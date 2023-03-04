@@ -89,7 +89,7 @@ void CowBase::DisabledPeriodic()
     if (m_ControlBoard->GetConstantsResetButton())
     {
         printf("RESETTING CONSTANTS\n");
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "RESETTING CONSTANTS");
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_OFF, "RESETTING CONSTANTS");
         m_Constants->RestoreData();
         m_Bot->Reset();
     }
