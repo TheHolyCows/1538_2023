@@ -8,7 +8,7 @@ OperatorController::OperatorController(GenericControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
-    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(7) > 0.8)
+    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
     {
         bot->GetDrivetrain()->SetLocked(true);
         bot->GetDrivetrain()->SetVelocity(0, 0, 0);
@@ -20,8 +20,6 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
-        double stickY = m_CB->GetLeftDriveStickY();
-
         bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
         // TODO: re-enable this after testing
 
@@ -49,7 +47,7 @@ void OperatorController::Handle(CowRobot *bot)
         bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickY(),
                                          m_CB->GetLeftDriveStickX(),
                                          m_CB->GetRightDriveStickX() * -1,
-                                         !m_CB->GetRobotRelativeButton());
+                                         true);
     }
 
     // ARM STATES

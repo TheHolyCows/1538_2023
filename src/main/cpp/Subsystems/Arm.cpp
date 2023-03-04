@@ -228,7 +228,11 @@ void Arm::UpdateClawState()
         {
             if (m_State == ARM_L3)
             {
-                m_Claw->SetIntakeSpeed(-0.5);
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_L3_SCORE_CONE"));
+            }
+            else
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"))
             }
             m_Claw->SetOpen(true);
         }

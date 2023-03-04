@@ -44,6 +44,8 @@ void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
     printf("DISABLED INIT -------------------\n");
+
+    m_Bot->GetDriveController()->ResetHeadingLock();
 }
 
 void CowBase::AutonomousInit()

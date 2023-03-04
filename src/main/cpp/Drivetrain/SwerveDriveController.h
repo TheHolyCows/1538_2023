@@ -22,6 +22,10 @@ public:
 
     void LockHeadingToScore(double x, double y, bool armFlipped);
 
+    void Balance();
+
+    void ResetHeadingLock();
+
     void ResetConstants();
 
 private:
