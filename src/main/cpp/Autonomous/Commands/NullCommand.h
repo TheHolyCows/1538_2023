@@ -9,7 +9,7 @@ public:
     NullCommand() = default;
     ~NullCommand() override = default;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

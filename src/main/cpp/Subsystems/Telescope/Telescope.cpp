@@ -46,6 +46,11 @@ double Telescope::GetSetpoint()
     return m_MotorRequest.Position * -1;
 }
 
+bool Telescope::AtTarget()
+{
+    return fabs(GetPosition() - GetSetpoint()) < CONSTANT("TELESCOPE_TOLERANCE");
+}
+
 double Telescope::GetPosition()
 {
     return m_TelescopeMotor->GetPosition() * -1;

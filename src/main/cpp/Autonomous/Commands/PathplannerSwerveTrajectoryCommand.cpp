@@ -52,7 +52,7 @@ PathplannerSwerveTrajectoryCommand::~PathplannerSwerveTrajectoryCommand()
     delete m_HolonomicController;
 }
 
-bool PathplannerSwerveTrajectoryCommand::IsComplete()
+bool PathplannerSwerveTrajectoryCommand::IsComplete(CowRobot *robot)
 {
     return m_Timer->HasElapsed(m_TotalTime);
 }
@@ -87,7 +87,7 @@ void PathplannerSwerveTrajectoryCommand::Handle(CowRobot *robot)
                 event.started = true;
             }
 
-            if (event.command->IsComplete())
+            if (event.command->IsComplete(robot))
             {
                 event.done = true;
                 event.command->Finish(robot);

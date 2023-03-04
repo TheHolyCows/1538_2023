@@ -16,7 +16,7 @@ public:
     SeriesCommand(std::deque<RobotCommand*> commands);
     ~SeriesCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

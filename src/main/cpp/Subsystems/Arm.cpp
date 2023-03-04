@@ -36,6 +36,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_PrevState = ARM_NONE;
 
+    m_ClawState = CLAW_OFF;
+
     ResetConstants();
 }
 
@@ -180,6 +182,11 @@ ARM_STATE Arm::GetArmState()
     return m_State;
 }
 
+CLAW_STATE Arm::GetClawState()
+{
+    return m_ClawState;
+}
+
 /**
  * @brief swap +/- for arm rotation
 */
@@ -195,8 +202,15 @@ void Arm::InvertArm(bool value)
  */
 void Arm::UpdateClawState()
 {
-    if (m_State == ARM_SCORE)
+    switch (m_ClawState)
     {
+    case CLAW_OFF :
+        m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
+        break;
+    case CLAW_INTAKE :
+        m_Claw->SetIntakeSpeed(1);
+        break;
+    case CLAW_EXHAUST :
         if (m_Cargo == CG_CUBE)
         {
             m_Claw->SetIntakeSpeed(-1);
@@ -209,7 +223,7 @@ void Arm::UpdateClawState()
             }
             m_Claw->SetOpen(true);
         }
-        return;
+        break;
     }
 
     // set cargo open/close state
@@ -220,17 +234,6 @@ void Arm::UpdateClawState()
     else if (m_Cargo == CG_CONE)
     {
         m_Claw->SetOpen(false);
-    }
-
-    // set intake on off state - will add exfil state for scoring in future
-    // potentially need to add another if for stow so cargo does not fall out?
-    if (m_State == ARM_IN)
-    {
-        m_Claw->SetIntakeSpeed(1);
-    }
-    else
-    {
-        m_Claw->SetIntakeSpeed(CONSTANT("INTAKE_OFF_SPEED"));
     }
 }
 
@@ -245,7 +248,7 @@ void Arm::FlipWristState()
 */
 void Arm::SetArmCargo(ARM_CARGO cargo)
 {
-    if (m_State == ARM_IN)
+    if (m_ClawState == CLAW_INTAKE)
         m_Cargo = cargo;
 }
 
@@ -258,12 +261,17 @@ void Arm::SetArmState(ARM_STATE state)
         // manual control, may change control modes
     }
     // reset wrist position when transitioning states
-    if (state != ARM_IN && state != ARM_MANUAL && state != ARM_GND)
+    if (m_ClawState != CLAW_INTAKE && state != ARM_MANUAL && state != ARM_GND)
     {
         m_WristState = false;
     }
 
     m_State = state;
+}
+
+void Arm::SetClawState(CLAW_STATE state)
+{
+    m_ClawState = state;
 }
 
 void Arm::ResetConstants()
@@ -288,6 +296,11 @@ void Arm::ResetConstants()
 void Arm::CheckMinMax()
 {
     return;
+}
+
+bool Arm::AtTarget()
+{
+    return m_Pivot->AtTarget() && m_Telescope->AtTarget() && m_Claw->WristAtTarget();
 }
 
 void Arm::RequestPosition(double angle, double extension, double clawOffset)
@@ -334,10 +347,10 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
     }
 
-//    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
-//    {
-////        curext
-//    }
+    //    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
+    //    {
+    ////        curext
+    //    }
 
     m_Claw->RequestWristAngle(safeWrist);
 

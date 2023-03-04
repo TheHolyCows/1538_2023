@@ -7,7 +7,7 @@ AprilTagAlignCommand::AprilTagAlignCommand(Vision::GamePiece gamePiece, const do
 {
 }
 
-bool AprilTagAlignCommand::IsComplete()
+bool AprilTagAlignCommand::IsComplete(CowRobot *robot)
 {
     return Vision::GetInstance()->ScoringYAligned(m_GamePiece) && Vision::GetInstance()->ScoringYawAligned();
 }
