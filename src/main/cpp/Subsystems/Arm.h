@@ -73,6 +73,8 @@ private:
 
     ARM_STATE m_PrevState;
 
+    bool m_UpdateArmLPF;
+    bool m_ReInitArmLPF;
     CowLib::CowLPF *m_ArmLPF;
 
 public:

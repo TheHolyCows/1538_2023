@@ -36,7 +36,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_PrevState = ARM_NONE;
 
-    m_ArmLPF = new CowLib::CowLPF(CONSTANT("ARM_LPF_BETA"));
+    m_UpdateArmLPF = false;
+    m_ReInitArmLPF = false;
+    m_ArmLPF       = new CowLib::CowLPF(CONSTANT("ARM_LPF_BETA"));
 
     ResetConstants();
 }
@@ -68,7 +70,8 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     // lock out extension until we reach desired angle +/- a few degrees
     if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5)
     {
-        m_ExtLockout = true;
+        m_ExtLockout   = true;
+        m_UpdateArmLPF = false;
     }
     else
     {
@@ -189,6 +192,7 @@ void Arm::InvertArm(bool value)
 {
     if (value != m_ArmInvert)
     {
+        m_UpdateArmLPF = true;
     }
     m_ArmInvert = value;
 }
@@ -268,6 +272,11 @@ void Arm::SetArmState(ARM_STATE state)
         m_WristState = false;
     }
 
+    if (m_State != state)
+    {
+        m_ReInitArmLPF = true;
+    }
+
     m_State = state;
 }
 
@@ -289,7 +298,7 @@ void Arm::ResetConstants()
     m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
 
-    m_ArmLPF->ReInit(m_Pivot);
+    m_ArmLPF->ReInit(m_Pivot->GetSetpoint(), m_Pivot->GetSetpoint());
 }
 
 void Arm::CheckMinMax()
@@ -314,10 +323,25 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     }
 
     // todo add extension back in
-    double safeAngle = GetSafeAngle(angle, curAngle, curExt); // curExt);
+    double safeAngle = GetSafeAngle(angle, curAngle, curExt);
+
+    if (m_ReInitArmLPF)
+    {
+        // this is set true by SetArmState() when state changes
+        m_ArmLPF->ReInit(curAngle, curAngle);
+        m_ReInitArmLPF = false;
+    }
+    double lpfAngle = m_ArmLPF->Calculate(safeAngle);
+    if (m_UpdateArmLPF)
+    {
+        // this is set to true by InvertArm() when state changes
+        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
+        safeAngle = lpfAngle;
+    }
+
     m_Pivot->RequestAngle(safeAngle);
 
-    double safeExt = GetSafeExt(extension, safeAngle, curExt); // curExt);
+    double safeExt = GetSafeExt(extension, safeAngle, curExt);
 
     // if (fabs(curExt - safeExt) < CONSTANT("TELESCOPE_PID_SWAP_THRESHOLD"))
     // {

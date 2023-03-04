@@ -23,6 +23,7 @@ namespace CowLib
         CowLPF(double beta);
         double Calculate(double value);
         void UpdateBeta(double beta);
+        void ReInit(double raw, double smooth);
         virtual ~CowLPF();
     };
 
