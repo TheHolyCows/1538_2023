@@ -41,14 +41,6 @@ void OperatorController::Handle(CowRobot *bot)
         //            break;
         //        }
     }
-    else if (m_CB->GetDriveAxis(5) > 0.5)
-    {
-        bot->GetDriveController()->QuickTurn(m_CB->GetLeftDriveStickY(),
-                                             m_CB->GetLeftDriveStickX(),
-                                             m_CB->GetRightDriveStickX(),
-                                             m_CB->GetRightDriveStickY(),
-                                             !m_CB->GetRobotRelativeButton());
-    }
     else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
     {
         bot->GetDriveController()->LockHeadingToScore(m_CB->GetLeftDriveStickY(),

@@ -147,12 +147,9 @@ void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipp
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
                              omega,
-                             fieldRelative,
+                             true,
                              0,
                              0);
-
-    m_TargetHeading = heading;
-    m_HeadingLocked = true;
 }
 
 void SwerveDriveController::CubeAlign(double x)
