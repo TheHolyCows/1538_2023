@@ -11,6 +11,7 @@
 #include "../CowConstants.h"
 #include "../CowLib/Conversions.h"
 #include "../CowLib/CowLogger.h"
+#include "../CowLib/CowLPF.h"
 #include "../CowLib/CowMotorController.h"
 #include "ArmInterface.h"
 #include "ArmState.h"
@@ -71,6 +72,8 @@ private:
     int m_LoopCount;
 
     ARM_STATE m_PrevState;
+
+    CowLib::CowLPF *m_ArmLPF;
 
 public:
     /**

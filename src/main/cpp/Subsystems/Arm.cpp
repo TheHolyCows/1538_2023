@@ -36,6 +36,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_PrevState = ARM_NONE;
 
+    m_ArmLPF = new CowLib::CowLPF(CONSTANT("ARM_LPF_BETA"));
+
     ResetConstants();
 }
 
@@ -185,6 +187,9 @@ ARM_STATE Arm::GetArmState()
 */
 void Arm::InvertArm(bool value)
 {
+    if (value != m_ArmInvert)
+    {
+    }
     m_ArmInvert = value;
 }
 
@@ -283,6 +288,8 @@ void Arm::ResetConstants()
     m_Pivot->ResetConstants();
     m_Telescope->ResetConstants();
     m_Claw->ResetConstants();
+
+    m_ArmLPF->ReInit(m_Pivot);
 }
 
 void Arm::CheckMinMax()
@@ -333,11 +340,6 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     {
         safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
     }
-
-//    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
-//    {
-////        curext
-//    }
 
     m_Claw->RequestWristAngle(safeWrist);
 
