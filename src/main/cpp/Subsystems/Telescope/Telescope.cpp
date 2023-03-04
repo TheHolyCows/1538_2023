@@ -41,6 +41,11 @@ void Telescope::RequestPosition(double pos)
     m_MotorRequest.Position = pos * -1;
 }
 
+double Telescope::GetSetpoint()
+{
+    return m_MotorRequest.Position * -1;
+}
+
 double Telescope::GetPosition()
 {
     return m_TelescopeMotor->GetPosition() * -1;

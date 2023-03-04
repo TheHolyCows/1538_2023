@@ -173,6 +173,12 @@ public:
      * 
      */
     void Handle() override;
+
+    Pivot &GetPivot() const { return *m_Pivot; }
+
+    Telescope &GetTelescope() const { return *m_Telescope; }
+
+    Claw &GetClaw() const { return *m_Claw; }
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */

@@ -41,6 +41,8 @@ CowRobot::CowRobot()
     m_DriveController = new SwerveDriveController(*m_Drivetrain);
 
     m_Arm = new Arm(9, 10, 11, 12, 4);
+
+    m_PrevArmState = ARM_NONE;
 }
 
 /**
@@ -133,6 +135,11 @@ void CowRobot::DoNothing()
  */
 void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 {
+    if (state != m_Arm->GetArmState())
+    {
+        m_PrevArmState = m_Arm->GetArmState();
+    }
+
     m_Arm->SetArmState(state);
 
     if (state == ARM_IN)
@@ -146,7 +153,7 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 */
 void CowRobot::ArmSM()
 {
-    double scorePivotOffset  = 0;
+    double scorePivotOffset = 0;
     if (m_Arm->GetArmCargo() == CG_CUBE)
     {
         scorePivotOffset = CONSTANT("CUBE_PIVOT_OFFSET");
@@ -160,6 +167,16 @@ void CowRobot::ArmSM()
         m_Arm->UpdateClawState();
         break;
     case ARM_IN :
+        // if cube add that other offset as well
+        if (m_Arm->GetArmCargo() == CG_CUBE && m_PrevArmState == ARM_GND)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"),
+                                   CONSTANT("ARM_GND_EXT"),
+                                   CONSTANT("WRIST_OFFSET_IN") + CONSTANT("WRIST_OFFSET_CUBE_IN"));
+        } else {
+            // TODO: make it reset to cone mode only if it has to. rn it only fixes if you hit the ground btn again
+        }
+
         m_Arm->UpdateClawState();
         break;
     case ARM_STOW :
@@ -167,10 +184,14 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE") + scorePivotOffset, CONSTANT("ARM_L3_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
+        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE") + scorePivotOffset,
+                               CONSTANT("ARM_L3_EXT"),
+                               CONSTANT("WRIST_OFFSET_SCORE"));
         break;
     case ARM_L2 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE") + scorePivotOffset, CONSTANT("ARM_L2_EXT"), CONSTANT("WRIST_OFFSET_SCORE"));
+        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE") + scorePivotOffset,
+                               CONSTANT("ARM_L2_EXT"),
+                               CONSTANT("WRIST_OFFSET_SCORE"));
         break;
     case ARM_GND :
         m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"), CONSTANT("WRIST_OFFSET_IN"));

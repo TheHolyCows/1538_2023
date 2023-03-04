@@ -35,6 +35,8 @@ public:
 
     void RequestWristAngle(double position);
 
+    double GetWristSetpoint();
+
     double GetWristAngle();
 
     void SetIntakeSpeed(double percent);

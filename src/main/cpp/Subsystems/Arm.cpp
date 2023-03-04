@@ -334,10 +334,10 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         safeWrist = angle > 0 ? safeWrist - clawOffset : safeWrist + clawOffset;
     }
 
-    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
-    {
-//        curext
-    }
+//    if (m_Cargo == CG_CUBE && (m_State == ARM_GND || m_State == ARM_IN))
+//    {
+////        curext
+//    }
 
     m_Claw->RequestWristAngle(safeWrist);
 
