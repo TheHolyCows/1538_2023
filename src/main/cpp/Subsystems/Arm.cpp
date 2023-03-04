@@ -73,12 +73,12 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     // lock out extension until we reach desired angle +/- a few degrees
     if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5)
     {
-        m_ExtLockout   = true;
-        m_UpdateArmLPF = false;
+        m_ExtLockout = true;
     }
     else
     {
-        m_ExtLockout = false;
+        m_ExtLockout   = false;
+        m_UpdateArmLPF = false;
     }
 
     return reqAngle;
