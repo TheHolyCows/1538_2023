@@ -201,7 +201,7 @@ void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
     }
     else
     {
-        omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), targetHeading);
+        omega = m_HeadingPIDController->Calculate(units::meter_t{m_Gyro.GetYawDegrees()}, units::meter_t{targetHeading});
     }
 
     // Override if yInput is above override threshold

@@ -1,4 +1,4 @@
-#include "CubeTagAlignCommand.h"
+#include "CubeAlignCommand.h"
 
 CubeAlignCommand::CubeAlignCommand(const double timeout)
     : m_Timer(std::make_unique<CowLib::CowTimer>()),
@@ -6,7 +6,7 @@ CubeAlignCommand::CubeAlignCommand(const double timeout)
 {
 }
 
-bool CubeAlignCommand::IsComplete()
+bool CubeAlignCommand::IsComplete(CowRobot *robot)
 {
     return m_Timer->HasElapsed(m_Timeout) || (Vision::GetInstance()->CubeYAligned() && Vision::GetInstance()->CubeYawAligned());
 }
