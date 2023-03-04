@@ -18,7 +18,7 @@ public:
     AprilTagAlignCommand(Vision::GamePiece gamePiece, const double timeout);
     ~AprilTagAlignCommand() = default;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot *robot) override;
 

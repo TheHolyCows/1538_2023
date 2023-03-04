@@ -142,10 +142,10 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 
     m_Arm->SetArmState(state);
 
-    if (state == ARM_IN)
-    {
-        m_Arm->SetArmCargo(cargo);
-    }
+    //    if (state == ARM_IN)
+    //    {
+    //        m_Arm->SetArmCargo(cargo);
+    //    }
 }
 
 /**
@@ -153,12 +153,6 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 */
 void CowRobot::ArmSM()
 {
-    double scorePivotOffset = 0;
-    if (m_Arm->GetArmCargo() == CG_CUBE)
-    {
-        scorePivotOffset = CONSTANT("CUBE_PIVOT_OFFSET");
-    }
-
     switch (m_Arm->GetArmState())
     {
     case ARM_NONE :
@@ -166,41 +160,54 @@ void CowRobot::ArmSM()
         // should only turn intake off?
         m_Arm->UpdateClawState();
         break;
-    case ARM_IN :
-        // if cube add that other offset as well
-        if (m_Arm->GetArmCargo() == CG_CUBE && m_PrevArmState == ARM_GND)
-        {
-            m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"),
-                                   CONSTANT("ARM_GND_EXT"),
-                                   CONSTANT("WRIST_OFFSET_IN") + CONSTANT("WRIST_OFFSET_CUBE_IN"));
-        } else {
-            // TODO: make it reset to cone mode only if it has to. rn it only fixes if you hit the ground btn again
-        }
-
-        m_Arm->UpdateClawState();
-        break;
     case ARM_STOW :
         m_Arm->UpdateClawState();
         m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
         break;
     case ARM_L3 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L3_ANGLE") + scorePivotOffset,
-                               CONSTANT("ARM_L3_EXT"),
-                               CONSTANT("WRIST_OFFSET_SCORE"));
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L3_CUBE_ANGLE"),
+                                   CONSTANT("ARM_L3_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+        }
+        else if (m_Arm->GetArmCargo() == CG_CONE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L3_CONE_ANGLE"),
+                                   CONSTANT("ARM_L3_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CONE"));
+        }
         break;
     case ARM_L2 :
-        m_Arm->RequestPosition(CONSTANT("ARM_L2_ANGLE") + scorePivotOffset,
-                               CONSTANT("ARM_L2_EXT"),
-                               CONSTANT("WRIST_OFFSET_SCORE"));
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L2_CUBE_ANGLE"),
+                                   CONSTANT("ARM_L2_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+        }
+        else if (m_Arm->GetArmCargo() == CG_CONE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L2_CONE_ANGLE"),
+                                   CONSTANT("ARM_L2_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CONE"));
+        }
         break;
     case ARM_GND :
-        m_Arm->RequestPosition(CONSTANT("ARM_GND_ANGLE"), CONSTANT("ARM_GND_EXT"), CONSTANT("WRIST_OFFSET_IN"));
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_GND_CUBE_ANGLE"),
+                                   CONSTANT("ARM_GND_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_IN_CUBE"));
+        }
+        else
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_GND_CONE_ANGLE"),
+                                   CONSTANT("ARM_GND_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_IN_CONE"));
+        }
         break;
     case ARM_HUMAN :
         m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
-        break;
-    case ARM_SCORE :
-        m_Arm->UpdateClawState();
         break;
     case ARM_MANUAL : // handled in OperatorController
         break;

@@ -30,6 +30,11 @@ double Pivot::GetSetpoint()
     return CowLib::Conversions::FalconToDegrees(m_TargetAngle, CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
+bool Pivot::AtTarget()
+{
+    return fabs(GetSetpoint() - GetAngle() < CONSTANT("PIVOT_TOLERANCE"));
+}
+
 double Pivot::GetAngle()
 {
     return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048,

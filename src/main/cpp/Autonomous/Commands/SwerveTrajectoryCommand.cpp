@@ -43,7 +43,7 @@ SwerveTrajectoryCommand::~SwerveTrajectoryCommand()
     delete m_HolonomicController;
 }
 
-bool SwerveTrajectoryCommand::IsComplete()
+bool SwerveTrajectoryCommand::IsComplete(CowRobot *robot)
 {
     // I think these units are correct but could be problem spot
 

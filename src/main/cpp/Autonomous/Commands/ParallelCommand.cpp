@@ -16,10 +16,10 @@ ParallelCommand::~ParallelCommand()
     // }
 }
 
-bool ParallelCommand::IsComplete()
+bool ParallelCommand::IsComplete(CowRobot *robot)
 {
     for (RobotCommand* command : m_Commands) {
-        if (!command->IsComplete()) {
+        if (!command->IsComplete(robot)) {
             return false;
         }
     }

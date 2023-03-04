@@ -32,6 +32,8 @@ public:
 
     double GetSetpoint();
 
+    bool AtTarget();
+
     /**
      * returns the current encoder read from the motor
      * not currently converted

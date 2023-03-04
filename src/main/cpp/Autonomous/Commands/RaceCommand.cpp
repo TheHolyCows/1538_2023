@@ -17,9 +17,9 @@ RaceCommand::~RaceCommand()
     // }
 }
 
-bool RaceCommand::IsComplete()
+bool RaceCommand::IsComplete(CowRobot *robot)
 {
-    return m_LeadCommand->IsComplete();
+    return m_LeadCommand->IsComplete(robot);
 }
 
 void RaceCommand::Start(CowRobot* robot)

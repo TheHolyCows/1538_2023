@@ -39,7 +39,7 @@ HoldPositionCommand::~HoldPositionCommand()
     delete m_RotationController;
 }
 
-bool HoldPositionCommand::IsComplete()
+bool HoldPositionCommand::IsComplete(CowRobot *robot)
 {
     // I think these units are correct but could be problem spot
 

@@ -14,6 +14,7 @@
 #include "Commands/SwerveTrajectoryCommand.h"
 #include "Commands/UpdateArmStateCommand.h"
 #include "Commands/WaitCommand.h"
+#include "Commands/ClawCommand.h"
 
 #include <deque>
 #include <frc/Errors.h>

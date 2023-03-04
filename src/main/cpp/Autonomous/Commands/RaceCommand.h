@@ -14,7 +14,7 @@ public:
     RaceCommand(RobotCommand* leadCommand, std::vector<RobotCommand*> otherCommands);
     ~RaceCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

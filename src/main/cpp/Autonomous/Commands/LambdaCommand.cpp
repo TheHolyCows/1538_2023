@@ -7,7 +7,7 @@ LambdaCommand::LambdaCommand(std::function<void(CowRobot *)> lambda)
 
 LambdaCommand::~LambdaCommand() = default;
 
-bool LambdaCommand::IsComplete()
+bool LambdaCommand::IsComplete(CowRobot *robot)
 {
     return true;
 }
