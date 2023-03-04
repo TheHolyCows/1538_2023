@@ -349,7 +349,6 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
     if (m_ReInitArmLPF)
     {
         // this is set true by SetArmState() when state changes
-        printf("re init lpf\n");
         m_ArmLPF->ReInit(curAngle, curAngle);
         m_ReInitArmLPF = false;
     }
