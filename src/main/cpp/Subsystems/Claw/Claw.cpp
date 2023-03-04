@@ -9,10 +9,10 @@
 
 Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 {
-    // m_WristMotor  = new CowLib::CowMotorController(wristMotor);
+    m_WristMotor  = new CowLib::CowMotorController(wristMotor);
     m_IntakeMotor = new CowLib::CowMotorController(intakeMotor);
 
-    // m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    m_WristMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
     m_IntakeMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
 
     // TODO: don't like the hardcoded 40 here, see if we can put it elsewhere
@@ -23,17 +23,17 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
     m_Open = false;
 
-    // ResetConstants();
+    ResetConstants();
 }
 
-void Claw::SetWristPosition(double position)
+void Claw::RequestWristAngle(double angle)
 {
-    m_WristControlRequest.Position = position * CONSTANT("ARM_WRIST_RATIO");
+    m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
-double Claw::GetWristPosition()
+double Claw::GetWristAngle()
 {
-    return m_WristMotor->GetPosition();
+    return CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
 void Claw::SetIntakeSpeed(double percent)
@@ -61,7 +61,8 @@ void Claw::SetOpen(bool open)
 
 void Claw::ResetConstants()
 {
-    // m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
+    m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
+    m_WristMotor->SetMotionMagic(CONSTANT("WRIST_V"), CONSTANT("WRIST_A"));
     // m_IntakeMotor->SetPID(CONSTANT("INTK_P"), CONSTANT("INTK_I"), CONSTANT("INTK_D"), CONSTANT("INTK_F"));
 }
 
@@ -72,10 +73,10 @@ void Claw::Handle()
         m_IntakeMotor->Set(m_IntakeControlRequest);
     }
 
-    // if (m_WristMotor)
-    // {
-    //     m_WristMotor->Set(m_WristControlRequest);
-    // }
+    if (m_WristMotor)
+    {
+        m_WristMotor->Set(m_WristControlRequest);
+    }
     if (m_Solenoid)
     {
         m_Solenoid->Set(m_Open);

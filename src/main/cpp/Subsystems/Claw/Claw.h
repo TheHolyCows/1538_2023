@@ -21,7 +21,7 @@ private:
     CowLib::CowMotorController *m_WristMotor;
     CowLib::CowMotorController *m_IntakeMotor;
 
-    CowLib::CowMotorController::PositionPercentOutput m_WristControlRequest{ 0 };
+    CowLib::CowMotorController::MotionMagicPercentOutput m_WristControlRequest{ 0 };
     CowLib::CowMotorController::PercentOutput m_IntakeControlRequest{ 0 };
     frc::Solenoid *m_Solenoid;
 
@@ -33,9 +33,9 @@ private:
 public:
     Claw(int wristMotor, int intakeMotor, int solenoidChannel);
 
-    void SetWristPosition(double position);
+    void RequestWristAngle(double position);
 
-    double GetWristPosition();
+    double GetWristAngle();
 
     void SetIntakeSpeed(double percent);
 

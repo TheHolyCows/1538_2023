@@ -1,5 +1,7 @@
 #include "CowMotorController.h"
 
+#include <utility>
+
 #include "CowLogger.h"
 
 namespace CowLib
@@ -8,9 +10,9 @@ namespace CowLib
      * @brief Construct a new Cow Motor Controller
      * @param id The CAN ID of the motor controller
      */
-    CowMotorController::CowMotorController(int id)
+    CowMotorController::CowMotorController(int id, std::string bus)
     {
-        m_Talon             = new ctre::phoenixpro::hardware::TalonFX(id, "cowbus");
+        m_Talon             = new ctre::phoenixpro::hardware::TalonFX(id, std::move(bus));
         m_Setpoint          = 0;
         m_UseFOC            = true;
         m_OverrideBrakeMode = false;

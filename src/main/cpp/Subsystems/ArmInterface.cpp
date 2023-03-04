@@ -15,13 +15,13 @@ void ArmInterface::SetAngle(double angle)
 {
     SetSafeAngle(angle);
     SetArmAngle(m_CurrentConfig.angle);
-    SetArmPosition(m_CurrentConfig.pos);
+    SetArmExtension(m_CurrentConfig.ext);
 }
 
 void ArmInterface::SetTelescopePosition(double position)
 {
     SetSafePos(position);
-    SetArmPosition(m_CurrentConfig.pos);
+    SetArmExtension(m_CurrentConfig.ext);
 }
 
 void ArmInterface::SetSafeAngle(const double angle)
@@ -44,7 +44,7 @@ void ArmInterface::SetSafeAngle(const double angle)
     }
 
     // Check if the currenet Pos is safe at the new angle
-    SetSafePos(m_CurrentConfig.pos);
+    SetSafePos(m_CurrentConfig.ext);
 }
 
 void ArmInterface::SetSafePos(const double position)
@@ -56,14 +56,14 @@ void ArmInterface::SetSafePos(const double position)
         ss << "Error: Angle is Invalid: " << m_CurrentConfig.angle << "!";
         throw std::runtime_error(ss.str());
     }
-    const double totalHeight          = m_ArmHeight + m_ClawHeight;
+    const double totalHeight          = m_FrameHeight + m_ClawLen;
     const double MaxPosAtCurrentAngle = totalHeight / (std::cos(m_CurrentConfig.angle * M_PI / 180.0));
     if (position > MaxPosAtCurrentAngle)
     {
-        m_CurrentConfig.pos = MaxPosAtCurrentAngle;
+        m_CurrentConfig.ext = MaxPosAtCurrentAngle;
     }
     else
     {
-        m_CurrentConfig.pos = position;
+        m_CurrentConfig.ext = position;
     }
 }

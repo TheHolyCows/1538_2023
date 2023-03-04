@@ -43,7 +43,6 @@ void CowBase::RobotInit()
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
-    m_Bot->Reset();
     printf("DISABLED INIT -------------------\n");
 }
 
@@ -87,6 +86,7 @@ void CowBase::DisabledPeriodic()
 
     if (m_ControlBoard->GetConstantsResetButton())
     {
+        printf("RESETTING CONSTANTS");
         m_Constants->RestoreData();
         m_Bot->Reset();
     }

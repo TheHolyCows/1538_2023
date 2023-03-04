@@ -127,6 +127,31 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
+void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipped)
+{
+    double omega = 0;
+
+    if (armFlipped)
+    {
+        m_TargetHeading = 180;
+    } else {
+        m_TargetHeading = 0;
+    }
+    m_HeadingLocked = true;
+
+    // idk if this makes a difference but should ensure no weird PID to past heading things
+    m_PrevHeading = m_TargetHeading;
+
+    omega = m_HeadingPIDController->Calculate(m_Gyro.GetYawDegrees(), m_TargetHeading);
+
+    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
+                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
+                             omega,
+                             true,
+                             0,
+                             0);
+}
+
 void SwerveDriveController::AlignToScore(double x, Vision::GamePiece gamePiece)
 {
     double y     = 0;
