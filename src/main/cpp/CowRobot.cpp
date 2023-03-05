@@ -149,11 +149,12 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
         m_PrevArmState = m_Arm->GetArmState();
     }
 
-    if (state == ARM_DRIVER_STOW && (m_PrevArmState == ARM_L2 || m_PrevArmState == ARM_L3))
+    if (state == ARM_DRIVER_STOW
+        && (m_PrevArmState == ARM_L2 || m_PrevArmState == ARM_L3 || m_Arm->GetArmState() == ARM_DRIVER_STOW))
     {
         m_Arm->SetArmState(state);
     }
-    else if (state == ARM_DRIVER_STOW && m_PrevArmState != ARM_DRIVER_STOW)
+    else if (state == ARM_DRIVER_STOW)
     {
         m_Arm->SetArmState(ARM_STOW);
     }
