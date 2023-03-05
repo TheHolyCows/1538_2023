@@ -24,7 +24,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_LoopCount = 0;
 
-    m_ArmInvert  = false;
+    // this should match our starting configuration
+    m_ArmInvert  = true;
     m_WristState = false;
 
     m_PivotLockout = false;
@@ -34,8 +35,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_Pivot     = std::make_unique<Pivot>(pivotMotor);
     m_Claw      = std::make_unique<Claw>(wristMotor, intakeMotor, solenoidChannel);
 
-    m_PrevState = ARM_NONE;
-    m_Cargo     = CG_CONE;
+    m_PrevState      = ARM_NONE;
+    m_Cargo          = CG_CONE;
+    m_ResetCargoFlag = false;
 
     m_UpdateArmLPF = false;
     m_ReInitArmLPF = false;
@@ -228,6 +230,14 @@ void Arm::UpdateClawState()
     {
     case CLAW_OFF :
         m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
+
+        if (m_ResetCargoFlag)
+        {
+            m_Cargo          = CG_NONE;
+            open             = true;
+            m_ResetCargoFlag = false;
+        }
+
         break;
     case CLAW_INTAKE :
         m_Claw->SetIntakeSpeed(1);
@@ -247,7 +257,8 @@ void Arm::UpdateClawState()
             {
                 m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
             }
-            open = true;
+            open             = true;
+            m_ResetCargoFlag = true;
         }
         break;
     }
