@@ -432,6 +432,10 @@ void Arm::ManualPosition(double value, bool pivotOrTelescope)
 
     if (pivotOrTelescope) // pivot = true
     {
+        if (m_ArmInvert)
+        {
+            value = value * -1;
+        }
         if (curAngle > 0)
         {
             if (value < 0)

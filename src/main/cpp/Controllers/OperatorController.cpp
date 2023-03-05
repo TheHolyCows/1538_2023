@@ -143,8 +143,7 @@ void OperatorController::Handle(CowRobot *bot)
         }
         else
         {
-            // TODO: make pivot direction relative to robot orientation
-            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1) * -1, true);
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
         }
     }
 }
