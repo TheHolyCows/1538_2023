@@ -63,6 +63,7 @@ private:
     ARM_CARGO m_Cargo;
     ARM_STATE m_State;
     CLAW_STATE m_ClawState;
+    bool m_ResetCargoFlag;
 
     bool m_ArmInvert;
     bool m_WristState;

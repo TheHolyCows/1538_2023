@@ -237,12 +237,13 @@ void Arm::UpdateClawState()
             // but this is how you get around the top check
             // alternatively, can keep this flag set and change to
             // false in intake without changing cargo
-            m_Cargo          = CG_NONE;
-            open             = true;
-            m_ResetCargoFlag = false;
+            // m_Cargo          = CG_NONE;
+            open = true;
+            // m_ResetCargoFlag = false;
         }
         break;
     case CLAW_INTAKE :
+        m_ResetCargoFlag = false;
         m_Claw->SetIntakeSpeed(1);
         break;
     case CLAW_EXHAUST :
