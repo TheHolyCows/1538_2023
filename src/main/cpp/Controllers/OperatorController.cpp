@@ -107,9 +107,9 @@ void OperatorController::Handle(CowRobot *bot)
 
     // only ARM_IN will change cargo within Arm subsystem code
     // safe to put CG_NONE for the remaining states, it will be ignored
-    if (m_CB->GetDriveAxis(3) > 0.8)
+    if (m_CB->GetDriveAxis(3) > 0.8) // driver stow
     {
-        bot->SetArmState(ARM_STOW, CG_NONE);
+        bot->SetArmState(ARM_DRIVER_STOW, CG_NONE);
     }
     if (m_CB->GetOperatorButton(BT_STOW))
     {

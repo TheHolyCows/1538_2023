@@ -112,12 +112,12 @@ void CowRobot::Handle()
         CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
     }
 
-//    // APRIL TAG BOTPOSE
-//    std::optional<Vision::BotPoseResult> visionPose = Vision::GetInstance()->GetBotPose();
-//    if (visionPose.has_value())
-//    {
-//        m_Drivetrain->AddVisionMeasurement((*visionPose).pose, (*visionPose).timestamp);
-//    }
+    //    // APRIL TAG BOTPOSE
+    //    std::optional<Vision::BotPoseResult> visionPose = Vision::GetInstance()->GetBotPose();
+    //    if (visionPose.has_value())
+    //    {
+    //        m_Drivetrain->AddVisionMeasurement((*visionPose).pose, (*visionPose).timestamp);
+    //    }
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
@@ -149,7 +149,18 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
         m_PrevArmState = m_Arm->GetArmState();
     }
 
-    m_Arm->SetArmState(state);
+    if (state == ARM_DRIVER_STOW && (m_PrevArmState == ARM_L2 || m_PrevArmState == ARM_L3))
+    {
+        m_Arm->SetArmState(state);
+    }
+    else if (state == ARM_DRIVER_STOW && m_PrevArmState != ARM_DRIVER_STOW)
+    {
+        m_Arm->SetArmState(ARM_STOW);
+    }
+    else
+    {
+        m_Arm->SetArmState(state);
+    }
 
     //    if (state == ARM_IN)
     //    {
@@ -219,6 +230,9 @@ void CowRobot::ArmSM()
         m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
         break;
     case ARM_MANUAL : // handled in OperatorController
+        break;
+    case ARM_DRIVER_STOW :
+        m_Arm->RequestSafeStow();
         break;
     default :
         break;

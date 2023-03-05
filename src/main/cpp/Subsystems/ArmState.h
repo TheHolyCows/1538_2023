@@ -9,6 +9,7 @@ enum ARM_STATE
     ARM_GND,
     ARM_HUMAN,
     ARM_MANUAL,
+    ARM_DRIVER_STOW,
 };
 
 enum CLAW_STATE

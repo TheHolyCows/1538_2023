@@ -154,9 +154,11 @@ public:
     void ManualPosition(double value, bool pivotOrTelesope);
 
     /**
-     * please do not use, for testing only
+     * @brief safe stow position for post scoring
+     * this is broken out into a new function because we override the extension safety features of the
+     * standard RequestPosition()
     */
-    void RequestWristPosition(double pos);
+    void RequestSafeStow();
 
     /**
      * @brief Will reset the PID values for both rotation and telescope motors
