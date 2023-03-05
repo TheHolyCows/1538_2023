@@ -18,11 +18,10 @@
 #include <pathplanner/lib/PathPlanner.h>
 #include <units/length.h>
 #include <vector>
+#include "ArmState.h"
 
 #define LL_PIPELINE_APRIL_TAG 0
 #define LL_PIPELINE_REFLECTIVE_TAPE 1
-#define LL_NAME_FRONT "limelight-front"
-#define LL_NAME_BACK "limelight-back"
 
 class Vision
 {
@@ -35,10 +34,14 @@ private:
     frc2::PIDController m_CubeYawPID;
     frc2::PIDController m_ConeYPID;
 
-    void UpdatePipeline(std::string limelightName, int id);
-    int GetPipeline(std::string limelightName);
+    void RequestPipeline(int id);
+    int GetPipeline();
+    [[nodiscard]] std::shared_ptr<nt::NetworkTable> GetLimelightTable() const;
+    bool HasTarget();
+    std::vector<double> GetTargetPoseRobotRelative();
+    double GetTargetX();
 
-    std::string DetermineCorrectPosition();
+    bool m_Flipped;
 
 public:
     static Vision *GetInstance();
@@ -69,6 +72,10 @@ public:
     };
 
     std::optional<BotPoseResult> GetBotPose();
+
+    void SetFlipped(bool flipped);
+
+    void SetCargo(ARM_CARGO cargo);
 };
 
 #endif /* __VISION_H__ */

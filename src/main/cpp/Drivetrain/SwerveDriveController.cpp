@@ -186,22 +186,21 @@ void SwerveDriveController::CubeAlign(double x)
 
 void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
 {
-    double y     = 0;
-    double omega = 0;
+    double target = (armFlipped) ? 180 : 0;
 
-    // TODO: confirm this logic is correct
-    double targetHeading = armFlipped ? 0 : 180;
-
-    if (fabs(m_Gyro.GetYawDegrees() - targetHeading) < CONSTANT("CONE_YAW_THRESHOLD"))
+    if (fabs(m_Gyro.GetYawDegrees() - target) > CONSTANT("CONE_YAW_TOLERANCE"))
     {
-        if (!Vision::GetInstance()->ConeYAligned())
-        {
-            y = Vision::GetInstance()->ConeYPID();
-        }
+        LockHeadingToScore(x, 0, armFlipped);
+        return;
     }
-    else
+
+    m_HeadingLocked = false;
+
+    double y = 0;
+
+    if (!Vision::GetInstance()->ConeYAligned())
     {
-        omega = m_HeadingPIDController->Calculate(units::meter_t{m_Gyro.GetYawDegrees()}, units::meter_t{targetHeading});
+        y = Vision::GetInstance()->ConeYPID();
     }
 
     // Override if yInput is above override threshold
@@ -212,7 +211,7 @@ void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
-    m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
+    m_Drivetrain.SetVelocity(x, y, 0, false, 0, 0, true);
 }
 
 void SwerveDriveController::Balance()

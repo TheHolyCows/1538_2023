@@ -8,6 +8,10 @@ OperatorController::OperatorController(GenericControlBoard *controlboard)
 
 void OperatorController::Handle(CowRobot *bot)
 {
+    bool inverted = !m_CB->GetOperatorButton(SW_ORIENT);
+    bot->GetArm()->InvertArm(inverted);
+    Vision::GetInstance()->SetFlipped(inverted);
+
     if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
     {
         bot->GetDrivetrain()->SetLocked(true);
@@ -20,6 +24,17 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
+        switch(bot->GetArm()->GetArmCargo())
+        {
+            case CG_CONE :
+                bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX(), inverted);
+                break;
+            case CG_CUBE :
+                bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+                break;
+            default :
+                break;
+        }
         bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
         // TODO: re-enable this after testing
 
@@ -64,19 +79,19 @@ void OperatorController::Handle(CowRobot *bot)
         m_WristFlipCheck = false;
     }
 
-    bot->GetArm()->InvertArm(!m_CB->GetOperatorButton(SW_ORIENT));
-
     // New claw logic
     if (m_CB->GetOperatorButton(BT_CONE))
     {
         bot->GetArm()->SetClawState(CLAW_INTAKE);
         bot->GetArm()->SetArmCargo(CG_CONE);
+        Vision::GetInstance()->SetCargo(CG_CONE);
         bot->GetArm()->UpdateClawState();
     }
     else if (m_CB->GetOperatorButton(BT_CUBE))
     {
         bot->GetArm()->SetClawState(CLAW_INTAKE);
         bot->GetArm()->SetArmCargo(CG_CUBE);
+        Vision::GetInstance()->SetCargo(CG_CUBE);
         bot->GetArm()->UpdateClawState();
     }
     else if (m_CB->GetOperatorButton(BT_SCORE))
