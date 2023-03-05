@@ -368,12 +368,12 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         m_ReInitArmLPF = false;
     }
     double lpfAngle = m_ArmLPF->Calculate(safeAngle);
-    if (m_UpdateArmLPF)
-    {
-        // this is set to true by InvertArm() when state changes
-        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
-        safeAngle = lpfAngle;
-    }
+//    if (m_UpdateArmLPF)
+//    {
+//        // this is set to true by InvertArm() when state changes
+//        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
+//        safeAngle = lpfAngle;
+//    }
 
     m_Pivot->RequestAngle(safeAngle);
 

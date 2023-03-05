@@ -214,13 +214,6 @@ void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
     m_Drivetrain.SetVelocity(x, y, 0, false, 0, 0, true);
 }
 
-void SwerveDriveController::Balance()
-{
-    // logic:
-    // take x input. drive. have some lockout when you press
-    // stop driving and lock wheels when you have been not flat then flat again.
-}
-
 void SwerveDriveController::ResetHeadingLock()
 {
     m_HeadingLocked = false;

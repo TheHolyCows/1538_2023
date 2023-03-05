@@ -5,6 +5,7 @@
 #ifndef __AUTO_MODES_H__
 #define __AUTO_MODES_H__
 
+#include "Commands/BalanceCommand.h"
 #include "Commands/ClawCommand.h"
 #include "Commands/CubeAlignCommand.h"
 #include "Commands/HoldPositionCommand.h"
