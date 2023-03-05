@@ -24,16 +24,16 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
-        switch(bot->GetArm()->GetArmCargo())
+        switch (bot->GetArm()->GetArmCargo())
         {
-            case CG_CONE :
-                bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX(), inverted);
-                break;
-            case CG_CUBE :
-                bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
-                break;
-            default :
-                break;
+        case CG_CONE :
+            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX(), inverted);
+            break;
+        case CG_CUBE :
+            bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+            break;
+        default :
+            break;
         }
         bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
         // TODO: re-enable this after testing
@@ -107,6 +107,10 @@ void OperatorController::Handle(CowRobot *bot)
 
     // only ARM_IN will change cargo within Arm subsystem code
     // safe to put CG_NONE for the remaining states, it will be ignored
+    if (m_CB->GetDriveAxis(3) > 0.8)
+    {
+        bot->SetArmState(ARM_STOW, CG_NONE);
+    }
     if (m_CB->GetOperatorButton(BT_STOW))
     {
         bot->SetArmState(ARM_STOW, CG_NONE);
@@ -133,12 +137,13 @@ void OperatorController::Handle(CowRobot *bot)
     if (fabs(m_CB->GetOperatorAxis(1)) > 0.10) //CONSTANT("STICK_DEADBAND"))
     {
         bot->SetArmState(ARM_MANUAL, CG_NONE);
-        if (m_CB->GetOperatorAxis(2) > 0.85)
+        if (m_CB->GetOperatorAxis(2) > 0.8)
         {
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
         }
         else
         {
+            // TODO: make pivot direction relative to robot orientation
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1) * -1, true);
         }
     }
