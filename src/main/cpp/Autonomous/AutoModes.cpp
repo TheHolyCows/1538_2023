@@ -29,8 +29,10 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true, true));
-    m_Modes["Test"].push_back(new ClawCommand(CLAW_INTAKE, 2));
+    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 3, 2, true, true));
+
+    // m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true, true));
+    // m_Modes["Test"].push_back(new ClawCommand(CLAW_INTAKE, 2));
 
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
     //     new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));

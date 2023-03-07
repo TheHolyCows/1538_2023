@@ -53,7 +53,9 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double curExt)
 {
     // if arm extended and change in angle is large?, do not move pivot
-    if (curExt > m_MinPos + 0.5 && (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5))
+    if (curExt > m_MinPos + 0.5
+        && (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5
+            || std::signbit(reqAngle) != std::signbit(curAngle)))
     {
         m_PivotLockout = true;
         return curAngle;
@@ -487,7 +489,7 @@ void Arm::RequestSafeStow()
 
     m_Pivot->RequestAngle(reqAngle);
 
-    if (fabs(curAngle) > fabs(reqAngle) - 5 && fabs(curAngle) < fabs(reqAngle) + 5)
+    if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD") && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
         m_Telescope->RequestPosition(CONSTANT("SCORE_STOW_EXT"));
 }
 

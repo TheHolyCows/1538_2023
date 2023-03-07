@@ -98,7 +98,7 @@ void OperatorController::Handle(CowRobot *bot)
     }
     if (m_CB->GetOperatorButton(BT_STOW))
     {
-        bot->SetArmState(ARM_STOW, CG_NONE);
+        bot->SetArmState(ARM_DRIVER_STOW, CG_NONE);
     }
     else if (m_CB->GetOperatorButton(BT_L3))
     {

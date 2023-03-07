@@ -39,6 +39,15 @@ void Telescope::RequestPosition(double pos)
     //    m_MotorRequest.Position = setpoint.position.value() * flip;
 
     m_MotorRequest.Position = pos * -1;
+
+    if (GetPosition() < GetSetpoint())
+    {
+        m_MotorRequest.FeedForward = CONSTANT("TELESCOPE_FF");
+    }
+    else
+    {
+        m_MotorRequest.FeedForward = 0;
+    };
 }
 
 double Telescope::GetSetpoint()
