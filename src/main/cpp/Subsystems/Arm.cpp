@@ -39,6 +39,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_Cargo          = CG_CONE;
     m_ResetCargoFlag = false;
 
+    m_ManualControl = false;
+
     m_UpdateArmLPF = false;
     m_ReInitArmLPF = false;
     m_ArmLPF       = new CowLib::CowLPF(CONSTANT("ARM_LPF_BETA"));
@@ -287,14 +289,8 @@ void Arm::SetArmCargo(ARM_CARGO cargo)
 
 void Arm::SetArmState(ARM_STATE state)
 {
-    // don't move arm to in position while scoring?
-
-    if (state == ARM_MANUAL && m_State != ARM_MANUAL)
-    {
-        // manual control, may change control modes
-    }
     // reset wrist position when transitioning states
-    if (m_ClawState != CLAW_INTAKE && state != ARM_MANUAL && state != ARM_GND)
+    if (m_ClawState != CLAW_INTAKE && !m_ManualControl && state != ARM_GND)
     {
         m_WristState = false;
     }
@@ -345,6 +341,11 @@ bool Arm::AtTarget()
 
 void Arm::RequestPosition(double angle, double extension, double clawOffset)
 {
+    if (m_ManualControl)
+    {
+        return;
+    }
+
     double curAngle = m_Pivot->GetAngle();
     double curExt   = m_Telescope->GetPosition();
 
@@ -504,4 +505,9 @@ void Arm::Handle()
     m_Pivot->Handle();
     m_Telescope->Handle();
     m_Claw->Handle();
+}
+
+void Arm::UseManualControl(bool manual)
+{
+    m_ManualControl = manual;
 }

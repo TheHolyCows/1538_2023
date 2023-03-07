@@ -8,7 +8,7 @@ CubeAlignCommand::CubeAlignCommand(const double timeout)
 
 bool CubeAlignCommand::IsComplete(CowRobot *robot)
 {
-    return m_Timer->HasElapsed(m_Timeout) || (Vision::GetInstance()->CubeYAligned() && Vision::GetInstance()->CubeYawAligned());
+    return m_Timer->HasElapsed(m_Timeout) || (Vision::GetInstance()->CubeYAligned() && Vision::GetInstance()->Cube3dYawAligned());
 }
 
 void CubeAlignCommand::Start(CowRobot *robot)

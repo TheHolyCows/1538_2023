@@ -32,6 +32,4 @@ private:
     bool m_PitchHasChanged;
 
     bool m_Done;
-
-    double m_MaxPitch;
 };

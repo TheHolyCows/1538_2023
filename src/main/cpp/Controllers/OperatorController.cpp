@@ -10,7 +10,7 @@ void OperatorController::Handle(CowRobot *bot)
 {
     bool inverted = !m_CB->GetOperatorButton(SW_ORIENT);
     bot->GetArm()->InvertArm(inverted);
-    Vision::GetInstance()->SetFlipped(inverted);
+    Vision::GetInstance()->SetInverted(inverted);
 
     if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
     {
@@ -27,7 +27,7 @@ void OperatorController::Handle(CowRobot *bot)
         switch (bot->GetArm()->GetArmCargo())
         {
         case CG_CONE :
-            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX(), inverted);
+            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
             break;
         case CG_CUBE :
             bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
@@ -35,26 +35,11 @@ void OperatorController::Handle(CowRobot *bot)
         default :
             break;
         }
-        bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
-        // TODO: re-enable this after testing
-
-        //        switch (bot->GetArm()->GetArmCargo())
-        //        {
-        //        case ST_CONE :
-        //            bot->GetDriveController()->ConeAlign(stickY);
-        //            break;
-        //        case ST_CUBE :
-        //            bot->GetDriveController()->CubeAlign(stickY);
-        //            break;
-        //        case ST_NONE :
-        //            break;
-        //        }
     }
     else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
     {
-        bot->GetDriveController()->LockHeadingToScore(m_CB->GetLeftDriveStickY(),
-                                                      m_CB->GetLeftDriveStickX(),
-                                                      !m_CB->GetOperatorButton(SW_ORIENT));
+        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(),
+                                               m_CB->GetLeftDriveStickX());
     }
     else
     {
@@ -136,7 +121,8 @@ void OperatorController::Handle(CowRobot *bot)
     // deadband is higher because I really don't want to accidentally hit it
     if (fabs(m_CB->GetOperatorAxis(1)) > 0.10) //CONSTANT("STICK_DEADBAND"))
     {
-        bot->SetArmState(ARM_MANUAL, CG_NONE);
+        bot->GetArm()->UseManualControl(true);
+
         if (m_CB->GetOperatorAxis(2) > 0.8)
         {
             bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);

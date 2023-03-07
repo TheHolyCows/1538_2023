@@ -71,6 +71,8 @@ private:
     bool m_PivotLockout;
     bool m_ExtLockout;
 
+    bool m_ManualControl;
+
     int m_LoopCount;
 
     ARM_STATE m_PrevState;
@@ -182,6 +184,8 @@ public:
      * 
      */
     //void ZeroSensors() override;
+
+    void UseManualControl(bool manual);
 
     /**
      * @brief Will set the motors to their specified values

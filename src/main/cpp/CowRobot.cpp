@@ -144,6 +144,8 @@ void CowRobot::DoNothing()
  */
 void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
 {
+    m_Arm->UseManualControl(false);
+
     if (state != m_Arm->GetArmState())
     {
         m_PrevArmState = m_Arm->GetArmState();
@@ -229,8 +231,6 @@ void CowRobot::ArmSM()
         break;
     case ARM_HUMAN :
         m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
-        break;
-    case ARM_MANUAL : // handled in OperatorController
         break;
     case ARM_DRIVER_STOW :
         m_Arm->RequestSafeStow();

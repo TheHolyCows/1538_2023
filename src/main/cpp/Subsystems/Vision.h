@@ -20,7 +20,8 @@
 #include <vector>
 #include "ArmState.h"
 
-#define LL_PIPELINE_APRIL_TAG 0
+#define LL_PIPELINE_APRIL_TAG_2D 0
+#define LL_PIPELINE_APRIL_TAG_3D 2
 #define LL_PIPELINE_REFLECTIVE_TAPE 1
 
 class Vision
@@ -53,13 +54,14 @@ public:
      */
     void Reset();
 
+    double Cube3dYPID();
+    double Cube3dYawPID();
+
+    bool Cube3dYAligned();
+    bool Cube3dYawAligned();
+
     double CubeYPID();
-    double CubeYawPID();
-
     bool CubeYAligned();
-    bool CubeYawAligned();
-
-    std::optional<pathplanner::PathPlannerTrajectory> GenerateTrajectoryToCube();
 
     double ConeYPID();
 
@@ -71,9 +73,7 @@ public:
         double timestamp;
     };
 
-    std::optional<BotPoseResult> GetBotPose();
-
-    void SetFlipped(bool flipped);
+    void SetInverted(bool flipped);
 
     void SetCargo(ARM_CARGO cargo);
 };

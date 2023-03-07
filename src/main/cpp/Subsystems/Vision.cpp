@@ -33,7 +33,43 @@ void Vision::Reset()
 
 double Vision::CubeYPID()
 {
-    if (GetPipeline() != LL_PIPELINE_APRIL_TAG)
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_2D)
+    {
+        return 0;
+    }
+
+    if (!HasTarget())
+    {
+        return 0;
+    }
+
+    auto tx = GetTargetX();
+
+    double yOutput = m_CubeYPID.Calculate(0, tx);
+
+    return yOutput;
+}
+
+bool Vision::CubeYAligned()
+{
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_2D)
+    {
+        return false;
+    }
+
+    if (!HasTarget())
+    {
+        return false;
+    }
+
+    auto tx = GetTargetX();
+
+    return fabs(tx) < CONSTANT("CUBE_Y_TOLERANCE");
+}
+
+double Vision::Cube3dYPID()
+{
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
         return 0;
     }
@@ -64,9 +100,9 @@ double Vision::CubeYPID()
     return yOutput;
 }
 
-double Vision::CubeYawPID()
+double Vision::Cube3dYawPID()
 {
-    if (GetPipeline() != LL_PIPELINE_APRIL_TAG)
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
         return 0;
     }
@@ -98,9 +134,9 @@ double Vision::CubeYawPID()
     return yawOutput;
 }
 
-bool Vision::CubeYAligned()
+bool Vision::Cube3dYAligned()
 {
-    if (GetPipeline() != LL_PIPELINE_APRIL_TAG)
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
         return false;
     }
@@ -125,9 +161,9 @@ bool Vision::CubeYAligned()
     return fabs(targetX) < CONSTANT("CUBE_Y_TOLERANCE");
 }
 
-bool Vision::CubeYawAligned()
+bool Vision::Cube3dYawAligned()
 {
-    if (GetPipeline() != LL_PIPELINE_APRIL_TAG)
+    if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
         return false;
     }
@@ -202,100 +238,7 @@ int Vision::GetPipeline()
     return (int) GetLimelightTable()->GetNumber("pipeline", -1);
 }
 
-std::optional<Vision::BotPoseResult> Vision::GetBotPose()
-{
-    //    std::string limelightName = "";
-    //    //    std::string limelightName = DetermineCorrectPosition();
-    //
-    //    if (limelightName == "none")
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    RequestPipeline(, LL_PIPELINE_APRIL_TAG);
-    //
-    //    if (GetPipeline() != LL_PIPELINE_APRIL_TAG)
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    auto botPoseVec = nt::NetworkTableInstance::GetDefault()
-    //                          .GetTable(limelightName)
-    //                          ->GetNumberArray("botpose", std::vector<double>(7));
-    //
-    //    if (botPoseVec.size() != 7)
-    //    {
-    //        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR,
-    //                                  "bot pose array has incorrect length %f",
-    //                                  botPoseVec.size());
-    //
-    //        return std::nullopt;
-    //    }
-    //
-    //    // TODO: match up these indices with the what they actually do. This is a guess rn
-    //    frc::Translation2d translation
-    //        = frc::Translation2d(units::meter_t{ botPoseVec[0] }, units::meter_t{ botPoseVec[1] });
-    //    frc::Rotation2d rotation = frc::Rotation2d(units::degree_t{ botPoseVec[5] });
-    //
-    //    frc::Pose2d pose = frc::Pose2d(translation, rotation);
-    //
-    //    double timestamp = frc::Timer::GetFPGATimestamp().value() - (botPoseVec[6] / 1000.0);
-    //
-    //    return BotPoseResult{ pose, timestamp };
-
-    return std::nullopt;
-}
-
-std::optional<pathplanner::PathPlannerTrajectory> Vision::GenerateTrajectoryToCube()
-{
-    //    // Get current botpose
-    //    // TODO: make this from odometry
-    //    auto botPoseResult = GetBotPose();
-    //    if (!botPoseResult.has_value())
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    frc::Pose2d pose = (*botPoseResult).pose;
-    //
-    //    // Get tag id
-    //    // Botpose will already fail if incorrect pipeline so no need to check
-    //    std::string limelightName = DetermineCorrectPosition();
-    //
-    //    if (limelightName == "none")
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    int tagId = nt::NetworkTableInstance::GetDefault().GetTable(limelightName)->GetNumber("tid", -1);
-    //
-    //    if (tagId == -1)
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    // use wpilib to get april tag location
-    //    static frc::AprilTagFieldLayout fieldLayout = frc::AprilTagFieldLayout();
-    //    auto tagLocationResult = fieldLayout.GetTagPose(tagId);
-    //    if (!tagLocationResult.has_value())
-    //    {
-    //        return std::nullopt;
-    //    }
-    //
-    //    frc::Pose2d tagLocation = (*tagLocationResult).ToPose2d();
-    //
-    //    frc::Translation2d targetTranslation = frc::Translation2d(pose.X(), tagLocation.Y());
-    //
-    //    frc::Rotation2d targetRotation = frc::Rotation2d();
-    //
-    //
-    //
-    //    // Make path from current position to april tag (with same x as current)
-
-    return std::nullopt;
-}
-
-void Vision::SetFlipped(bool flipped)
+void Vision::SetInverted(bool flipped)
 {
     m_Flipped = flipped;
 }
@@ -328,7 +271,7 @@ void Vision::SetCargo(ARM_CARGO cargo)
     switch (cargo)
     {
     case ARM_CARGO::CG_CUBE :
-        RequestPipeline(LL_PIPELINE_APRIL_TAG);
+        RequestPipeline(LL_PIPELINE_APRIL_TAG_3D);
         break;
     case ARM_CARGO::CG_CONE :
         RequestPipeline(LL_PIPELINE_REFLECTIVE_TAPE);

@@ -7,8 +7,7 @@ BalanceCommand::BalanceCommand(const double speed, const double timeout, const d
       m_Timeout(timeout),
       m_MaxDistance(maxDistance),
       m_PitchHasChanged(false),
-      m_Done(false),
-      m_MaxPitch(0)
+      m_Done(false)
 {
 }
 
@@ -50,7 +49,7 @@ void BalanceCommand::Handle(CowRobot *robot)
         }
 
         robot->GetDrivetrain()->SetLocked(false); // Make sure we aren't locked
-        robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0);
+        robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
     }
     else
     {
@@ -63,7 +62,7 @@ void BalanceCommand::Handle(CowRobot *robot)
         else
         {
             robot->GetDrivetrain()->SetLocked(false);
-            robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0);
+            robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
         }
     }
 }
@@ -71,5 +70,5 @@ void BalanceCommand::Handle(CowRobot *robot)
 void BalanceCommand::Finish(CowRobot *robot)
 {
     robot->GetDrivetrain()->SetLocked(true);
-    robot->GetDrivetrain()->SetVelocity(0, 0, 0);
+    robot->GetDrivetrain()->SetVelocity(0, 0, 0, true);
 }

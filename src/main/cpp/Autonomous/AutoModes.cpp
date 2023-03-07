@@ -31,13 +31,27 @@ AutoModes::AutoModes()
 
     m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true, true));
     m_Modes["Test"].push_back(new ClawCommand(CLAW_INTAKE, 2));
-//    m_Modes["Test"].push_back(new WaitCommand(, false));
-//    m_Modes["Test"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->InvertArm(true); }));
-//    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true));
-//    m_Modes["Test"].push_back(new WaitCommand(2, false));
-////    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
-//    m_Modes["Test"].push_back(new WaitCommand(2, false));
-//    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_STOW));
+
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    //     new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 2));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    //     new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 5, 3, true, true));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    //     new PathplannerSwerveTrajectoryCommand("intake (loading zone side)", 2, 1, true, false));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_OFF, 0));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    //     new PathplannerSwerveTrajectoryCommand("drive to balance (loading zone side)", 5, 3, true, false));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new BalanceCommand(1, 3, 3));
+
+    //    m_Modes["Test"].push_back(new WaitCommand(, false));
+    //    m_Modes["Test"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->InvertArm(true); }));
+    //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true));
+    //    m_Modes["Test"].push_back(new WaitCommand(2, false));
+    ////    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
+    //    m_Modes["Test"].push_back(new WaitCommand(2, false));
+    //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_STOW));
 
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE));
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));

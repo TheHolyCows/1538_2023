@@ -134,25 +134,32 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
-void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipped)
+void SwerveDriveController::LockHeading(double x, double y)
 {
-    double omega = 0;
+    double currentHeading = m_Gyro.GetYawDegrees();
 
-    if (armFlipped)
+    currentHeading = fmod(currentHeading, 360);
+    if (currentHeading < 0)
     {
-        m_TargetHeading = 180;
+        currentHeading += 360;
     }
-    else
+
+    if (currentHeading < 90 || currentHeading > 270)
     {
         m_TargetHeading = 0;
     }
+    else
+    {
+        m_TargetHeading = 180;
+    }
+
     m_HeadingLocked = true;
 
     // idk if this makes a difference but should ensure no weird PID to past heading things
     m_PrevHeading = m_TargetHeading;
 
-    omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
-                                              units::meter_t{ m_TargetHeading });
+    double omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
+                                                     units::meter_t{ m_TargetHeading });
 
     m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
                              ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
@@ -164,44 +171,16 @@ void SwerveDriveController::LockHeadingToScore(double x, double y, bool armFlipp
 
 void SwerveDriveController::CubeAlign(double x)
 {
-    double y     = 0;
-    double omega = 0;
-
-    if (!Vision::GetInstance()->CubeYawAligned())
-    {
-        omega = Vision::GetInstance()->CubeYawPID();
-    }
-    else
-    {
-        m_TargetHeading = m_Drivetrain.GetPoseRot();
-        y               = Vision::GetInstance()->CubeYPID();
-    }
+    double y = Vision::GetInstance()->CubeYPID();
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
-    m_Drivetrain.SetVelocity(x, y, omega, false, 0, 0, true);
-
-    m_HeadingLocked = false;
+    m_Drivetrain.SetVelocity(x, y, 0, true, 0, 0, true);
 }
 
-void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
+void SwerveDriveController::ConeAlign(double x, double yInput)
 {
-    double target = (armFlipped) ? 180 : 0;
-
-    if (fabs(m_Gyro.GetYawDegrees() - target) > CONSTANT("CONE_YAW_TOLERANCE"))
-    {
-        LockHeadingToScore(x, 0, armFlipped);
-        return;
-    }
-
-    m_HeadingLocked = false;
-
-    double y = 0;
-
-    if (!Vision::GetInstance()->ConeYAligned())
-    {
-        y = Vision::GetInstance()->ConeYPID();
-    }
+    double y = Vision::GetInstance()->ConeYPID();
 
     // Override if yInput is above override threshold
     if (fabs(yInput) > CONSTANT("CONE_Y_OVERRIDE_THRESHOLD"))
@@ -211,7 +190,7 @@ void SwerveDriveController::ConeAlign(double x, double yInput, bool armFlipped)
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
 
-    m_Drivetrain.SetVelocity(x, y, 0, false, 0, 0, true);
+    m_Drivetrain.SetVelocity(x, y, 0, true, 0, 0, true);
 }
 
 void SwerveDriveController::ResetHeadingLock()
