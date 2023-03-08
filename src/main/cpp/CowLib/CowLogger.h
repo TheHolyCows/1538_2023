@@ -82,8 +82,8 @@ namespace CowLib
 
         uint32_t m_IdToLog;
 
-        // 10.15.38.00
-        const uint32_t m_LogServerSubnet = 0x0a0f2600;
+        // 10.95.38.00
+        const uint32_t m_LogServerSubnet = 0x0a5f2600;
         uint16_t m_LogServerPort;
         uint32_t m_LogServerIP;
 

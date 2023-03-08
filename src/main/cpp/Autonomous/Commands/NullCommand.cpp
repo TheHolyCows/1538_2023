@@ -1,6 +1,6 @@
 #include "NullCommand.h"
 
-bool NullCommand::IsComplete()
+bool NullCommand::IsComplete(CowRobot *robot)
 {
     return true;
 }

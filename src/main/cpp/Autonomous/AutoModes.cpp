@@ -2,8 +2,8 @@
 
 #include "Commands/ParallelCommand.h"
 #include "Commands/PathplannerSwerveTrajectoryCommand.h"
-#include "Commands/UpdateArmStateCommand.h"
 #include "Commands/WaitCommand.h"
+#include "Commands/BalanceCommand.h"
 
 // TODO: make auto constants reloadable for quick testing
 // TODO: still need to add timeouts
@@ -29,7 +29,7 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 4, 3, true, true));
+    m_Modes["Test"].push_back(new BalanceCommand(3, 15, 100));
 
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));

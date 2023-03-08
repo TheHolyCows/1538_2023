@@ -14,7 +14,7 @@ WaitCommand::~WaitCommand()
     delete m_Timer;
 }
 
-bool WaitCommand::IsComplete()
+bool WaitCommand::IsComplete(CowRobot *robot)
 {
     return m_Timer->HasElapsed(m_TimeToWait);
 }

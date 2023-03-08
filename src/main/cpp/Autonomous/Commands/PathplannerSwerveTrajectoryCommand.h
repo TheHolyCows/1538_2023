@@ -30,7 +30,7 @@ public:
                                        std::vector<Event> events = {});
     ~PathplannerSwerveTrajectoryCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot *robot) override;
 

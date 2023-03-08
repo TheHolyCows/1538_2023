@@ -52,7 +52,7 @@ void AutoModeController::Handle(CowRobot *bot)
     m_CurrentCommand->Handle(bot);
 
     // If the command is done
-    if (m_CurrentCommand->IsComplete())
+    if (m_CurrentCommand->IsComplete(bot))
     {
         // Cleanup current command
         m_CurrentCommand->Finish(bot);

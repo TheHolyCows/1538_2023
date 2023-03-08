@@ -9,6 +9,22 @@ CommandRunner::CommandRunner(RobotCommand &command, double timeout)
     m_Timer->Reset();
 }
 
+bool CommandRunner::IsComplete(CowRobot *robot)
+{
+    if (m_State == FINISHED)
+    {
+        return true;
+    }
+
+    if (m_Command.IsComplete(robot))
+    {
+        m_State = FINISHED;
+        return true;
+    }
+
+    return false;
+}
+
 void CommandRunner::Start(CowRobot *robot)
 {
     m_State = RUNNING;
@@ -26,6 +42,11 @@ void CommandRunner::Handle(CowRobot *robot)
     if (m_Timeout.ShouldStop(m_Timer->Get()))
     {
         m_State = FINISHED;
+        return;
+    }
+
+    if (m_Command.IsComplete(robot))
+    {
         return;
     }
 
