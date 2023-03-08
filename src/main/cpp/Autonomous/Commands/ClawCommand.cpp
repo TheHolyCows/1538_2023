@@ -24,10 +24,12 @@ void ClawCommand::Start(CowRobot *robot)
     m_Timer->Reset();
     m_Timer->Start();
     robot->GetArm()->SetClawState(m_ClawState);
+    robot->GetArm()->UpdateClawState();
 }
 
 void ClawCommand::Handle(CowRobot *robot)
 {
+    robot->GetArm()->UpdateClawState();
     return;
 }
 

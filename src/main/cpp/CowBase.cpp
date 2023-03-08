@@ -86,6 +86,12 @@ void CowBase::DisabledPeriodic()
     //     m_Display->DisplayPeriodic();
     // }
 
+    if (m_ControlBoard->GetOperatorButton(BT_STOW)) {
+        m_Bot->GetArm()->GetPivot().BrakeMode(false);
+    } else {
+        m_Bot->GetArm()->GetPivot().BrakeMode(true);
+    }
+
     if (m_ControlBoard->GetConstantsResetButton())
     {
         printf("RESETTING CONSTANTS\n");

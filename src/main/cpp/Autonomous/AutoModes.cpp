@@ -29,18 +29,66 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 3, 2, true, true));
+    // m_Modes["Test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 3, 2, true, true));
 
     // m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true, true));
     // m_Modes["Test"].push_back(new ClawCommand(CLAW_INTAKE, 2));
 
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CONE);
+            Vision::GetInstance()->SetCargo(CG_CONE);
+            bot->GetArm()->UpdateClawState();
+        }));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(1, false));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(0.1, false));
+
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-    //     new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 2));
+    //     new UpdateArmStateCommand(ARM_GND, CG_CONE, true, true));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ParallelCommand(
+        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
+          new SeriesCommand({ new WaitCommand(1.5, false),
+                              new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
+                                                  new ClawCommand(CLAW_INTAKE, 0) }) }) }));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_GND, CG_CONE, false));
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-    //     new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 5, 3, true, true));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    //     new PathplannerSwerveTrajectoryCommand("intake (loading zone side)", 5, 3, true, false));
+
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_OFF, 0));
+
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new PathplannerSwerveTrajectoryCommand("drive to score (loading zone side)", 16.5, 8, true, false));
+
+
+
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(1.5, false));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+        new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(0.1, false));
+
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    //     new PathplannerSwerveTrajectoryCommand("c", 5, 3, true, true));
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back();
+    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(1, false));
     //     new PathplannerSwerveTrajectoryCommand("intake (loading zone side)", 2, 1, true, false));
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_OFF, 0));
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(

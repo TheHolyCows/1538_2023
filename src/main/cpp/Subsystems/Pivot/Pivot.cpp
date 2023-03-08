@@ -74,3 +74,15 @@ void Pivot::Handle()
         CowLib::CowLogger::LogMotor(9, 0, m_PivotMotor->GetSelectedSensorPosition() / 2048);
     }
 }
+
+void Pivot::BrakeMode(bool brakeMode)
+{
+    if (brakeMode)
+    {
+        m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
+    }
+    else
+    {
+        m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Coast);
+    }
+}

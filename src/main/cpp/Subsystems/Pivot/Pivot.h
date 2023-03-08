@@ -41,6 +41,8 @@ public:
 
     void ResetConstants() override;
 
+    void BrakeMode(bool brakeMode);
+
     void Handle();
 
 private:
