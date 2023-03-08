@@ -6,7 +6,8 @@ BalanceCommand::BalanceCommand(const double speed, const double timeout, const d
       m_Speed(speed),
       m_Timeout(timeout),
       m_MaxDistance(maxDistance),
-      m_PitchHasChanged(false),
+      m_OnIncline(false),
+      m_LastPitch(0),
       m_Done(false)
 {
 }
@@ -38,11 +39,12 @@ void BalanceCommand::Start(CowRobot *robot)
 
 void BalanceCommand::Handle(CowRobot *robot)
 {
-    if (m_PitchHasChanged)
+    double pitch = m_Gyro.GetPitchDegrees();
+    double err = fabs(pitch - m_LastPitch);
+
+    if (m_OnIncline)
     {
-        // When it started falling from the target
-        if (fabs(fabs(m_Gyro.GetPitchDegrees() - fabs(CONSTANT("BALANCE_PITCH_TARGET"))))
-            < (CONSTANT("BALANCE_PITCH_TOLERANCE")))
+        if (err > CONSTANT("BALANCE_PITCH_THRESHOLD"))
         {
             m_Done = true;
             return;
@@ -53,11 +55,10 @@ void BalanceCommand::Handle(CowRobot *robot)
     }
     else
     {
-        // When it first reaches the target point
-        if (fabs(fabs(m_Gyro.GetPitchDegrees() - fabs(CONSTANT("BALANCE_PITCH_TARGET"))))
-            < (CONSTANT("BALANCE_PITCH_TOLERANCE")))
+        if (err > CONSTANT("BALANCE_PITCH_THRESHOLD"))
         {
-            m_PitchHasChanged = true;
+            m_OnIncline = true;
+            return;
         }
         else
         {
@@ -65,6 +66,8 @@ void BalanceCommand::Handle(CowRobot *robot)
             robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
         }
     }
+
+    m_LastPitch = pitch;
 }
 
 void BalanceCommand::Finish(CowRobot *robot)

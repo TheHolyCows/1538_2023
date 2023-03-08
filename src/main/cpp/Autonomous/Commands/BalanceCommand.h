@@ -29,7 +29,9 @@ private:
 
     frc::Pose2d m_StartingPose;
 
-    bool m_PitchHasChanged;
+    bool m_OnIncline;
+
+    double m_LastPitch;
 
     bool m_Done;
 };
