@@ -56,7 +56,7 @@ AutoModes::AutoModes()
         new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
     m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ParallelCommand(
-        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 12, true, true),
+        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
           new SeriesCommand({ new WaitCommand(1.5, false),
                               new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
                                                   new ClawCommand(CLAW_INTAKE, 0) }) }) }));
@@ -72,13 +72,13 @@ AutoModes::AutoModes()
         new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
     m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-        new PathplannerSwerveTrajectoryCommand("drive to score (loading zone side)", 16.5, 12, true, false));
+        new PathplannerSwerveTrajectoryCommand("drive to score (loading zone side)", 16.5, 8, true, false));
 
 
 
     m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
         new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(1.5, false));
+    m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(2, false));
     m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
         new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
