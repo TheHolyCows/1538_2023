@@ -17,6 +17,10 @@ AutoModes::AutoModes()
     // BAD THINGS WILL HAPPEN
 
     // For some reason we need to run this stuff
+    m_Modes["balance"].push_back(new BalanceCommand(8, 7, 100, false));
+    m_Modes["balance"].push_back(new WaitCommand(1, true));
+    m_Modes["balance"].push_back(new BalanceCommand(2.5, 7, 15, true));
+
     m_Modes["2 cone (loading zone size)"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
@@ -80,7 +84,7 @@ AutoModes::AutoModes()
 
     m_Modes["1 cone + balance (middle)"].push_back(
         new PathplannerSwerveTrajectoryCommand("drive to charge station (middle)", 10, 5, true, true));
-    m_Modes["1 cone + balance (middle)"].push_back(new BalanceCommand(2, 10, 10));
+    // m_Modes["1 cone + balance (middle)"].push_back(new BalanceCommand(2, 10, 10));
 
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
     //     new PathplannerSwerveTrajectoryCommand("c", 5, 3, true, true));
