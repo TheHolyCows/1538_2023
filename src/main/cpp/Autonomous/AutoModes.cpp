@@ -29,9 +29,9 @@ AutoModes::AutoModes()
     // m_Modes["Test"].push_back(new SwerveTrajectoryCommand("output/Test1", 0, true, true));
     // m_Modes["Test"].push_back(new HoldPositionCommand(120, 0, true, false));
 
-    m_Modes["Test"].push_back(new BalanceCommand(3, 7, 100, false));
+    m_Modes["Test"].push_back(new BalanceCommand(4.5, 7, 100, false));
     m_Modes["Test"].push_back(new WaitCommand(1, true));
-    m_Modes["Test"].push_back(new BalanceCommand(2, 4, 100, true));
+    m_Modes["Test"].push_back(new BalanceCommand(2, 7, 100, true));
 
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, ST_CONE));
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));

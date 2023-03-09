@@ -48,8 +48,8 @@ void BalanceCommand::Handle(CowRobot *robot)
     double accel = m_AccelerometerLPF.Calculate(m_Accelerometer.GetZ());
     double err   = pitch - m_LastPitch;
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "accel : %f", accel);
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "pitch : %f", pitch);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "accel : %f", accel);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "pitch : %f", pitch);
 
     if (!m_PitchOnly && (fabs(pitch) > 16 && fabs(accel) > 1))
     {
@@ -58,7 +58,12 @@ void BalanceCommand::Handle(CowRobot *robot)
     }
     else if (m_PitchOnly)
     {
-        if (fabs(pitch) < fabs(m_LastPitch) - 0.3)
+        if (fabs(pitch) < 1 && fabs(pitch) > 0)
+        {
+            m_Done = true;
+            return;
+        }
+        if (fabs(pitch) < fabs(m_LastPitch) - 0.1)
         {
             m_Done = true;
             return;
