@@ -15,7 +15,7 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
     m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
     m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
     m_MinPos   = CONSTANT("ARM_MIN_EXT");
-    m_MaxPos   = CONSTANT("ARM_MAX_EXT");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXT") * CONSTANT("TELESCOPE_GEAR_RATIO");
 
     m_WristMaxAngle = CONSTANT("WRIST_MAX_ANGLE");
 
@@ -317,7 +317,7 @@ void Arm::ResetConstants()
     m_MaxAngle = CONSTANT("PIVOT_MAX_ANGLE");
     m_MinAngle = CONSTANT("PIVOT_MAX_ANGLE") * -1;
     m_MinPos   = CONSTANT("ARM_MIN_EXT");
-    m_MaxPos   = CONSTANT("ARM_MAX_EXT");
+    m_MaxPos   = CONSTANT("ARM_MAX_EXT") * CONSTANT("TELESCOPE_GEAR_RATIO");
 
     m_WristMaxAngle = CONSTANT("WRIST_MAX_ANGLE");
 
@@ -371,12 +371,14 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         m_ReInitArmLPF = false;
     }
     double lpfAngle = m_ArmLPF->Calculate(safeAngle);
-    // if (m_UpdateArmLPF)
-    // {
-    //     // this is set to true by InvertArm() when state changes
-    //     // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
-    //     safeAngle = lpfAngle;
-    // }
+    if (m_UpdateArmLPF)
+    {
+        // this is set to true by InvertArm() when state changes
+        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
+        // safeAngle = lpfAngle;
+        if (m_LoopCount % 20 == 0)
+            CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "lpf setpoint: %f\n", lpfAngle);
+    }
 
     m_Pivot->RequestAngle(safeAngle);
 
@@ -489,7 +491,8 @@ void Arm::RequestSafeStow()
 
     m_Pivot->RequestAngle(reqAngle);
 
-    if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD") && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
+    if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD")
+        && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
         m_Telescope->RequestPosition(CONSTANT("SCORE_STOW_EXT"));
 }
 

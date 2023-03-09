@@ -38,7 +38,7 @@ void Telescope::RequestPosition(double pos)
     //
     //    m_MotorRequest.Position = setpoint.position.value() * flip;
 
-    m_MotorRequest.Position = pos * -1;
+    m_MotorRequest.Position = pos * -1 * CONSTANT("TELESCOPE_GEAR_RATIO");
 
     if (GetPosition() < GetSetpoint())
     {
@@ -52,7 +52,7 @@ void Telescope::RequestPosition(double pos)
 
 double Telescope::GetSetpoint()
 {
-    return m_MotorRequest.Position * -1;
+    return m_MotorRequest.Position * -1 / CONSTANT("TELESCOPE_GEAR_RATIO");
 }
 
 bool Telescope::AtTarget()
@@ -62,7 +62,7 @@ bool Telescope::AtTarget()
 
 double Telescope::GetPosition()
 {
-    return m_TelescopeMotor->GetPosition() * -1;
+    return m_TelescopeMotor->GetPosition() * -1 / CONSTANT("TELESCOPE_GEAR_RATIO");
 }
 
 void Telescope::UpdatePID(double armExt)
