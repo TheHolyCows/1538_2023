@@ -1,14 +1,17 @@
 #pragma once
 
-#include "RobotCommand.h"
-#include "../../CowPigeon.h"
+#include "../../CowLib/CowLogger.h"
 #include "../../CowLib/CowTimer.h"
+#include "../../CowPigeon.h"
+#include "RobotCommand.h"
+
+#include <frc/filter/LinearFilter.h>
 #include <frc/geometry/Pose2d.h>
 
 class BalanceCommand : public RobotCommand
 {
 public:
-    BalanceCommand(double speed, double timeout, double maxDistance);
+    BalanceCommand(double speed, double timeout, double maxDistance, bool pitchOnly);
     ~BalanceCommand() = default;
 
     bool IsComplete(CowRobot *robot) override;
@@ -26,10 +29,17 @@ private:
     const double m_Speed;
     const double m_Timeout;
     const double m_MaxDistance;
+    const bool m_PitchOnly;
 
     frc::Pose2d m_StartingPose;
 
+    frc::LinearFilter<double> m_GyroLPF;
+    frc::LinearFilter<double> m_AccelerometerLPF;
+
+    frc::BuiltInAccelerometer m_Accelerometer{};
+
     bool m_OnIncline;
+    bool m_SecondIncline;
 
     double m_LastPitch;
 

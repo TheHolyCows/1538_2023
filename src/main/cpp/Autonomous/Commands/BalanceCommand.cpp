@@ -1,15 +1,19 @@
 #include "BalanceCommand.h"
 
-BalanceCommand::BalanceCommand(const double speed, const double timeout, const double maxDistance)
+BalanceCommand::BalanceCommand(const double speed, const double timeout, const double maxDistance, const bool pitchOnly)
     : m_Timer(std::make_unique<CowLib::CowTimer>()),
       m_Gyro(*CowPigeon::GetInstance()),
       m_Speed(speed),
       m_Timeout(timeout),
       m_MaxDistance(maxDistance),
+      m_PitchOnly(pitchOnly),
       m_OnIncline(false),
+      m_SecondIncline(false),
       m_LastPitch(0),
       m_Done(false),
-      m_Sign(1)
+      m_Sign(1),
+      m_GyroLPF(frc::LinearFilter<double>::MovingAverage(10)),
+      m_AccelerometerLPF(frc::LinearFilter<double>::MovingAverage(10))
 {
 }
 
@@ -40,34 +44,29 @@ void BalanceCommand::Start(CowRobot *robot)
 
 void BalanceCommand::Handle(CowRobot *robot)
 {
-    double pitch = m_Gyro.GetPitchDegrees();
+    double pitch = m_GyroLPF.Calculate(m_Gyro.GetPitchDegrees());
+    double accel = m_AccelerometerLPF.Calculate(m_Accelerometer.GetZ());
     double err   = pitch - m_LastPitch;
 
-    if (m_OnIncline)
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "accel : %f", accel);
+    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "pitch : %f", pitch);
+
+    if (!m_PitchOnly && (fabs(pitch) > 16 && fabs(accel) > 1))
     {
-        if (fabs(err) > CONSTANT("BALANCE_PITCH_THRESHOLD") && m_Sign != ((0 < (err)) - (err < 0)) && fabs(pitch) < CONSTANT("BALANCE_PITCH_THRESHOLD"))
+        m_Done = true;
+        return;
+    }
+    else if (m_PitchOnly)
+    {
+        if (fabs(pitch) < fabs(m_LastPitch) - 0.3)
         {
             m_Done = true;
             return;
         }
+    }
 
-        robot->GetDrivetrain()->SetLocked(false); // Make sure we aren't locked
-        robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
-    }
-    else
-    {
-        if (fabs(err) > CONSTANT("BALANCE_PITCH_THRESHOLD"))
-        {
-            m_OnIncline = true;
-            m_Sign      = (0 < err) - (err < 0);
-            return;
-        }
-        else
-        {
-            robot->GetDrivetrain()->SetLocked(false);
-            robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
-        }
-    }
+    robot->GetDrivetrain()->SetLocked(false);
+    robot->GetDrivetrain()->SetVelocity(m_Speed, 0, 0, true);
 
     m_LastPitch = pitch;
 }
