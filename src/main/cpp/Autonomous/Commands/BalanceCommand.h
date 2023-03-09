@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../CowConstants.h"
 #include "../../CowLib/CowLogger.h"
 #include "../../CowLib/CowTimer.h"
 #include "../../CowPigeon.h"

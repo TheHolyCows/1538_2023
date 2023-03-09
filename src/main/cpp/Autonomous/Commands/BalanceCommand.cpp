@@ -51,7 +51,7 @@ void BalanceCommand::Handle(CowRobot *robot)
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "accel : %f", accel);
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "pitch : %f", pitch);
 
-    if (!m_PitchOnly && (fabs(pitch) > 16 && fabs(accel) > 1))
+    if (!m_PitchOnly && (fabs(pitch) > CONSTANT("CHARGE_INIT_THRESHOLD") && fabs(accel) > 1))
     {
         m_Done = true;
         return;
@@ -63,7 +63,7 @@ void BalanceCommand::Handle(CowRobot *robot)
             m_Done = true;
             return;
         }
-        if (fabs(pitch) < fabs(m_LastPitch) - 0.1)
+        if (fabs(pitch) < CONSTANT("CHARGE_TIP_THRESHOLD") && fabs(pitch) < fabs(m_LastPitch) - 0.1)
         {
             m_Done = true;
             return;
