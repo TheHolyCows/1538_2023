@@ -48,14 +48,14 @@ double Claw::GetWristAngle()
 
 void Claw::SetIntakeSpeed(double percent)
 {
-    m_IntakeControlRequest.PercentOut = percent;
+    m_IntakeControlRequest.PercentOut = percent * -1;
 
-    m_IntakePercent = percent;
+    m_IntakePercent = percent * -1;
 }
 
 double Claw::GetIntakeSpeed()
 {
-    return m_IntakeMotor->GetVelocity();
+    return m_IntakeMotor->GetVelocity() * -1;
 }
 
 void Claw::SetOpen(bool open)
