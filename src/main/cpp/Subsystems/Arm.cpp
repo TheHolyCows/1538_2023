@@ -249,12 +249,19 @@ void Arm::UpdateClawState()
         break;
     case CLAW_INTAKE :
         m_ResetCargoFlag = false;
-        m_Claw->SetIntakeSpeed(1);
+        if (m_Cargo == CG_CUBE)
+        {
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_INTAKE_CUBE"));
+        }
+        else if (m_Cargo == CG_CONE)
+        {
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_INTAKE_CONE"));
+        }
         break;
     case CLAW_EXHAUST :
         if (m_Cargo == CG_CUBE)
         {
-            m_Claw->SetIntakeSpeed(-1);
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE"));
         }
         else if (m_Cargo == CG_CONE)
         {

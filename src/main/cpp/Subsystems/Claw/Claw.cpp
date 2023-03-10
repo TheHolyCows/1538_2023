@@ -48,14 +48,8 @@ double Claw::GetWristAngle()
 
 void Claw::SetIntakeSpeed(double percent)
 {
-    if (m_Open)
-    {
-        m_IntakeControlRequest.PercentOut = percent * CONSTANT("ARM_INTAKE_CUBE");
-    }
-    else
-    {
-        m_IntakeControlRequest.PercentOut = percent * CONSTANT("ARM_INTAKE_CONE");
-    }
+    m_IntakeControlRequest.PercentOut = percent;
+
     m_IntakePercent = percent;
 }
 
