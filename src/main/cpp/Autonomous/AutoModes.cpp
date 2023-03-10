@@ -21,7 +21,7 @@ AutoModes::AutoModes()
     m_Modes["balance"].push_back(new WaitCommand(1, true));
     m_Modes["balance"].push_back(new BalanceCommand(2.5, 7, 15, true));
 
-    m_Modes["2 cone (loading zone size)"].push_back(new LambdaCommand(
+    m_Modes["2 cone - loading zn"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
             bot->GetArm()->SetClawState(CLAW_INTAKE);
@@ -31,40 +31,93 @@ AutoModes::AutoModes()
         }));
 
     // Go to L3 and wait to score
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    m_Modes["2 cone (loading zone size)"].push_back(new WaitCommand(1, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["2 cone - loading zn"].push_back(new WaitCommand(1, false));
+    m_Modes["2 cone - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
 
     // Driver stow than real stow
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new WaitCommand(0.1, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["2 cone - loading zn"].push_back(new WaitCommand(0.1, false));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
     // Drive and intake. Run intake 1.5 seconds in
-    m_Modes["2 cone (loading zone size)"].push_back(new ParallelCommand(
+    m_Modes["2 cone - loading zn"].push_back(new ParallelCommand(
         { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
           new SeriesCommand({ new WaitCommand(1.5, false),
                               new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
                                                   new ClawCommand(CLAW_INTAKE, 0) }) }) }));
-    m_Modes["2 cone (loading zone size)"].push_back(new ClawCommand(CLAW_INTAKE, 0));
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new ClawCommand(CLAW_OFF, 0));
+    m_Modes["2 cone - loading zn"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, false));
+    m_Modes["2 cone - loading zn"].push_back(new ClawCommand(CLAW_OFF, 0));
 
     // Stow and drive back
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
-    m_Modes["2 cone (loading zone size)"].push_back(
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["2 cone - loading zn"].push_back(
         new PathplannerSwerveTrajectoryCommand("drive to score (loading zone side)", 16.5, 8, true, false));
 
     // L3 cone and score
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    m_Modes["2 cone (loading zone size)"].push_back(new WaitCommand(2, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["2 cone - loading zn"].push_back(new WaitCommand(2, false));
+    m_Modes["2 cone - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
 
     // Stow again
-    m_Modes["2 cone (loading zone size)"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["2 cone (loading zone size)"].push_back(new WaitCommand(0.1, false));
+    m_Modes["2 cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["2 cone - loading zn"].push_back(new WaitCommand(0.1, false));
 
-    m_Modes["1 cone + balance (middle)"].push_back(new LambdaCommand(
+    // start with cube, grab cone
+    m_Modes["cube/cone - loading zn"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CUBE);
+            Vision::GetInstance()->SetCargo(CG_CUBE);
+            bot->GetArm()->UpdateClawState();
+        }));
+
+    // Go to L3 and wait to score
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CUBE, true, true));
+    m_Modes["cube/cone - loading zn"].push_back(new WaitCommand(1, false));
+    m_Modes["cube/cone - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+
+    // Driver stow than real stow
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["cube/cone - loading zn"].push_back(new WaitCommand(0.1, false));
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    // Drive and intake. Run intake 1.5 seconds in
+    m_Modes["cube/cone - loading zn"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CONE);
+            Vision::GetInstance()->SetCargo(CG_CONE);
+            bot->GetArm()->UpdateClawState();
+        }));
+    m_Modes["cube/cone - loading zn"].push_back(new ParallelCommand(
+        { new PathplannerSwerveTrajectoryCommand("cube cone - grab cone (loading zone)", 16.5, 8, true, true),
+          new SeriesCommand({ new WaitCommand(1.5, false),
+                              new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CONE, false),
+                                                  new ClawCommand(CLAW_INTAKE, 0) }) }) }));
+    m_Modes["cube/cone - loading zn"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, false));
+    m_Modes["cube/cone - loading zn"].push_back(new ClawCommand(CLAW_OFF, 0));
+
+    // Stow and drive back
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["cube/cone - loading zn"].push_back(
+        new PathplannerSwerveTrajectoryCommand("cube cone - score cone (loading zone)", 16.5, 8, true, false));
+
+    // L3 cone and score
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["cube/cone - loading zn"].push_back(new WaitCommand(2, false));
+    m_Modes["cube/cone - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.3));
+
+    // Stow again
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["cube/cone - loading zn"].push_back(new WaitCommand(1, false));
+    m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    m_Modes["1 cone/balance - mid"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
             bot->GetArm()->SetClawState(CLAW_INTAKE);
@@ -73,18 +126,94 @@ AutoModes::AutoModes()
             bot->GetArm()->UpdateClawState();
         }));
     // Go to L3 and wait to score
-    m_Modes["1 cone + balance (middle)"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    m_Modes["1 cone + balance (middle)"].push_back(new WaitCommand(1, false));
-    m_Modes["1 cone + balance (middle)"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["1 cone/balance - mid"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(1, false));
+    m_Modes["1 cone/balance - mid"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
 
     // Driver stow than real stow
-    m_Modes["1 cone + balance (middle)"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["1 cone + balance (middle)"].push_back(new WaitCommand(0.1, false));
-    m_Modes["1 cone + balance (middle)"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["1 cone/balance - mid"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(0.1, false));
+    m_Modes["1 cone/balance - mid"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
-    m_Modes["1 cone + balance (middle)"].push_back(
+    m_Modes["1 cone/balance - mid"].push_back(
         new PathplannerSwerveTrajectoryCommand("drive to charge station (middle)", 10, 5, true, true));
-    // m_Modes["1 cone + balance (middle)"].push_back(new BalanceCommand(2, 10, 10));
+    m_Modes["1 cone/balance - mid"].push_back(new BalanceCommand(8, 7, 6, false));
+    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(1, true));
+    m_Modes["1 cone/balance - mid"].push_back(new BalanceCommand(2.5, 7, 4, true));
+
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CONE);
+            Vision::GetInstance()->SetCargo(CG_CONE);
+            bot->GetArm()->UpdateClawState();
+        }));
+
+    // Go to L3 and wait to score
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new WaitCommand(1, false));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+
+    // Driver stow than real stow
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new WaitCommand(0.1, false));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
+
+    // Drive and intake. Run intake 1.5 seconds in
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new ParallelCommand(
+        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
+          new SeriesCommand({ new WaitCommand(1.5, false),
+                              new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
+                                                  new ClawCommand(CLAW_INTAKE, 0) }) }) }));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CUBE, false));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new ClawCommand(CLAW_OFF, 0));
+
+    // Stow and drive to charge station
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(
+        new PathplannerSwerveTrajectoryCommand("drive to charge (loading zone)", 16.5, 10, true, false));
+    // m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new BalanceCommand(-8, 7, 6, false));
+    // m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new WaitCommand(1, true));
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new BalanceCommand(-2.5, 7, 5, true));
+
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CONE);
+            Vision::GetInstance()->SetCargo(CG_CONE);
+            bot->GetArm()->UpdateClawState();
+        }));
+
+    // Go to L3 and wait to score
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new WaitCommand(1, false));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+
+    // Driver stow than real stow
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new WaitCommand(0.1, false));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    // Drive and intake. Run intake 1.5 seconds in
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new ParallelCommand(
+        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
+          new SeriesCommand({ new WaitCommand(1.5, false),
+                              new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CONE, false),
+                                                  new ClawCommand(CLAW_INTAKE, 0) }) }) }));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new ClawCommand(CLAW_INTAKE, 0));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, false));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new ClawCommand(CLAW_OFF, 0));
+
+    // Stow and drive to charge station
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(
+        new PathplannerSwerveTrajectoryCommand("drive to charge (loading zone)", 16.5, 10, true, false));
+    // m_Modes["1.5 cone only/balance - loading zn"].push_back(new BalanceCommand(-8, 7, 6, false));
+    // m_Modes["1.5 cone only/balance - loading zn"].push_back(new WaitCommand(1, true));
+    m_Modes["1.5 cone only/balance - loading zn"].push_back(new BalanceCommand(-2.5, 7, 5, true));
 
     // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
     //     new PathplannerSwerveTrajectoryCommand("c", 5, 3, true, true));

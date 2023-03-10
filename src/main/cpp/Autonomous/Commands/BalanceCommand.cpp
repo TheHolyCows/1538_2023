@@ -78,6 +78,13 @@ void BalanceCommand::Handle(CowRobot *robot)
 
 void BalanceCommand::Finish(CowRobot *robot)
 {
-    robot->GetDrivetrain()->SetLocked(true);
+    if (!m_PitchOnly)
+    {
+        robot->GetDrivetrain()->SetLocked(false);
+    }
+    else
+    {
+        robot->GetDrivetrain()->SetLocked(true);
+    }
     robot->GetDrivetrain()->SetVelocity(0, 0, 0, true);
 }

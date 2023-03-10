@@ -77,7 +77,8 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     }
 
     // lock out extension until we reach desired angle +/- a few degrees
-    if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5)
+    if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5
+        || std::signbit(curAngle) != std::signbit(reqAngle))
     {
         m_ExtLockout = true;
     }
@@ -370,14 +371,12 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
         m_ArmLPF->ReInit(curAngle, curAngle);
         m_ReInitArmLPF = false;
     }
-    double lpfAngle = m_ArmLPF->Calculate(safeAngle);
+
     if (m_UpdateArmLPF)
     {
         // this is set to true by InvertArm() when state changes
         // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
-        // safeAngle = lpfAngle;
-        if (m_LoopCount % 20 == 0)
-            CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "lpf setpoint: %f\n", lpfAngle);
+        safeAngle = m_ArmLPF->Calculate(safeAngle);
     }
 
     m_Pivot->RequestAngle(safeAngle);
@@ -487,6 +486,27 @@ void Arm::RequestSafeStow()
     if (m_ArmInvert)
     {
         reqAngle = reqAngle * -1;
+    }
+
+    if (m_ReInitArmLPF)
+    {
+        // this is set true by SetArmState() when state changes
+        m_ArmLPF->ReInit(curAngle, curAngle);
+        m_ReInitArmLPF = false;
+    }
+
+    if (fabs(curAngle) > fabs(reqAngle) - 5 && fabs(curAngle) < fabs(reqAngle) + 5
+        && std::signbit(curAngle) == std::signbit(reqAngle))
+    {
+        // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "at target\ncur: %f\nreq: %f\n", curAngle, reqAngle);
+        m_UpdateArmLPF = false;
+    }
+
+    if (m_UpdateArmLPF)
+    {
+        // this is set to true by InvertArm() when state changes
+        // this is set to false by GetSafeAngle() when arm is within 5 degrees of target
+        reqAngle = m_ArmLPF->Calculate(reqAngle);
     }
 
     m_Pivot->RequestAngle(reqAngle);
