@@ -163,6 +163,14 @@ AutoModes::AutoModes()
     m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
 
     // Drive and intake. Run intake 1.5 seconds in
+    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CUBE);
+            Vision::GetInstance()->SetCargo(CG_CUBE);
+            bot->GetArm()->UpdateClawState();
+        }));
     m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new ParallelCommand(
         { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
           new SeriesCommand({ new WaitCommand(1.5, false),
@@ -177,15 +185,6 @@ AutoModes::AutoModes()
     m_Modes["1.5 cone/cube/balance - loading zn"].push_back(
         new PathplannerSwerveTrajectoryCommand("drive to charge (loading zone)", 16.5, 10, true, false));
     m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new BalanceCommand(-2.5, 7, 5, true));
-
-    m_Modes["1.5 cone/cube/balance - loading zn"].push_back(new LambdaCommand(
-        [](CowRobot *bot)
-        {
-            bot->GetArm()->SetClawState(CLAW_INTAKE);
-            bot->GetArm()->SetArmCargo(CG_CUBE);
-            Vision::GetInstance()->SetCargo(CG_CUBE);
-            bot->GetArm()->UpdateClawState();
-        }));
 
     /** 1.5 cone only + balance **/
 

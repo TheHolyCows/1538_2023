@@ -7,14 +7,14 @@ BalanceCommand::BalanceCommand(const double speed, const double timeout, const d
       m_Timeout(timeout),
       m_MaxDistance(maxDistance),
       m_PitchOnly(pitchOnly),
-      m_OnIncline(false),
-      m_SecondIncline(false),
-      m_LastPitch(0),
-      m_Done(false),
-      m_Sign(1),
       m_GyroLPF(frc::LinearFilter<double>::MovingAverage(10)),
       m_AccelerometerLPF(frc::LinearFilter<double>::MovingAverage(10))
 {
+    m_OnIncline     = false;
+    m_SecondIncline = false;
+    m_LastPitch     = 0;
+    m_Done          = false;
+    m_Sign          = 1;
 }
 
 bool BalanceCommand::IsComplete(CowRobot *robot)
@@ -46,7 +46,7 @@ void BalanceCommand::Handle(CowRobot *robot)
 {
     double pitch = m_GyroLPF.Calculate(m_Gyro.GetPitchDegrees());
     double accel = m_AccelerometerLPF.Calculate(m_Accelerometer.GetZ());
-    double err   = pitch - m_LastPitch;
+    // double err   = pitch - m_LastPitch;
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "accel : %f", accel);
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "pitch : %f", pitch);
