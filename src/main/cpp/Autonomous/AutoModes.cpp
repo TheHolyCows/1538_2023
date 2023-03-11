@@ -42,7 +42,7 @@ AutoModes::AutoModes()
 
     // Drive and intake. Run intake 1.5 seconds in
     m_Modes["2 cone - loading zone"].push_back(new ParallelCommand(
-        { new PathplannerSwerveTrajectoryCommand("drive to piece (loading zone side)", 16.5, 8, true, true),
+        { new PathplannerSwerveTrajectoryCommand("cone cone - grab cone (loading zone)", 16.5, 8, true, true),
           new SeriesCommand({ new WaitCommand(1.5, false),
                               new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
                                                   new ClawCommand(CLAW_INTAKE, 0) }) }) }));
@@ -53,7 +53,7 @@ AutoModes::AutoModes()
     // Stow and drive back
     m_Modes["2 cone - loading zone"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
     m_Modes["2 cone - loading zone"].push_back(
-        new PathplannerSwerveTrajectoryCommand("drive to score (loading zone side)", 16.5, 8, true, false));
+        new PathplannerSwerveTrajectoryCommand("cone cone - score cone (loading zone)", 16.5, 8, true, false));
 
     // L3 cone and score
     m_Modes["2 cone - loading zone"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
