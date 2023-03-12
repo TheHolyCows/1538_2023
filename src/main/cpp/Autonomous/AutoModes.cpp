@@ -117,6 +117,8 @@ AutoModes::AutoModes()
     m_Modes["cube/cone - loading zn"].push_back(new WaitCommand(1, false));
     m_Modes["cube/cone - loading zn"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
+    /** cone only balance mid **/
+
     m_Modes["1 cone/balance - mid"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
@@ -127,8 +129,9 @@ AutoModes::AutoModes()
         }));
     // Go to L3 and wait to score
     m_Modes["1 cone/balance - mid"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
-    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(1, false));
-    m_Modes["1 cone/balance - mid"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(1.3, false));
+    m_Modes["1 cone/balance - mid"].push_back(new ClawCommand(CLAW_EXHAUST, 0.5));
+    m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(0.5, false));
 
     // Driver stow than real stow
     m_Modes["1 cone/balance - mid"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
@@ -140,6 +143,33 @@ AutoModes::AutoModes()
     m_Modes["1 cone/balance - mid"].push_back(new BalanceCommand(8, 7, 6, false));
     m_Modes["1 cone/balance - mid"].push_back(new WaitCommand(1, true));
     m_Modes["1 cone/balance - mid"].push_back(new BalanceCommand(2.5, 7, 4, true));
+
+    /** cube only balance mid **/
+
+    m_Modes["1 cube/balance - mid"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CUBE);
+            Vision::GetInstance()->SetCargo(CG_CUBE);
+            bot->GetArm()->UpdateClawState();
+        }));
+    // Go to L3 and wait to score
+    m_Modes["1 cube/balance - mid"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CUBE, true, true));
+    m_Modes["1 cube/balance - mid"].push_back(new WaitCommand(1.3, false));
+    m_Modes["1 cube/balance - mid"].push_back(new ClawCommand(CLAW_EXHAUST, 0.5));
+    m_Modes["1 cube/balance - mid"].push_back(new WaitCommand(0.5, false));
+
+    // Driver stow than real stow
+    m_Modes["1 cube/balance - mid"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["1 cube/balance - mid"].push_back(new WaitCommand(0.1, false));
+    m_Modes["1 cube/balance - mid"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
+
+    m_Modes["1 cube/balance - mid"].push_back(
+        new PathplannerSwerveTrajectoryCommand("drive to charge station (middle cube)", 10, 5, true, true));
+    m_Modes["1 cube/balance - mid"].push_back(new BalanceCommand(8, 7, 6, false));
+    m_Modes["1 cube/balance - mid"].push_back(new WaitCommand(1, true));
+    m_Modes["1 cube/balance - mid"].push_back(new BalanceCommand(2.5, 7, 4, true));
 
     /** 1.5 cone + grab cube + balance **/
 

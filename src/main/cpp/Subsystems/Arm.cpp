@@ -265,14 +265,14 @@ void Arm::UpdateClawState()
         }
         else if (m_Cargo == CG_CONE)
         {
-            if (m_State == ARM_L3)
-            {
-                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_L3_SCORE_CONE"));
-            }
-            else
-            {
-                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
-            }
+            // if (m_State == ARM_L3)
+            // {
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_L3_SCORE_CONE"));
+            // }
+            // else
+            // {
+            //     m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
+            // }
             open             = true;
             m_ResetCargoFlag = true;
         }
