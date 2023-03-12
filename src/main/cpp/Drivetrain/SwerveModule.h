@@ -9,7 +9,9 @@
 #include "../CowLib/Swerve/CowSwerveKinematics.h"
 #include "../CowLib/Swerve/CowSwerveModulePosition.h"
 #include "../CowLib/Swerve/CowSwerveModuleState.h"
+#include "SwerveModuleInterface.h"
 
+#include <ctre/phoenixpro/TalonFX.hpp>
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/DataLogManager.h>
 #include <frc/geometry/Rotation2d.h>
@@ -17,49 +19,52 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <iostream>
+#include <memory>
 #include <units/angle.h>
 #include <units/velocity.h>
 
-class SwerveModule
+class SwerveModule : public SwerveModuleInterface
 {
 private:
-    int m_Id;
-
-    double m_EncoderOffset;
-
-    CowLib::CowMotorController *m_DriveMotor;
-    CowLib::CowMotorController *m_RotationMotor;
-
-    CowLib::CowCANCoder *m_Encoder;
-
-    double m_Velocity;
-    double m_Position;
-    double m_Angle;
-
     double m_PreviousAngle;
 
-    void ResetToAbsolute();
+    std::unique_ptr<CowLib::CowMotorController> m_DriveMotor;
+    std::unique_ptr<CowLib::CowMotorController> m_RotationMotor;
 
-    // Direct port of https://github.com/frc1678/C2022/blob/main/src/main/java/com/lib/util/CTREModuleState.java
-    static double PlaceInAppropriate0To360Scope(double scopeReference, double newAngle);
-    static CowLib::CowSwerveModuleState Optimize(CowLib::CowSwerveModuleState desiredState, double currentAngle);
+    CowLib::CowMotorController::PercentOutput m_DriveControlRequest;
+    CowLib::CowMotorController::PositionPercentOutput m_RotationControlRequest;
+
+    std::unique_ptr<CowLib::CowCANCoder> m_Encoder;
 
 public:
-    SwerveModule(int id, int driveMotor, int rotationMotor, int encoderId, double encoder_offset);
-    ~SwerveModule();
+    /**
+     * @brief Construct a new SwerveModule object
+     * @param id Module ID
+     * @param driveMotor Drive motor ID
+     * @param rotationMotor Rotation motor ID
+     * @param encoderId CANCoder ID
+     * @param encoderOffset Absolute encoder offset
+     * @param locationX Module X translation
+     * @param locationY Module Y translation
+     */
+    SwerveModule(const int id,
+                 const int driveMotor,
+                 const int rotationMotor,
+                 const int encoderId,
+                 const double encoderOffset);
 
-    int GetId() { return m_Id; }
+    /**
+     * @brief Sets the desired module state to the given state after optimizing
+     * @param state Target state
+     * @param force force angle during low speeds
+     */
+    void SetTargetState(CowLib::CowSwerveModuleState state, bool force = false) override;
 
-    CowLib::CowSwerveModuleState GetState();
-    CowLib::CowSwerveModulePosition GetPosition();
+    void ResetConstants() override;
 
-    void SetTargetState(CowLib::CowSwerveModuleState state);
+    void ResetEncoders() override;
 
-    void ResetConstants();
-
-    void ResetEncoders();
-
-    void Handle();
+    void Handle() override;
 };
 
 #endif /* __SWERVE_MODULE_H */

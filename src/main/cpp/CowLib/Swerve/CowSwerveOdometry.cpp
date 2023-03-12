@@ -1,5 +1,7 @@
 #include "./CowSwerveOdometry.h"
 
+#include "frc/smartdashboard/SmartDashboard.h"
+
 namespace CowLib
 {
 
@@ -17,6 +19,8 @@ namespace CowLib
                                          double initialY,
                                          double initialRotation)
     {
+        frc::SmartDashboard::PutData("field", &m_Field);
+
         std::array<frc::SwerveModulePosition, 4> zeroPositions;
         for (int i = 0; i < 4; i++)
         {
@@ -146,6 +150,8 @@ namespace CowLib
         std::array<frc::SwerveModulePosition, 4> WPIModulePositions = CreateWPIModulePositions(modulePositions);
 
         m_Pose = m_PoseEstimator->Update(frc::Rotation2d(units::degree_t{ gyroAngle }), WPIModulePositions);
+
+        m_Field.SetRobotPose(m_Pose);
     }
 
     /**

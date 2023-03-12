@@ -34,7 +34,7 @@ public:
                             bool resetOdometry = false);
     ~SwerveTrajectoryCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot *robot) override;
 

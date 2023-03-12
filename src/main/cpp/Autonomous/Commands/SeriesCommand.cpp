@@ -10,7 +10,7 @@ SeriesCommand::~SeriesCommand()
     // TODO: figure out if they need to be deleted here (don't think so)
 }
 
-bool SeriesCommand::IsComplete()
+bool SeriesCommand::IsComplete(CowRobot *robot)
 {
     return m_Commands.empty() && m_CurrentCommand == nullptr;
 }
@@ -29,7 +29,7 @@ void SeriesCommand::Handle(CowRobot* robot)
         return;
     }
 
-    if (m_CurrentCommand->IsComplete()) {
+    if (m_CurrentCommand->IsComplete(robot)) {
         m_CurrentCommand->Finish(robot);
         delete m_CurrentCommand;
 

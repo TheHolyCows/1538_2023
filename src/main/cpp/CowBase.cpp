@@ -9,7 +9,7 @@ CowBase::CowBase()
     CowConstants::GetInstance()->RestoreData();
     m_Bot = new CowRobot();
 
-    m_Display = new CowDisplay(m_Bot);
+    // m_Display = new CowDisplay(m_Bot); - removed from bot
 
     // init logger
     CowLib::CowLogger::GetInstance();
@@ -27,7 +27,7 @@ CowBase::~CowBase()
     delete m_ControlBoard;
     delete m_OpController;
     delete m_AutoController;
-    delete m_Display;
+    // delete m_Display;
 }
 
 void CowBase::RobotInit()
@@ -43,8 +43,9 @@ void CowBase::RobotInit()
 void CowBase::DisabledInit()
 {
     CowConstants::GetInstance()->RestoreData();
-    m_Bot->Reset();
     printf("DISABLED INIT -------------------\n");
+
+    m_Bot->GetDriveController()->ResetHeadingLock();
 }
 
 void CowBase::AutonomousInit()
@@ -80,38 +81,46 @@ void CowBase::DisabledPeriodic()
 
     // m_Bot->GyroHandleCalibration();
 
-    if (m_Display)
-    {
-        m_Display->DisplayPeriodic();
+    // if (m_Display)
+    // {
+    //     m_Display->DisplayPeriodic();
+    // }
+
+    if (m_ControlBoard->GetOperatorButton(BT_STOW)) {
+        m_Bot->GetArm()->GetPivot().BrakeMode(false);
+    } else {
+        m_Bot->GetArm()->GetPivot().BrakeMode(true);
     }
 
-    if (m_ControlBoard->GetLeftDriveStickButton(7))
+    if (m_ControlBoard->GetConstantsResetButton())
     {
+        printf("RESETTING CONSTANTS\n");
+        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_OFF, "RESETTING CONSTANTS");
         m_Constants->RestoreData();
-
-        // TODO: change back to 7
-        // if (m_ControlBoard->GetSteeringButton(7)) {
-        if (m_ControlBoard->GetLeftDriveStickButton(7))
-        {
-            m_Bot->Reset();
-
-            /*
-             * POSITION FIRST_OWNERSHIP SECOND_OWNERSHIP DRIVE
-             * iterates over AutoModes
-             */
-            AutoModes::GetInstance()->NextMode();
-            CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
-        }
+        m_Bot->Reset();
     }
+
+    if (m_ControlBoard->GetAutoSelectButton())
+    {
+        /*
+         * POSITION FIRST_OWNERSHIP SECOND_OWNERSHIP DRIVE
+         * iterates over AutoModes
+         */
+        AutoModes::GetInstance()->NextMode();
+        CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
+        printf("%s\n", AutoModes::GetInstance()->GetName().c_str());
+    }
+
     if (m_Bot)
     {
         // TODO: add this back in
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 10 == 0) // 50 ms tick rate
+    if (m_DisabledCount++ % 10 == 0) // 200 ms tick rate
     {
-        CowLib::CowLogger::LogAutoMode(AutoModes::GetInstance()->GetName().c_str());
+        m_Alliance = frc::DriverStation::GetAlliance();
+        CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
     }
 }

@@ -16,11 +16,9 @@ CowPigeon::CowPigeon()
 {
     constexpr int PIGEON_ID = 24;
 
-    m_Pigeon = new ctre::phoenix::sensors::Pigeon2(PIGEON_ID, "cowbus");
+    m_Pigeon = new ctre::phoenixpro::hardware::Pigeon2(PIGEON_ID, "cowbus");
 
     m_Inverted = false;
-
-    m_YawOffset = 0;
 }
 
 void CowPigeon::SetInverted(bool inverted)
@@ -28,37 +26,42 @@ void CowPigeon::SetInverted(bool inverted)
     m_Inverted = inverted;
 }
 
-double CowPigeon::GetYaw()
+units::degree_t CowPigeon::GetYaw()
 {
-    return (GetRawYaw() - m_YawOffset) * (m_Inverted ? -1 : 1);
+    return m_Pigeon->GetYaw().Refresh().GetValue() * (m_Inverted ? -1 : 1);
 }
 
-double CowPigeon::GetPitch()
+units::degree_t CowPigeon::GetPitch()
 {
-    return GetRawPitch() * (m_Inverted ? -1 : 1);
+    return m_Pigeon->GetPitch().Refresh().GetValue() * (m_Inverted ? -1 : 1);
 }
 
-double CowPigeon::GetRoll()
+units::degree_t CowPigeon::GetRoll()
 {
-    return GetRawRoll() * (m_Inverted ? -1 : 1);
+    return m_Pigeon->GetRoll().Refresh().GetValue() * (m_Inverted ? -1 : 1);
+}
+
+double CowPigeon::GetYawDegrees()
+{
+    return GetYaw().value();
+}
+
+double CowPigeon::GetPitchDegrees()
+{
+    return GetPitch().value();
+}
+
+double CowPigeon::GetRollDegrees()
+{
+    return GetRoll().value();
+}
+
+void CowPigeon::SetYaw(units::degree_t angle)
+{
+    m_Pigeon->SetYaw(angle);
 }
 
 void CowPigeon::SetYaw(double angle)
 {
-    m_YawOffset = GetRawYaw() - angle;
-}
-
-double CowPigeon::GetRawYaw()
-{
-    return m_Pigeon->GetYaw();
-}
-
-double CowPigeon::GetRawPitch()
-{
-    return m_Pigeon->GetPitch();
-}
-
-double CowPigeon::GetRawRoll()
-{
-    return m_Pigeon->GetRoll();
+    SetYaw(units::degree_t{ angle });
 }

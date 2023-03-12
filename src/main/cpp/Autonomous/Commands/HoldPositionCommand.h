@@ -35,7 +35,7 @@ public:
     HoldPositionCommand(double time, double maxVelocity, bool stopAtEnd, bool resetOdometry = false);
     ~HoldPositionCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot *robot) override;
 

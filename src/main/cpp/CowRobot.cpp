@@ -6,9 +6,12 @@ CowRobot::CowRobot()
     m_StartTime     = 0;
     m_DSUpdateCount = 0;
 
-    m_LEDDisplay = new CowLib::CowAlphaNum(0x70);
+    // uncomment for b-bot
+    m_PowerDistributionPanel = new frc::PowerDistribution(1, frc::PowerDistribution::ModuleType::kRev);
+    // m_PowerDistributionPanel = new frc::PowerDistribution();
 
-    m_PowerDistributionPanel = new frc::PowerDistribution();
+    // mxp board was removed from robot - can remove this code
+    m_LEDDisplay = nullptr;
 
     m_Gyro = CowPigeon::GetInstance();
 
@@ -21,15 +24,27 @@ CowRobot::CowRobot()
     // fl, fr, bl, br
     // drive motor, angle motor, encoder canId's
     SwerveDrive::ModuleConstants swerveModuleConstants[4]{
-        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
-        SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
+        SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 8, 7, 28, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 4, 3, 26, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+        SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BR_ENCODER_OFFSET") }
     };
+    //    4, 3, 26, CONSTANT("SWERVE_FL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 6, 5, 27, CONSTANT("SWERVE_FR_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 2, 1, 25, CONSTANT("SWERVE_BL_ENCODER_OFFSET") },
+    //    SwerveDrive::ModuleConstants{ 8, 7, 28, BR
 
     m_Drivetrain = new SwerveDrive(swerveModuleConstants, CONSTANT("WHEEL_BASE"));
 
     m_Drivetrain->ResetEncoders();
+
+    m_DriveController = new SwerveDriveController(*m_Drivetrain);
+
+    m_Arm = new Arm(9, 10, 11, 12, 4);
+
+    m_PrevArmState = ARM_NONE;
+
+    m_Arm->SetArmCargo(CG_CONE);
 }
 
 /**
@@ -42,6 +57,13 @@ void CowRobot::Reset()
     m_PreviousGyroError = 0;
 
     m_Drivetrain->ResetConstants();
+    m_DriveController->ResetConstants();
+    m_Arm->ResetConstants();
+    // m_Controller->ResetConstants(); TODO: error
+
+    Vision::GetInstance()->Reset();
+
+    CowLib::CowLogger::GetInstance()->Reset();
 }
 
 /**
@@ -56,9 +78,9 @@ void CowRobot::SetController(GenericController *controller)
 
 void CowRobot::PrintToDS()
 {
-    if (m_DSUpdateCount % 10 == 0)
+    if (m_DSUpdateCount++ % 10 == 0)
     {
-        m_DSUpdateCount = 0;
+        m_DSUpdateCount = 1;
     }
 }
 
@@ -74,13 +96,28 @@ void CowRobot::Handle()
         return;
     }
 
+    ArmSM();
+
     m_Controller->Handle(this);
     m_Drivetrain->Handle();
+    m_Arm->Handle();
 
+    // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
+    // log the following every 200 ms
+    if (m_DSUpdateCount % 10 == 0)
+    {
+        // m_DSUpdateCount is reset in PrintToDS
+        CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
+        CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
+    }
 
-    // Log gyro angle (only yaw for now)
-    //CowLib::CowLogger::LogGyroAngle(m_Gyro->GetYaw());
+    //    // APRIL TAG BOTPOSE
+    //    std::optional<Vision::BotPoseResult> visionPose = Vision::GetInstance()->GetBotPose();
+    //    if (visionPose.has_value())
+    //    {
+    //        m_Drivetrain->AddVisionMeasurement((*visionPose).pose, (*visionPose).timestamp);
+    //    }
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
@@ -99,4 +136,106 @@ void CowRobot::StartTime()
 void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
+}
+
+/**
+ * @brief Updates arm state based on inputs from operator
+ * 
+ */
+void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
+{
+    m_Arm->UseManualControl(false);
+
+    if (state != m_Arm->GetArmState())
+    {
+        m_PrevArmState = m_Arm->GetArmState();
+    }
+
+    if (state == ARM_DRIVER_STOW
+        && (m_PrevArmState == ARM_L2 || m_PrevArmState == ARM_L3 || m_Arm->GetArmState() == ARM_DRIVER_STOW))
+    {
+        m_Arm->SetArmState(state);
+    }
+    else if (state == ARM_DRIVER_STOW)
+    {
+        m_Arm->SetArmState(ARM_STOW);
+    }
+    else
+    {
+        m_Arm->SetArmState(state);
+    }
+
+    //    if (state == ARM_IN)
+    //    {
+    //        m_Arm->SetArmCargo(cargo);
+    //    }
+}
+
+/**
+ * called each cycle by operator controller (at the bottom)
+*/
+void CowRobot::ArmSM()
+{
+    switch (m_Arm->GetArmState())
+    {
+    case ARM_NONE :
+        // this state is only reachable from toggling intake
+        // should only turn intake off?
+        m_Arm->UpdateClawState();
+        break;
+    case ARM_STOW :
+        m_Arm->UpdateClawState();
+        m_Arm->RequestPosition(CONSTANT("ARM_STOW_ANGLE"), CONSTANT("ARM_STOW_EXT"));
+        break;
+    case ARM_L3 :
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L3_CUBE_ANGLE"),
+                                   CONSTANT("ARM_L3_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+        }
+        else if (m_Arm->GetArmCargo() == CG_CONE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L3_CONE_ANGLE"),
+                                   CONSTANT("ARM_L3_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CONE"));
+        }
+        break;
+    case ARM_L2 :
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L2_CUBE_ANGLE"),
+                                   CONSTANT("ARM_L2_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+        }
+        else if (m_Arm->GetArmCargo() == CG_CONE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_L2_CONE_ANGLE"),
+                                   CONSTANT("ARM_L2_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_SCORE_CONE"));
+        }
+        break;
+    case ARM_GND :
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_GND_CUBE_ANGLE"),
+                                   CONSTANT("ARM_GND_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_IN_CUBE"));
+        }
+        else
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_GND_CONE_ANGLE"),
+                                   CONSTANT("ARM_GND_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_IN_CONE"));
+        }
+        break;
+    case ARM_HUMAN :
+        m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
+        break;
+    case ARM_DRIVER_STOW :
+        m_Arm->RequestSafeStow();
+        break;
+    default :
+        break;
+    }
 }

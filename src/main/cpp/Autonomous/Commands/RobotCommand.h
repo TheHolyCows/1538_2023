@@ -7,7 +7,7 @@ class RobotCommand {
 public:
     virtual ~RobotCommand() = default;
 
-    virtual bool IsComplete() = 0;
+    virtual bool IsComplete(CowRobot* robot) = 0;
 
     virtual void Start(CowRobot* robot) = 0;
 

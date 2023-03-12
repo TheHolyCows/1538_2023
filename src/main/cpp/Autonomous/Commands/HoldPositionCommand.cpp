@@ -39,7 +39,7 @@ HoldPositionCommand::~HoldPositionCommand()
     delete m_RotationController;
 }
 
-bool HoldPositionCommand::IsComplete()
+bool HoldPositionCommand::IsComplete(CowRobot *robot)
 {
     // I think these units are correct but could be problem spot
 
@@ -57,11 +57,11 @@ void HoldPositionCommand::Start(CowRobot *robot)
 
     m_Pose = robot->GetDrivetrain()->GetPose();
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "Initial pose: x %f, y %f, d %f",
-                              m_Pose.X().convert<units::foot>().value(),
-                              m_Pose.Y().convert<units::foot>().value(),
-                              m_Pose.Rotation().Degrees().value());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "Initial pose: x %f, y %f, d %f",
+    //                           m_Pose.X().convert<units::foot>().value(),
+    //                           m_Pose.Y().convert<units::foot>().value(),
+    //                           m_Pose.Rotation().Degrees().value());
 
     m_Timer->Reset();
     m_Timer->Start();
@@ -70,11 +70,11 @@ void HoldPositionCommand::Start(CowRobot *robot)
 void HoldPositionCommand::Handle(CowRobot *robot)
 {
     frc::Pose2d currentPose = robot->GetDrivetrain()->GetPose();
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "current: x %f y %f angle %f",
-                              currentPose.X().value(),
-                              currentPose.Y().value(),
-                              currentPose.Rotation().Degrees().value());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "current: x %f y %f angle %f",
+    //                           currentPose.X().value(),
+    //                           currentPose.Y().value(),
+    //                           currentPose.Rotation().Degrees().value());
 
     double vx    = m_XController->Calculate(currentPose.X().convert<units::foot>().value(),
                                          m_Pose.X().convert<units::foot>().value());
@@ -85,11 +85,11 @@ void HoldPositionCommand::Handle(CowRobot *robot)
 
     auto chassisSpeeds = CowLib::CowChassisSpeeds{ vx, vy, omega };
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "set to:  x %f y %f angle %f",
-                              chassisSpeeds.vx,
-                              chassisSpeeds.vy,
-                              chassisSpeeds.omega);
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "set to:  x %f y %f angle %f",
+    //                           chassisSpeeds.vx,
+    //                           chassisSpeeds.vy,
+    //                           chassisSpeeds.omega);
 
     // Vision align logic has to go here
 

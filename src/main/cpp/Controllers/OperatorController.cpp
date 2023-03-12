@@ -1,91 +1,135 @@
 #include "OperatorController.h"
 
-#include <iostream>
-
-OperatorController::OperatorController(CowControlBoard *controlboard)
+OperatorController::OperatorController(GenericControlBoard *controlboard)
     : m_CB(controlboard)
 {
     m_TrackingCooldownTimer = 0.0;
-
-    m_EvasiveSwerveWheel = NONE;
 }
 
 void OperatorController::Handle(CowRobot *bot)
 {
-    double centerOfRotationX = 0;
-    double centerOfRotationY = 0;
+    bool inverted = !m_CB->GetOperatorButton(SW_ORIENT);
+    bot->GetArm()->InvertArm(inverted);
+    Vision::GetInstance()->SetInverted(inverted);
 
-    if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
+    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
     {
-        if (m_EvasiveSwerveWheel == NONE)
-        {
-            double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
-            stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
-
-            double robotOrientedAngle = bot->GetGyro()->GetYaw() + stickAngle;
-
-            // set wheel based on quadrant
-            if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
-            {
-                m_EvasiveSwerveWheel = FRONT_LEFT;
-            }
-            else if (robotOrientedAngle >= 90 && robotOrientedAngle < 180)
-            {
-                m_EvasiveSwerveWheel = FRONT_RIGHT;
-            }
-            else if (robotOrientedAngle >= 180 && robotOrientedAngle < 270)
-            {
-                m_EvasiveSwerveWheel = BACK_RIGHT;
-            }
-            else if (robotOrientedAngle >= 270 && robotOrientedAngle < 360)
-            {
-                m_EvasiveSwerveWheel = BACK_LEFT;
-            }
-            else
-            {
-                CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "Invalid angle for quick turn");
-            }
-        }
-
-        const double wb = CONSTANT("WHEEL_BASE");
-
-        switch (m_EvasiveSwerveWheel)
-        {
-        case FRONT_LEFT :
-            centerOfRotationX = wb;
-            centerOfRotationY = wb;
-            break;
-        case FRONT_RIGHT :
-            centerOfRotationX = wb;
-            centerOfRotationY = -wb;
-            break;
-        case BACK_LEFT :
-            centerOfRotationX = -wb;
-            centerOfRotationY = wb;
-            break;
-        case BACK_RIGHT :
-            centerOfRotationX = -wb;
-            centerOfRotationY = -wb;
-            break;
-        case NONE :
-            break;
-        }
+        bot->GetDrivetrain()->SetLocked(true);
+        bot->GetDrivetrain()->SetVelocity(0, 0, 0);
     }
     else
     {
-        m_EvasiveSwerveWheel = NONE;
+        bot->GetDrivetrain()->SetLocked(false);
     }
 
-    // Left trigger
-    bool fieldRelative = m_CB->GetLeftDriveStickAxis(2) < 0.85;
+    if (m_CB->GetVisionTargetButton())
+    {
+        switch (bot->GetArm()->GetArmCargo())
+        {
+        case CG_CONE :
+            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
+            break;
+        case CG_CUBE :
+            bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+            break;
+        default :
+            break;
+        }
+    }
+    else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
+    {
+        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(),
+                                               m_CB->GetLeftDriveStickX());
+    }
+    else
+    {
+        // standard drive with field/bot relative option
+        bot->GetDriveController()->Drive(m_CB->GetLeftDriveStickY(),
+                                         m_CB->GetLeftDriveStickX(),
+                                         m_CB->GetRightDriveStickX() * -1,
+                                         true);
+    }
 
-    bot->GetDrivetrain()->SetVelocity(CowLib::Deadband(m_CB->GetLeftDriveStickAxis(1), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(0), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_SPEED") * -1,
-                                      CowLib::Deadband(m_CB->GetLeftDriveStickAxis(4), CONSTANT("STICK_DEADBAND"))
-                                          * CONSTANT("DESIRED_MAX_ANG_VEL") * -1,
-                                      fieldRelative,
-                                      centerOfRotationX,
-                                      centerOfRotationY);
+    // ARM STATES
+    if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
+    {
+        if (!m_WristFlipCheck)
+        {
+            bot->GetArm()->FlipWristState();
+        }
+        m_WristFlipCheck = true;
+    }
+    else
+    {
+        m_WristFlipCheck = false;
+    }
+
+    // New claw logic
+    if (m_CB->GetOperatorButton(BT_CONE))
+    {
+        bot->GetArm()->SetClawState(CLAW_INTAKE);
+        bot->GetArm()->SetArmCargo(CG_CONE);
+        Vision::GetInstance()->SetCargo(CG_CONE);
+        bot->GetArm()->UpdateClawState();
+    }
+    else if (m_CB->GetOperatorButton(BT_CUBE))
+    {
+        bot->GetArm()->SetClawState(CLAW_INTAKE);
+        bot->GetArm()->SetArmCargo(CG_CUBE);
+        Vision::GetInstance()->SetCargo(CG_CUBE);
+        bot->GetArm()->UpdateClawState();
+    }
+    else if (m_CB->GetOperatorButton(BT_SCORE))
+    {
+        bot->GetArm()->SetClawState(CLAW_EXHAUST);
+        bot->GetArm()->UpdateClawState();
+    }
+    else
+    {
+        bot->GetArm()->SetClawState(CLAW_OFF);
+        bot->GetArm()->UpdateClawState();
+    }
+
+    // only ARM_IN will change cargo within Arm subsystem code
+    // safe to put CG_NONE for the remaining states, it will be ignored
+    if (m_CB->GetDriveAxis(3) > 0.8) // driver stow
+    {
+        bot->SetArmState(ARM_DRIVER_STOW, CG_NONE);
+    }
+    if (m_CB->GetOperatorButton(BT_STOW))
+    {
+        bot->SetArmState(ARM_DRIVER_STOW, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_L3))
+    {
+        bot->SetArmState(ARM_L3, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_L2))
+    {
+        bot->SetArmState(ARM_L2, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_GND))
+    {
+        bot->SetArmState(ARM_GND, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_HUMAN))
+    {
+        bot->SetArmState(ARM_HUMAN, CG_NONE);
+    }
+
+    // manual control - not sure if this will be final implementation
+    // deadband is higher because I really don't want to accidentally hit it
+    if (fabs(m_CB->GetOperatorAxis(1)) > 0.10) //CONSTANT("STICK_DEADBAND"))
+    {
+        bot->GetArm()->UseManualControl(true);
+
+        if (m_CB->GetOperatorAxis(2) > 0.8)
+        {
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), false);
+        }
+        else
+        {
+            bot->GetArm()->ManualPosition(m_CB->GetOperatorAxis(1), true);
+        }
+    }
 }

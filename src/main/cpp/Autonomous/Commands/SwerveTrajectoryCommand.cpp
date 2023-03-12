@@ -21,7 +21,7 @@ SwerveTrajectoryCommand::SwerveTrajectoryCommand(const std::string &trajectoryNa
 
     m_Trajectory = frc::TrajectoryUtil::FromPathweaverJson(path.string());
 
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Loaded trajectory %s", trajectoryName.c_str());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Loaded trajectory %s", trajectoryName.c_str());
 
     m_HolonomicController = new CowLib::CowHolonomicController(CONSTANT("AUTO_DRIVE_P"),
                                                                CONSTANT("AUTO_DRIVE_I"),
@@ -43,7 +43,7 @@ SwerveTrajectoryCommand::~SwerveTrajectoryCommand()
     delete m_HolonomicController;
 }
 
-bool SwerveTrajectoryCommand::IsComplete()
+bool SwerveTrajectoryCommand::IsComplete(CowRobot *robot)
 {
     // I think these units are correct but could be problem spot
 
@@ -58,12 +58,12 @@ void SwerveTrajectoryCommand::Start(CowRobot *robot)
     {
         robot->GetDrivetrain()->ResetOdometry(m_Trajectory.InitialPose());
 
-        auto initPose = m_Trajectory.InitialPose();
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                                  "Initial pose: x %f, y %f, d %f",
-                                  initPose.X().convert<units::foot>().value(),
-                                  initPose.Y().convert<units::foot>().value(),
-                                  initPose.Rotation().Degrees().value());
+        // auto initPose = m_Trajectory.InitialPose();
+        // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+        //                           "Initial pose: x %f, y %f, d %f",
+        //                           initPose.X().convert<units::foot>().value(),
+        //                           initPose.Y().convert<units::foot>().value(),
+        //                           initPose.Rotation().Degrees().value());
     }
 
     m_Timer->Reset();
@@ -82,11 +82,11 @@ void SwerveTrajectoryCommand::Handle(CowRobot *robot)
     //                           chassisSpeeds.vx,
     //                           chassisSpeeds.vy,
     //                           chassisSpeeds.omega);
-    CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
-                              "x %f y %f angle %f",
-                              currentPose.X().value(),
-                              currentPose.Y().value(),
-                              currentPose.Rotation().Degrees().value());
+    // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG,
+    //                           "x %f y %f angle %f",
+    //                           currentPose.X().value(),
+    //                           currentPose.Y().value(),
+    //                           currentPose.Rotation().Degrees().value());
 
     // Vision align logic has to go here
 

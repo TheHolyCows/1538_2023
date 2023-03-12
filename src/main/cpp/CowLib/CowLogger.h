@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <cstdarg>
 #include <errno.h>
+#include <frc/DriverStation.h>
 #include <fstream>
 #include <iostream>
 #include <mutex>
@@ -42,7 +43,8 @@ namespace CowLib
             MOTR_LOG,
             BATT_LOG,
             AUTO_LOG,
-            GYRO_LOG
+            GYRO_LOG,
+            POSE_LOG
         };
 
         enum CowLogLevel : uint16_t
@@ -57,17 +59,22 @@ namespace CowLib
         const static int REGISTERED_MOTORS_MAX = 24;
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
-        static void LogAutoMode(const char *);
-        static void LogGyroAngle(double);
+        static void LogAutoMode(frc::DriverStation::Alliance, const char *);
+        static void LogGyro(double, double, double);
+        static void LogPose(double, double, double);
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         void Handle();
+        void Reset();
+
+        static void LogMotor(uint32_t, double, double);
 
     private:
         CowLogger();
+        void ResetConstants();
         static int SendLog(void *, size_t);
         static void LogPID(uint32_t, double, double, double, double, double);
-        static void LogMotor(uint32_t, double, double);
+        // static void LogMotor(uint32_t, double, double);
 
         static CowLogger *m_Instance;
         struct sockaddr_in m_LogServer;
@@ -77,8 +84,10 @@ namespace CowLib
 
         uint32_t m_IdToLog;
 
-        const char *m_LogServerIP = "10.15.38.233";
-        uint16_t m_LogServerPort  = 5810;
+        // 10.15.38.00
+        const uint32_t m_LogServerSubnet = 0x0a0f2600;
+        uint16_t m_LogServerPort;
+        uint32_t m_LogServerIP;
 
         // assuming we don't have more than 24 motors ever
         CowLib::CowMotorController *m_RegisteredMotors[REGISTERED_MOTORS_MAX];
@@ -124,13 +133,24 @@ namespace CowLib
         struct CowAutoLog
         {
             CowLogHdr hdr;
+            uint16_t alliance;
             char name[32];
         };
 
         struct CowGyroLog
         {
             CowLogHdr hdr;
-            double angle;
+            double pitch;
+            double roll;
+            double yaw;
+        };
+
+        struct CowPoseLog
+        {
+            CowLogHdr hdr;
+            double x;
+            double y;
+            double rot;
         };
     };
 

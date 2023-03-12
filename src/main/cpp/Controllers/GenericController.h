@@ -5,13 +5,12 @@
 #ifndef __GENERIC_CONTROLLER_H__
 #define __GENERIC_CONTROLLER_H__
 
-
 class CowRobot;
 
 class GenericController
-{    
+{
 public:
-    virtual ~GenericController() {};
+    virtual ~GenericController(){};
     virtual void Handle(CowRobot *bot) = 0;
 };
 

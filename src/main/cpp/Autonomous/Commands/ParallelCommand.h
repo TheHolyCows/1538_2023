@@ -14,7 +14,7 @@ public:
     ParallelCommand(std::vector<RobotCommand*> commands);
     ~ParallelCommand() override;
 
-    bool IsComplete() override;
+    bool IsComplete(CowRobot *robot) override;
 
     void Start(CowRobot* robot) override;
 

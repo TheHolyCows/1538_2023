@@ -6,14 +6,17 @@
 #define __COW_BASE_H__
 
 #include "Autonomous/AutoModes.h"
+#include "ControlBoards/CowControlBoard.h"
+#include "ControlBoards/CowGamepad.h"
+#include "ControlBoards/GenericControlBoard.h"
 #include "Controllers/AutoModeController.h"
 #include "Controllers/OperatorController.h"
 #include "CowConstants.h"
-#include "CowControlBoard.h"
 #include "CowDisplay.h"
 #include "CowLib/CowLib.h"
 #include "CowLib/CowLogger.h"
 
+#include <frc/DriverStation.h>
 #include <frc/TimedRobot.h>
 #include <iostream>
 
@@ -21,13 +24,15 @@ class CowBase : public frc::TimedRobot
 {
 private:
     CowRobot *m_Bot;
-    CowControlBoard *m_ControlBoard;
+    GenericControlBoard *m_ControlBoard;
     OperatorController *m_OpController;
     AutoModeController *m_AutoController;
     CowConstants *m_Constants;
     CowDisplay *m_Display;
 
     int m_DisabledCount = 0;
+
+    frc::DriverStation::Alliance m_Alliance = frc::DriverStation::Alliance::kInvalid;
 
 public:
     CowBase();

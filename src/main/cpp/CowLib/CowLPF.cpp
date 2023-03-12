@@ -32,6 +32,12 @@ namespace CowLib
         m_LPFBeta    = beta;
     }
 
+    void CowLPF::ReInit(double raw, double smooth)
+    {
+        m_RawData    = raw;
+        m_SmoothData = smooth;
+    }
+
     CowLPF::~CowLPF()
     {
     }
