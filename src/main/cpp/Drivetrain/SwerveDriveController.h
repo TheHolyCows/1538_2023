@@ -20,7 +20,7 @@ public:
 
     void ConeAlign(double x, double yInput);
 
-    void LockHeading(double x, double y);
+    void LockHeading(double x, double y, bool useRawInputs=false);
 
     void ResetHeadingLock();
 

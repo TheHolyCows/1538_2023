@@ -37,12 +37,12 @@ private:
 
     void RequestPipeline(int id);
     int GetPipeline();
-    [[nodiscard]] std::shared_ptr<nt::NetworkTable> GetLimelightTable() const;
+    std::shared_ptr<nt::NetworkTable> GetLimelightTable() ;
     bool HasTarget();
     std::vector<double> GetTargetPoseRobotRelative();
     double GetTargetX();
 
-    bool m_Flipped;
+    [[maybe_unused]] bool m_Flipped;
 
 public:
     static Vision *GetInstance();
@@ -54,11 +54,11 @@ public:
      */
     void Reset();
 
-    double Cube3dYPID();
-    double Cube3dYawPID();
+    [[maybe_unused]] double Cube3dYPID();
+    [[maybe_unused]] double Cube3dYawPID();
 
-    bool Cube3dYAligned();
-    bool Cube3dYawAligned();
+    [[maybe_unused]] bool Cube3dYAligned();
+    [[maybe_unused]] bool Cube3dYawAligned();
 
     double CubeYPID();
     bool CubeYAligned();
@@ -66,12 +66,6 @@ public:
     double ConeYPID();
 
     bool ConeYAligned();
-
-    struct BotPoseResult
-    {
-        frc::Pose2d pose;
-        double timestamp;
-    };
 
     void SetInverted(bool flipped);
 
