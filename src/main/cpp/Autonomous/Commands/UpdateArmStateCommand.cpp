@@ -57,6 +57,7 @@ void UpdateArmStateCommand::Start(CowRobot *robot)
         cargo = *m_CargoType;
     }
 
+    robot->GetArm()->SetArmCargo(cargo);
     robot->SetArmState(state, cargo);
 }
 

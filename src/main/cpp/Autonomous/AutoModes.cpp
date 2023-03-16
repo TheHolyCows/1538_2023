@@ -16,7 +16,6 @@ AutoModes::AutoModes()
     // FOR THE FIRST SWERVE DRIVE ACTION IN A MODE, YOU MUST HAVE RESET ODOMETRY TRUE
     // BAD THINGS WILL HAPPEN
 
-    // For some reason we need to run this stuff
     m_Modes["balance"].push_back(new BalanceCommand(8, 7, 100, false));
     m_Modes["balance"].push_back(new WaitCommand(1, true));
     m_Modes["balance"].push_back(new BalanceCommand(2.5, 7, 15, true));
