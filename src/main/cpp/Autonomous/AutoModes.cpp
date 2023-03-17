@@ -13,6 +13,84 @@ AutoModes *AutoModes::s_Instance = nullptr;
 
 AutoModes::AutoModes()
 {
+    struct TrajectoryEvent
+    {
+        // Important: Delays are from the previous event NOT the start of the path
+        double delay;
+        RobotCommand *command;
+    };
+
+    auto pathWithEvents = [](const std::string &name,
+                             const std::vector<TrajectoryEvent> &events,
+                             bool resetOdometry = true,
+                             double speed       = 16.5,
+                             double accel       = 14)
+    {
+        std::deque<RobotCommand *> series;
+        for (const auto &event : events)
+        {
+            series.push_back(new WaitCommand(event.delay, false));
+            series.push_back(event.command);
+        }
+
+        return new ParallelCommand({ new PathplannerSwerveTrajectoryCommand(name, speed, accel, true, resetOdometry),
+                                     new SeriesCommand(series) });
+    };
+
+    // High Level Piece
+    auto scoreConeL3 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true),
+                                           new WaitCommand(1, false),
+                                           new ClawCommand(CLAW_EXHAUST, 0.2),
+                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
+                                           new WaitCommand(0.1, false),
+                                           new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true) });
+    auto scoreCubeL3 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L3, CG_CUBE, true, true),
+                                           new WaitCommand(1, false),
+                                           new ClawCommand(CLAW_EXHAUST, 0.2),
+                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
+                                           new WaitCommand(0.1, false),
+                                           new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true) });
+    auto scoreConeL2 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true),
+                                           new WaitCommand(0.5, false),
+                                           new ClawCommand(CLAW_EXHAUST, 0.2),
+                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
+                                           new WaitCommand(0.1, false),
+                                           new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true) });
+    auto scoreCubeL2 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L2, CG_CUBE, true, true),
+                                           new WaitCommand(0.5, false),
+                                           new ClawCommand(CLAW_EXHAUST, 0.2),
+                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
+                                           new WaitCommand(0.1, false),
+                                           new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true) });
+
+    auto startGroundIntake = [](ARM_CARGO cargo) {
+        return new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, cargo, false), new ClawCommand(CLAW_INTAKE, 0) });
+    };
+
+    auto stow = new SeriesCommand({ new UpdateArmStateCommand(ARM_STOW, false), new ClawCommand(CLAW_OFF, 0) });
+
+    m_Modes["3 GP LZ"].push_back(scoreConeL2);
+    m_Modes["3 GP LZ"].push_back(pathWithEvents(
+        "3 GP LZ - intake cube 1",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } }));
+    m_Modes["3 GP LZ"].push_back(stow);
+
+    m_Modes["3 GP LZ"].push_back(
+        pathWithEvents("3 GP LZ - score cube 1", { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }));
+
+    m_Modes["3 GP LZ"].push_back(scoreCubeL2);
+    m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+
+    m_Modes["3 GP LZ"].push_back(pathWithEvents(
+        "3 GP LZ - intake cube 2",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } }));
+    m_Modes["3 GP LZ"].push_back(stow);
+
+    m_Modes["3 GP LZ"].push_back(
+        pathWithEvents("3 GP LZ - score cube 2", { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }));
+    m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_GND, true));
+    m_Modes["3 GP LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 1));
+
     // FOR THE FIRST SWERVE DRIVE ACTION IN A MODE, YOU MUST HAVE RESET ODOMETRY TRUE
     // BAD THINGS WILL HAPPEN
 
@@ -302,7 +380,7 @@ AutoModes::AutoModes()
     //     3,
     //     true,
     //     true,
-    //     { PathplannerSwerveTrajectoryCommand::Event{ "start intake", new UpdateArmStateCommand(ARM_IN, CG_CONE) } }));
+    //     { PathplannerSwerveTrajectoryCommand::TrajectoryEvent{ "start intake", new UpdateArmStateCommand(ARM_IN, CG_CONE) } }));
     // m_Modes["theoretical 2 cone"].push_back(new WaitCommand(1, false));
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_STOW));
     // m_Modes["theoretical 2 cone"].push_back(
