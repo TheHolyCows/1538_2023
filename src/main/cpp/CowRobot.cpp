@@ -235,6 +235,8 @@ void CowRobot::ArmSM()
     case ARM_DRIVER_STOW :
         m_Arm->RequestSafeStow();
         break;
+    case ARM_UP:
+        m_Arm->RequestPosition(0, 0);
     default :
         break;
     }

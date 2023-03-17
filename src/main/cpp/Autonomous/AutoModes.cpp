@@ -16,6 +16,15 @@ AutoModes::AutoModes()
     // FOR THE FIRST SWERVE DRIVE ACTION IN A MODE, YOU MUST HAVE RESET ODOMETRY TRUE
     // BAD THINGS WILL HAPPEN
 
+    // m_Modes["test"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true));
+    // m_Modes["test"].push_back(new ParallelCommand(
+    //     { new PathplannerSwerveTrajectoryCommand("cone cone - grab cone (loading zone)", 16.5, 8, true, true),
+    //       new SeriesCommand({ new WaitCommand(1.5, false),
+    //                           new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CONE, false),
+    //                                               new ClawCommand(CLAW_INTAKE, 0) }) }) }));
+    // m_Modes["test"].push_back(new UpdateArmStateCommand(ARM_STOW, false));
+    // m_Modes["test"].push_back(new ClawCommand(CLAW_OFF, 0));
+
     m_Modes["balance"].push_back(new BalanceCommand(8, 7, 100, false));
     m_Modes["balance"].push_back(new WaitCommand(1, true));
     m_Modes["balance"].push_back(new BalanceCommand(2.5, 7, 15, true));
@@ -41,7 +50,7 @@ AutoModes::AutoModes()
 
     // Drive and intake. Run intake 1.5 seconds in
     m_Modes["2 cone - loading zone"].push_back(new ParallelCommand(
-        { new PathplannerSwerveTrajectoryCommand("cone cone - grab cone (loading zone)", 16.5, 8, true, true),
+        { new PathplannerSwerveTrajectoryCommand("cone cone - grab cone (loading zone)", 16.5, 14, true, true),
           new SeriesCommand({ new WaitCommand(1.5, false),
                               new SeriesCommand({ new UpdateArmStateCommand(ARM_GND, CG_CUBE, false),
                                                   new ClawCommand(CLAW_INTAKE, 0) }) }) }));
@@ -52,7 +61,7 @@ AutoModes::AutoModes()
     // Stow and drive back
     m_Modes["2 cone - loading zone"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
     m_Modes["2 cone - loading zone"].push_back(
-        new PathplannerSwerveTrajectoryCommand("cone cone - score cone (loading zone)", 16.5, 8, true, false));
+        new PathplannerSwerveTrajectoryCommand("cone cone - score cone (loading zone)", 16.5, 14, true, false));
 
     // L3 cone and score
     m_Modes["2 cone - loading zone"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
@@ -277,7 +286,7 @@ AutoModes::AutoModes()
     //    m_Modes["Test"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->InvertArm(true); }));
     //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true));
     //    m_Modes["Test"].push_back(new WaitCommand(2, false));
-    ////    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
+    // //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
     //    m_Modes["Test"].push_back(new WaitCommand(2, false));
     //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_STOW));
 
@@ -301,7 +310,7 @@ AutoModes::AutoModes()
     // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3));
     // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_SCORE));
-
+    //
     // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();

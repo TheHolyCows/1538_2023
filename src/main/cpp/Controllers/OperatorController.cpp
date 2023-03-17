@@ -38,8 +38,7 @@ void OperatorController::Handle(CowRobot *bot)
     }
     else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
     {
-        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(),
-                                               m_CB->GetLeftDriveStickX());
+        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
     }
     else
     {
@@ -51,18 +50,18 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // ARM STATES
-    if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
-    {
-        if (!m_WristFlipCheck)
-        {
-            bot->GetArm()->FlipWristState();
-        }
-        m_WristFlipCheck = true;
-    }
-    else
-    {
-        m_WristFlipCheck = false;
-    }
+    // if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
+    // {
+    //     if (!m_WristFlipCheck)
+    //     {
+    //         bot->GetArm()->FlipWristState();
+    //     }
+    //     m_WristFlipCheck = true;
+    // }
+    // else
+    // {
+    m_WristFlipCheck = false;
+    // }
 
     // New claw logic
     if (m_CB->GetOperatorButton(BT_CONE))
@@ -115,6 +114,9 @@ void OperatorController::Handle(CowRobot *bot)
     else if (m_CB->GetOperatorButton(BT_HUMAN))
     {
         bot->SetArmState(ARM_HUMAN, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_WRIST_FLIP)) {
+        bot->SetArmState(ARM_UP, CG_NONE);
     }
 
     // manual control - not sure if this will be final implementation

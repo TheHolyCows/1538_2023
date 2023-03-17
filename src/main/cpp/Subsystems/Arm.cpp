@@ -489,7 +489,7 @@ void Arm::RequestSafeStow()
 {
     double curAngle = m_Pivot->GetAngle();
     double reqAngle = CONSTANT("SCORE_STOW_ANGLE");
-    reqAngle = curAngle;
+    // reqAngle = curAngle;
 
     if (m_ArmInvert)
     {
