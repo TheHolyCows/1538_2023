@@ -519,11 +519,11 @@ void Arm::RequestSafeStow()
 
     m_Pivot->RequestAngle(reqAngle);
 
-    // if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD")
-    //     && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
-    // {
+    if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD")
+        && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
+    {
         m_Telescope->RequestPosition(CONSTANT("SCORE_STOW_EXT"));
-    // }
+    }
 
     double wristAngle = m_Pivot->GetAngle() > 0 ? 135 : 45;
     m_Claw->RequestWristAngle(wristAngle);
