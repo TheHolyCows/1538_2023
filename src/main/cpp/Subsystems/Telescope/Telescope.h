@@ -51,6 +51,8 @@ public:
 
     void Handle();
 
+    void BrakeMode(bool brakeMode);
+
 private:
     std::shared_ptr<CowLib::CowMotorController> m_TelescopeMotor;
     CowLib::CowMotorController::MotionMagicPercentOutput m_MotorRequest = { 0 };

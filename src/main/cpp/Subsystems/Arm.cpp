@@ -77,7 +77,7 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     }
 
     // lock out extension until we reach desired angle +/- a few degrees
-    if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5
+    if (fabs(curAngle) < fabs(reqAngle) - 8 || fabs(curAngle) > fabs(reqAngle) + 8
         || std::signbit(curAngle) != std::signbit(reqAngle))
     {
         m_ExtLockout = true;

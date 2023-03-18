@@ -52,6 +52,8 @@ public:
     void Handle();
 
     virtual ~Claw();
+
+    void BrakeMode(bool);
 };
 
 #endif /* SRC_SUBSYSTEMS_CLAW_H_ */

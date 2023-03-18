@@ -24,17 +24,17 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
-        switch (bot->GetArm()->GetArmCargo())
-        {
-        case CG_CONE :
-            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
-            break;
-        case CG_CUBE :
-            bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
-            break;
-        default :
-            break;
-        }
+        // switch (bot->GetArm()->GetArmCargo())
+        // {
+        // case CG_CONE :
+        //     bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
+        //     break;
+        // case CG_CUBE :
+        //     bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+        //     break;
+        // default :
+        //     break;
+        // }
     }
     else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
     {

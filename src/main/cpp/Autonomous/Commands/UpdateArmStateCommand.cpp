@@ -24,7 +24,7 @@ UpdateArmStateCommand::UpdateArmStateCommand(ARM_STATE state, ARM_CARGO cargoTyp
     m_State             = state;
     m_CargoType         = cargoType;
     m_WaitForCompletion = waitForCompletion;
-    m_Invert            = true;
+    m_Invert            = invert;
 }
 
 bool UpdateArmStateCommand::IsComplete(CowRobot *robot)
@@ -54,7 +54,7 @@ void UpdateArmStateCommand::Start(CowRobot *robot)
 
     if (m_Invert.has_value())
     {
-        cargo = *m_CargoType;
+        robot->GetArm()->InvertArm(*m_Invert);
     }
 
     robot->GetArm()->SetArmCargo(cargo);

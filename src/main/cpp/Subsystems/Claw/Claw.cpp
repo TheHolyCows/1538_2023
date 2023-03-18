@@ -93,3 +93,14 @@ Claw::~Claw()
     delete m_WristMotor;
     delete m_Solenoid;
 }
+
+void Claw::BrakeMode(bool brakeMode) {
+    if (brakeMode)
+    {
+        m_WristMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::BRAKE);
+    }
+    else
+    {
+        m_WristMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::COAST);
+    }
+}
