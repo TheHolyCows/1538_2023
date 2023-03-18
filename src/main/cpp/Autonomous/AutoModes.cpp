@@ -37,25 +37,28 @@ AutoModes::AutoModes()
                                      new SeriesCommand(series) });
     };
 
-    // High Level Piece
+    // High Level Components
     auto scoreConeL3 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true),
                                            new WaitCommand(1, false),
                                            new ClawCommand(CLAW_EXHAUST, 0.2),
-                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
+                                           new UpdateArmStateCommand(ARM_DRIVER_STOW, true),
                                            new WaitCommand(0.1, false),
                                            new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true) });
-    auto scoreCubeL3 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L3, CG_CUBE, true, true),
+
+    [[maybe_unused]] auto scoreCubeL3 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L3, CG_CUBE, true, true),
                                            new WaitCommand(1, false),
                                            new ClawCommand(CLAW_EXHAUST, 0.2),
                                            new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
                                            new WaitCommand(0.1, false),
                                            new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true) });
+
     auto scoreConeL2 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true),
                                            new WaitCommand(0.5, false),
                                            new ClawCommand(CLAW_EXHAUST, 0.2),
                                            new UpdateArmStateCommand(ARM_DRIVER_STOW, false),
                                            new WaitCommand(0.1, false),
                                            new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true) });
+
     auto scoreCubeL2 = new SeriesCommand({ new UpdateArmStateCommand(ARM_L2, CG_CUBE, true, true),
                                            new WaitCommand(0.5, false),
                                            new ClawCommand(CLAW_EXHAUST, 0.2),
@@ -68,6 +71,9 @@ AutoModes::AutoModes()
     };
 
     auto stow = new SeriesCommand({ new UpdateArmStateCommand(ARM_STOW, false), new ClawCommand(CLAW_OFF, 0) });
+
+    m_Modes["1 Cone Balance"].push_back(stow);
+    m_Modes["test"].push_back(new PathplannerSwerveTrajectoryCommand("TestA", 16.5, 14, true, true));
 
     m_Modes["3 GP LZ"].push_back(scoreConeL2);
     m_Modes["3 GP LZ"].push_back(pathWithEvents(
@@ -91,6 +97,26 @@ AutoModes::AutoModes()
     m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_GND, true));
     m_Modes["3 GP LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 1));
 
+    m_Modes["1 Cone Balance Mid"].push_back(scoreConeL3);
+    m_Modes["1 Cone Balance Mid"].push_back(new PathplannerSwerveTrajectoryCommand("to CS mid", 16.5, 6, true, true));
+    m_Modes["1 Cone Balance Mid"].push_back(new BalanceCommand(3, 7, 15, true));
+
+    m_Modes["3 GP Guard"].push_back(scoreConeL2);
+    m_Modes["3 GP Guard"].push_back(pathWithEvents(
+        "Guard - intake 1",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } }));
+    m_Modes["3 GP Guard"].push_back(stow);
+    m_Modes["3 GP Guard"].push_back(
+        pathWithEvents("Guard - score 1", { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }));
+    m_Modes["3 GP Guard"].push_back(scoreCubeL2);
+    m_Modes["3 GP Guard"].push_back(pathWithEvents(
+        "Guard - intake 2",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } }));
+    m_Modes["3 GP Guard"].push_back(stow);
+    m_Modes["3 GP Guard"].push_back(
+        pathWithEvents("Guard - score 2", { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }));
+    m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_GND, true));
+    m_Modes["3 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 1));
     // FOR THE FIRST SWERVE DRIVE ACTION IN A MODE, YOU MUST HAVE RESET ODOMETRY TRUE
     // BAD THINGS WILL HAPPEN
 
@@ -348,48 +374,6 @@ AutoModes::AutoModes()
             Vision::GetInstance()->SetCargo(CG_CONE);
             bot->GetArm()->UpdateClawState();
         }));
-
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-    //     new PathplannerSwerveTrajectoryCommand("c", 5, 3, true, true));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back();
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new WaitCommand(1, false));
-    //     new PathplannerSwerveTrajectoryCommand("intake (loading zone side)", 2, 1, true, false));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new ClawCommand(CLAW_OFF, 0));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(
-    //     new PathplannerSwerveTrajectoryCommand("drive to balance (loading zone side)", 5, 3, true, false));
-    // m_Modes["1 cone + get cube + balance (loading zone size)"].push_back(new BalanceCommand(1, 3, 3));
-
-    //    m_Modes["Test"].push_back(new WaitCommand(, false));
-    //    m_Modes["Test"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->InvertArm(true); }));
-    //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CONE, true));
-    //    m_Modes["Test"].push_back(new WaitCommand(2, false));
-    // //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_IN));
-    //    m_Modes["Test"].push_back(new WaitCommand(2, false));
-    //    m_Modes["Test"].push_back(new UpdateArmStateCommand(ARM_STOW));
-
-    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE));
-    // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
-    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_SCORE));
-    // m_Modes["theoretical 2 cone"].push_back(new ParallelCommand(
-    //     { new PathplannerSwerveTrajectoryCommand("2ConeIntake", 5, 3, true, true),
-    //       new SeriesCommand({ new WaitCommand(3, false), new UpdateArmStateCommand(ARM_IN, CG_CONE) }) }));
-    // m_Modes["theoretical 2 cone"].push_back(new PathplannerSwerveTrajectoryCommand(
-    //     "2ConeIntake",
-    //     5,
-    //     3,
-    //     true,
-    //     true,
-    //     { PathplannerSwerveTrajectoryCommand::TrajectoryEvent{ "start intake", new UpdateArmStateCommand(ARM_IN, CG_CONE) } }));
-    // m_Modes["theoretical 2 cone"].push_back(new WaitCommand(1, false));
-    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_STOW));
-    // m_Modes["theoretical 2 cone"].push_back(
-    //     new PathplannerSwerveTrajectoryCommand("2ConeDriveToScore", 5, 3, true, false));
-    // m_Modes["theoretical 2 cone"].push_back(new AprilTagAlignCommand(Vision::CONE, 2));
-    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_L3));
-    // m_Modes["theoretical 2 cone"].push_back(new UpdateArmStateCommand(ARM_SCORE));
-    //
-    // std::cout << "Complete AutoModes constructor" << std::endl;
 
     m_Iterator = m_Modes.begin();
 }
