@@ -12,7 +12,7 @@ void OperatorController::Handle(CowRobot *bot)
     bot->GetArm()->InvertArm(inverted);
     Vision::GetInstance()->SetInverted(inverted);
 
-    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
+    if (m_CB->GetDriveAxis(2) > 0.8 && m_CB->GetDriveAxis(6) > 0.8)
     {
         bot->GetDrivetrain()->SetLocked(true);
         bot->GetDrivetrain()->SetVelocity(0, 0, 0);
@@ -36,7 +36,7 @@ void OperatorController::Handle(CowRobot *bot)
         //     break;
         // }
     }
-    else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
+    else if (m_CB->GetDriveAxis(3) > 0.8) // Align heading
     {
         bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
     }

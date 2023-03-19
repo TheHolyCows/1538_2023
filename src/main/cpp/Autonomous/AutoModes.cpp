@@ -107,7 +107,7 @@ AutoModes::AutoModes()
     m_Modes["1 Cone Balance Mid"].push_back(new PathplannerSwerveTrajectoryCommand("to CS mid", 16.5, 6, true, true));
     m_Modes["1 Cone Balance Mid"].push_back(new BalanceCommand(3, 7, 15, true));
 
-    m_Modes["3 GP Guard"].push_back(new LambdaCommand(
+    m_Modes["2.5 GP Guard"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
             bot->GetArm()->SetClawState(CLAW_INTAKE);
@@ -117,39 +117,47 @@ AutoModes::AutoModes()
             bot->GetArm()->SetClawState(CLAW_OFF);
             bot->GetArm()->UpdateClawState();
         }));
-    m_Modes["3 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("cone L2 start", 8, 4, true, true));
-    m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true));
-    m_Modes["3 GP Guard"].push_back(new WaitCommand(0.6, false));
-    m_Modes["3 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["3 GP Guard"].push_back(new WaitCommand(0.1, false));
-    m_Modes["3 GP Guard"].push_back(
+    m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
+    m_Modes["2.5 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("cone L2 start", 8, 4, true, true));
+    // m_Modes["2.5 GP Guard"].push_back(new LambdaCommand(
+    //     [](CowRobot *bot) {
+    //     }));
+    m_Modes["2.5 GP Guard"].push_back(new WaitCommand(0.6, false));
+    m_Modes["2.5 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["2.5 GP Guard"].push_back(new WaitCommand(0.1, false));
+    m_Modes["2.5 GP Guard"].push_back(
         pathWithEvents("Guard - intake 1",
                        { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
                          { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
                          { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
                        true,
                        16.5,
-                       12));
+                       8));
 
-    // m_Modes["3 GP Guard"].push_back(pathWithEvents("Guard - score 1",
-    //                                                { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
-    //                                                  { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
-    //                                                true,
-    //                                                16.5,
-    //                                                10));
-    // m_Modes["3 GP Guard"].push_back(new WaitCommand(0.2, false));
-    // m_Modes["3 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    // m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    // m_Modes["3 GP Guard"].push_back(new WaitCommand(0.1, false));
-    // m_Modes["3 GP Guard"].push_back(pathWithEvents(
-    //     "Guard - intake 2",
-    //     { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } },
-    //     false,
-    //     16.5,
-    //     8));
-    // m_Modes["3 GP Guard"].push_back(stow());
-    // m_Modes["3 GP Guard"].push_back(
+    m_Modes["2.5 GP Guard"].push_back(stow());
+
+    m_Modes["2.5 GP Guard"].push_back(pathWithEvents("Guard - score 1",
+                                                   { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
+                                                     { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
+                                                   false,
+                                                   16.5,
+                                                   8));
+    m_Modes["2.5 GP Guard"].push_back(new WaitCommand(0.2, false));
+    m_Modes["2.5 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["2.5 GP Guard"].push_back(new WaitCommand(0.2, false));
+    m_Modes["2.5 GP Guard"].push_back(pathWithEvents(
+        "Guard - intake 2",
+        { { 0.3, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
+        false,
+        16.5,
+        8));
+    m_Modes["2.5 GP Guard"].push_back(stow());
+    // m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE), false, true));
+    m_Modes["2.5 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("Guard - to CS", 10, 4, true, false));
+    m_Modes["2.5 GP Guard"].push_back(new BalanceCommand(-4, 7, 8, true));
+    // m_Modes["2.5 GP Guard"].push_back(
     //     pathWithEvents("Guard - score 2", { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }, false));
     // m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_GND, true));
     // m_Modes["3 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 1));

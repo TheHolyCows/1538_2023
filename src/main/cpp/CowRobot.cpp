@@ -192,7 +192,7 @@ void CowRobot::ArmSM()
         {
             m_Arm->RequestPosition(CONSTANT("ARM_L3_CUBE_ANGLE"),
                                    CONSTANT("ARM_L3_CUBE_EXT"),
-                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+                                   CONSTANT("WRIST_OFFSET_L3_CUBE"));
         }
         else if (m_Arm->GetArmCargo() == CG_CONE)
         {
@@ -206,7 +206,7 @@ void CowRobot::ArmSM()
         {
             m_Arm->RequestPosition(CONSTANT("ARM_L2_CUBE_ANGLE"),
                                    CONSTANT("ARM_L2_CUBE_EXT"),
-                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+                                   CONSTANT("WRIST_OFFSET_L2_CUBE"));
         }
         else if (m_Arm->GetArmCargo() == CG_CONE)
         {

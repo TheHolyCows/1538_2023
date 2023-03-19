@@ -261,7 +261,14 @@ void Arm::UpdateClawState()
     case CLAW_EXHAUST :
         if (m_Cargo == CG_CUBE)
         {
-            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE"));
+            if (m_State == ARM_GND)
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE_GND"));
+            }
+            else
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE"));
+            }
         }
         else if (m_Cargo == CG_CONE)
         {
