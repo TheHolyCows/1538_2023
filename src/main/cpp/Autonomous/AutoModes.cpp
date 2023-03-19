@@ -164,13 +164,6 @@ AutoModes::AutoModes()
         16.5,
         8));
     m_Modes["2.5 GP Guard"].push_back(stow());
-    // // m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE), false, true));
-    // m_Modes["2.5 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("Guard - to CS", 10, 4, true, false));
-    // m_Modes["2.5 GP Guard"].push_back(new BalanceCommand(-4, 7, 8, true));
-    // m_Modes["2.5 GP Guard"].push_back(
-    //     pathWithEvents("Guard - score 2", { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }, false));
-    // m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_GND, true));
-    // m_Modes["3 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 1));
 
     // m_Modes["balance"].push_back(new BalanceCommand(8, 7, 100, false));
     // m_Modes["balance"].push_back(new WaitCommand(1, true));
