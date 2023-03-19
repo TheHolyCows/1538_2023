@@ -147,6 +147,16 @@ AutoModes::AutoModes()
     m_Modes["2.5 GP Guard"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["2.5 GP Guard"].push_back(new WaitCommand(0.2, false));
+    m_Modes["2.5 GP Guard"].push_back(new LambdaCommand(
+        [](CowRobot *bot)
+        {
+            bot->GetArm()->SetClawState(CLAW_INTAKE);
+            bot->GetArm()->SetArmCargo(CG_CONE);
+            Vision::GetInstance()->SetCargo(CG_CONE);
+            bot->GetArm()->UpdateClawState();
+            bot->GetArm()->SetClawState(CLAW_OFF);
+            bot->GetArm()->UpdateClawState();
+        }));
     m_Modes["2.5 GP Guard"].push_back(pathWithEvents(
         "Guard - intake 2",
         { { 0.3, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
@@ -154,9 +164,9 @@ AutoModes::AutoModes()
         16.5,
         8));
     m_Modes["2.5 GP Guard"].push_back(stow());
-    // m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE), false, true));
-    m_Modes["2.5 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("Guard - to CS", 10, 4, true, false));
-    m_Modes["2.5 GP Guard"].push_back(new BalanceCommand(-4, 7, 8, true));
+    // // m_Modes["2.5 GP Guard"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE), false, true));
+    // m_Modes["2.5 GP Guard"].push_back(new PathplannerSwerveTrajectoryCommand("Guard - to CS", 10, 4, true, false));
+    // m_Modes["2.5 GP Guard"].push_back(new BalanceCommand(-4, 7, 8, true));
     // m_Modes["2.5 GP Guard"].push_back(
     //     pathWithEvents("Guard - score 2", { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } }, false));
     // m_Modes["3 GP Guard"].push_back(new UpdateArmStateCommand(ARM_GND, true));

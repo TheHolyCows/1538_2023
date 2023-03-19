@@ -232,10 +232,15 @@ void CowRobot::ArmSM()
     case ARM_HUMAN :
         if (m_Arm->GetArmCargo() == CG_CUBE)
         {
-            m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM_CUBE"));
+            m_Arm->RequestPosition(CONSTANT("ARM_HUM_CUBE_ANGLE"),
+                                   CONSTANT("ARM_HUM_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_HUM_CUBE"));
         }
+        else
         {
-            m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM_CONE"));
+            m_Arm->RequestPosition(CONSTANT("ARM_HUM_CONE_ANGLE"),
+                                   CONSTANT("ARM_HUM_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_HUM_CONE"));
         }
         break;
     case ARM_DRIVER_STOW :
