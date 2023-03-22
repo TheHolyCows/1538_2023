@@ -66,47 +66,59 @@ AutoModes::AutoModes()
                                    new WaitCommand(0.1, false) });
     };
 
-    std::deque<RobotCommand *> threeGPLZ;
+    std::deque<RobotCommand *> twoPointFiveGP;
 
-    threeGPLZ.push_back(setClaw(CG_CONE));
-    threeGPLZ.push_back(scoreConeL2());
-    threeGPLZ.push_back(pathWithEvents("3 GP LZ - intake cube 1",
+    twoPointFiveGP.push_back(new WaitCommand(0.125, false));
+    twoPointFiveGP.push_back(setClaw(CG_CONE));
+    twoPointFiveGP.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
+    twoPointFiveGP.push_back(new PathplannerSwerveTrajectoryCommand("cone L2 start", 8, 4, true, true));
+    twoPointFiveGP.push_back(new WaitCommand(0.6, false));
+    twoPointFiveGP.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    twoPointFiveGP.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    twoPointFiveGP.push_back(new WaitCommand(0.1, false));
+    twoPointFiveGP.push_back(stow());
+    twoPointFiveGP.push_back(setClaw(CG_CUBE));
+    twoPointFiveGP.push_back(pathWithEvents("3 GP LZ - intake cube 1",
                                        { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
                                          { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
                                          { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
-                                       true,
+                                       false,
                                        16.5,
                                        12));
-    threeGPLZ.push_back(stow());
-    threeGPLZ.push_back(pathWithEvents("3 GP LZ - score cube 1",
+    twoPointFiveGP.push_back(stow());
+    twoPointFiveGP.push_back(pathWithEvents("3 GP LZ - score cube 1",
                                        { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                          { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                        false,
                                        16.5,
                                        10));
-    threeGPLZ.push_back(new WaitCommand(0.2, false));
-    threeGPLZ.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    threeGPLZ.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    threeGPLZ.push_back(new WaitCommand(0.1, false));
-    threeGPLZ.push_back(pathWithEvents(
+    twoPointFiveGP.push_back(new WaitCommand(0.1, false));
+    twoPointFiveGP.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    twoPointFiveGP.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    twoPointFiveGP.push_back(new WaitCommand(0.1, false));
+    twoPointFiveGP.push_back(pathWithEvents(
         "3 GP LZ - intake cube 2",
         { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } },
         false,
         16.5,
         8));
-    threeGPLZ.push_back(stow());
-    threeGPLZ.push_back(pathWithEvents("3 GP LZ - score cube 2",
-                                       { { 1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } },
-                                       false));
-    threeGPLZ.push_back(new UpdateArmStateCommand(ARM_GND, true));
-    threeGPLZ.push_back(new ClawCommand(CLAW_EXHAUST, 1));
+    twoPointFiveGP.push_back(stow());
 
-    m_Modes["3 GP LZ"] = threeGPLZ;
+    m_Modes["3 GP LZ ( [] [] )"] = twoPointFiveGP;
+    m_Modes["3 GP LZ ( [] [] )"].push_back(pathWithEvents("3 GP LZ - score cube 2",
+                                            { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } },
+                                            false));
+    m_Modes["3 GP LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_GND, true));
+    m_Modes["3 GP LZ ( [] [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.15));
+    m_Modes["3 GP LZ ( [] [] )"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 16.5, 12, true, false));
 
-    m_Modes["3 GP & Balance LZ"] = threeGPLZ;
-    m_Modes["3 GP & Balance LZ"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - to CS inside", 8, 4, true, false));
-    m_Modes["3 GP & Balance LZ"].push_back(new BalanceCommand(3, 7, 15, true));
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"] = twoPointFiveGP;
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("LZ - to CS outside", 10, 8, true, false));
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new BalanceCommand(-3, 7, 15, true));
 
+    m_Modes["1 Cone Balance Mid"].push_back(new WaitCommand(0.125, false));
     m_Modes["1 Cone Balance Mid"].push_back(setClaw(CG_CONE));
     m_Modes["1 Cone Balance Mid"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, true, true));
     m_Modes["1 Cone Balance Mid"].push_back(new WaitCommand(0.8, false));
@@ -118,6 +130,7 @@ AutoModes::AutoModes()
 
     std::deque<RobotCommand *> twoGPGuard;
 
+    twoGPGuard.push_back(new WaitCommand(0.125, false));
     twoGPGuard.push_back(setClaw(CG_CONE));
     twoGPGuard.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
     twoGPGuard.push_back(new PathplannerSwerveTrajectoryCommand("Guard - start", 8, 4, true, true));
@@ -147,13 +160,13 @@ AutoModes::AutoModes()
     twoGPGuard.push_back(new WaitCommand(0.2, false));
     twoGPGuard.push_back(new UpdateArmStateCommand(ARM_STOW, false));
 
-    m_Modes["2 GP & Balance Guard"] = twoGPGuard;
-    m_Modes["2 GP & Balance Guard"].push_back(
+    m_Modes["2 GP & Balance Guard ( [] )"] = twoGPGuard;
+    m_Modes["2 GP & Balance Guard ( [] )"].push_back(
         new PathplannerSwerveTrajectoryCommand("Guard - to CS inside", 8, 4, true, false));
-    m_Modes["2 GP & Balance Guard"].push_back(new BalanceCommand(3, 7, 15, true));
+    m_Modes["2 GP & Balance Guard ( [] )"].push_back(new BalanceCommand(3, 7, 15, true));
 
-    m_Modes["2.5 GP Guard"] = twoGPGuard;
-    m_Modes["2.5 GP Guard"].push_back(new LambdaCommand(
+    m_Modes["2.5 GP Guard ( [] ^ )"] = twoGPGuard;
+    m_Modes["2.5 GP Guard ( [] ^ )"].push_back(new LambdaCommand(
         [](CowRobot *bot)
         {
             bot->GetArm()->SetClawState(CLAW_INTAKE);
@@ -163,13 +176,13 @@ AutoModes::AutoModes()
             bot->GetArm()->SetClawState(CLAW_OFF);
             bot->GetArm()->UpdateClawState();
         }));
-    m_Modes["2.5 GP Guard"].push_back(pathWithEvents(
+    m_Modes["2.5 GP Guard ( [] ^ )"].push_back(pathWithEvents(
         "Guard - intake 2",
         { { 0.3, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
         false,
         16.5,
         8));
-    m_Modes["2.5 GP Guard"].push_back(stow());
+    m_Modes["2.5 GP Guard ( [] ^ )"].push_back(stow());
 
     // m_Modes["balance"].push_back(new BalanceCommand(8, 7, 100, false));
     // m_Modes["balance"].push_back(new WaitCommand(1, true));
