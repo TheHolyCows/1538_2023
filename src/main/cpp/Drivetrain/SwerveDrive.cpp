@@ -213,7 +213,7 @@ void SwerveDrive::ResetEncoders()
 
 void SwerveDrive::ResetOdometry(frc::Pose2d pose)
 {
-    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions;
+    std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
     for (auto module : m_Modules)
     {
         modulePositions[module->GetID()] = module->GetPosition();

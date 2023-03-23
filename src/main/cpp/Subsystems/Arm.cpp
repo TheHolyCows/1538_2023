@@ -139,11 +139,11 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     //  1. when intaking and the flip wrist button has been pressed for cone pickup
     //       and wrist is perpendicular to the floor (TODO: this should also change safe pivot angle by a few degrees)
     //  2. when inside bot perimeter
-    if (reqPivotAngle < 20 && reqPivotAngle > -20 && m_State != ARM_HUMAN) // keep in temporarily
-    {
-        return 90;
-    }
-    else if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    // if (reqPivotAngle < 20 && reqPivotAngle > -20 && m_State != ARM_HUMAN) // keep in temporarily
+    // {
+    //     return 90;
+    // }
+    if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
     {
         // theoretically, wrist angle should be opposite to pivot angle?
         return reqPivotAngle > 0 ? m_WristMaxAngle : 0;
