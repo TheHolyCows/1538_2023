@@ -7,7 +7,7 @@ namespace CowLib
     /// @param deviceId
     CowCANCoder::CowCANCoder(int deviceId)
     {
-        m_Cancoder = new ctre::phoenixpro::hardware::CANcoder(deviceId, "cowbus");
+        m_Cancoder = new ctre::phoenixpro::hardware::CANcoder(deviceId, "cowdrive");
 
         // Default config
         m_Config = ctre::phoenixpro::configs::CANcoderConfiguration{};

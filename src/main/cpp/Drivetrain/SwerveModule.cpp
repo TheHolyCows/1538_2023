@@ -11,8 +11,8 @@ SwerveModule::SwerveModule(const int id,
                            const double encoderOffset)
     : SwerveModuleInterface(id, encoderOffset)
 {
-    m_DriveMotor    = std::make_unique<CowLib::CowMotorController>(driveMotor);
-    m_RotationMotor = std::make_unique<CowLib::CowMotorController>(rotationMotor);
+    m_DriveMotor    = std::make_unique<CowLib::CowMotorController>(driveMotor, "cowdrive");
+    m_RotationMotor = std::make_unique<CowLib::CowMotorController>(rotationMotor, "cowdrive");
     m_Encoder       = std::make_unique<CowLib::CowCANCoder>(encoderId);
 
     m_DriveControlRequest = { 0 };
