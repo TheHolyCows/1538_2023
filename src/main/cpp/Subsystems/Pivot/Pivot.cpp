@@ -11,7 +11,7 @@
 
 Pivot::Pivot(const int motorID)
 {
-    m_PivotMotor = std::make_shared<ctre::phoenix::motorcontrol::can::TalonFX>(motorID, "");
+    m_PivotMotor = std::make_shared<ctre::phoenix::motorcontrol::can::TalonFX>(motorID, "cowbus");
     m_PivotMotor->SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
 
     m_TargetAngle = 0;
