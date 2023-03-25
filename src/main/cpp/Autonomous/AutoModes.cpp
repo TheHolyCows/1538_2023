@@ -109,14 +109,14 @@ AutoModes::AutoModes()
         pathWithEvents("3 GP LZ - score cube 2",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) } },
                        false));
-    m_Modes["3 GP LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_GND, true));
-    m_Modes["3 GP LZ ( [] [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.19));
+    m_Modes["3 GP LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, true));
+    m_Modes["3 GP LZ ( [] [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.15));
     m_Modes["3 GP LZ ( [] [] )"].push_back(stow());
     m_Modes["3 GP LZ ( [] [] )"].push_back(
         new PathplannerSwerveTrajectoryCommand("LZ - drive away", 16.5, 12, true, false));
 
     m_Modes["2.5 GP & Balance LZ ( [] [] )"] = twoPointFiveGP;
-    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CUBE, false, true));
     m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(
         new PathplannerSwerveTrajectoryCommand("LZ - to CS outside", 10, 8, true, false));
     m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new BalanceCommand(-3, 7, 15, true));
