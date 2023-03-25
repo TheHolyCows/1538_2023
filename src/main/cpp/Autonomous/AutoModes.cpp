@@ -116,7 +116,7 @@ AutoModes::AutoModes()
         new PathplannerSwerveTrajectoryCommand("LZ - drive away", 16.5, 12, true, false));
 
     m_Modes["2.5 GP & Balance LZ ( [] [] )"] = twoPointFiveGP;
-    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_GND, CG_CUBE, false, true));
+    m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
     m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(
         new PathplannerSwerveTrajectoryCommand("LZ - to CS outside", 10, 8, true, false));
     m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new BalanceCommand(-3, 7, 15, true));
