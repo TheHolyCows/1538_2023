@@ -129,15 +129,14 @@ void CowRobot::Handle()
     PrintToDS();
 
     double xAccel = m_Accelerometer->GetX();
-    frc::SmartDashboard::PutNumber("x accel", xAccel);
-    frc::SmartDashboard::PutNumber("gyro yaw", m_Gyro->GetYawDegrees());
-    if (m_Arm->GetArmState() == ARM_HUMAN && m_Arm->GetClawState() == CLAW_INTAKE && fabs(xAccel) > CONSTANT("GYRO_RESET_ACCEL"))
+    // frc::SmartDashboard::PutNumber("x accel", xAccel);
+    // frc::SmartDashboard::PutNumber("gyro yaw", m_Gyro->GetYawDegrees());
+    if (m_Arm->GetArmState() == ARM_HUMAN && m_Arm->GetClawState() == CLAW_INTAKE
+        && fabs(xAccel) > CONSTANT("GYRO_RESET_ACCEL"))
     {
         m_Gyro->SetYaw(0);
         m_DriveController->ResetHeadingLock();
     }
-
-
 }
 
 void CowRobot::StartTime()
@@ -148,6 +147,22 @@ void CowRobot::StartTime()
 void CowRobot::DoNothing()
 {
     // TODO: make the robot stop (including drive)
+}
+
+/**
+ * @brief enables automatic stow when intaking cargo
+ * only called by OperatorController when intaking
+*/
+void CowRobot::AllowAutoStow()
+{
+    if (m_Arm->GetArmState() == ARM_GND)
+    {
+        m_AutoStowAllowed = true;
+    }
+    else
+    {
+        m_AutoStowAllowed = false;
+    }
 }
 
 /**
@@ -162,13 +177,13 @@ void CowRobot::SetArmState(ARM_STATE state, ARM_CARGO cargo)
     {
         m_PrevArmState = m_Arm->GetArmState();
     }
-
+    // set to driver stow if stow is pressed after scoring or if currently in DRIVER_STOW and button is hit
     if (state == ARM_DRIVER_STOW
         && (m_PrevArmState == ARM_L2 || m_PrevArmState == ARM_L3 || m_Arm->GetArmState() == ARM_DRIVER_STOW))
     {
         m_Arm->SetArmState(state);
     }
-    else if (state == ARM_DRIVER_STOW)
+    else if (state == ARM_DRIVER_STOW) // otherwise set to standard stow
     {
         m_Arm->SetArmState(ARM_STOW);
     }
@@ -228,6 +243,14 @@ void CowRobot::ArmSM()
         }
         break;
     case ARM_GND :
+        // auto stow check - should be called every cycle in ARM_GND
+        if (m_AutoStowAllowed && m_Arm->GetClaw().IsStalled())
+        {
+            SetArmState(ARM_STOW, CG_NONE);
+            m_AutoStowAllowed = false;
+            break;
+        }
+
         if (m_Arm->GetArmCargo() == CG_CUBE)
         {
             m_Arm->RequestPosition(CONSTANT("ARM_GND_CUBE_ANGLE"),

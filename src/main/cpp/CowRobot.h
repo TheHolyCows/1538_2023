@@ -63,6 +63,8 @@ private:
     double m_MatchTime;
     double m_StartTime;
 
+    bool m_AutoStowAllowed = false;
+
     ARM_STATE m_PrevArmState;
 
 public:
@@ -89,6 +91,7 @@ public:
 
     void DoNothing(void);
 
+    void AllowAutoStow();
     void SetArmState(ARM_STATE, ARM_CARGO);
     void ArmSM();
 };
