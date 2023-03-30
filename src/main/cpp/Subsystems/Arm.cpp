@@ -54,7 +54,8 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
 {
     // if arm extended and change in angle is large?, do not move pivot
     if (curExt > m_MinPos + 0.5
-        && (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5
+        && (fabs(curAngle) < fabs(reqAngle) - CONSTANT("PIVOT_WHILE_EXT_TOLERANCE")
+            || fabs(curAngle) > fabs(reqAngle) + CONSTANT("PIVOT_WHILE_EXT_TOLERANCE")
             || std::signbit(reqAngle) != std::signbit(curAngle)))
     {
         m_PivotLockout = true;
@@ -77,7 +78,8 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     }
 
     // lock out extension until we reach desired angle +/- a few degrees
-    if (fabs(curAngle) < fabs(reqAngle) - 8 || fabs(curAngle) > fabs(reqAngle) + 8
+    if (fabs(curAngle) < fabs(reqAngle) - CONSTANT("PIVOT_WHILE_EXT_TOLERANCE")
+        || fabs(curAngle) > fabs(reqAngle) + CONSTANT("PIVOT_WHILE_EXT_TOLERANCE")
         || std::signbit(curAngle) != std::signbit(reqAngle))
     {
         m_ExtLockout = true;
@@ -143,7 +145,7 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     // {
     //     return 90;
     // }
-    if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    if (fabs(reqPivotAngle) >= CONSTANT("PIVOT_WITHIN_BOT") || m_State == ARM_STOW)
     {
         // theoretically, wrist angle should be opposite to pivot angle?
         return reqPivotAngle > 0 ? m_WristMaxAngle : 0;
