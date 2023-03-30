@@ -135,6 +135,28 @@ namespace CowLib
     }
 
     /** 
+     * @brief Gets the cached current corresponding to the torque output by the motor
+     * this is split from the refresh current getter due to the possibility of flooding
+     * the CANBUS or the motor with requests
+     * @return The current in amps
+     */
+    double CowMotorController::GetTorqueCurrent()
+    {
+        return m_Talon->GetTorqueCurrent().GetValue().value();
+    }
+
+    /** 
+     * @brief Gets the updated current corresponding to the torque output by the motor
+     * this is split from the standard current getter due to the possibility of flooding
+     * the CANBUS or the motor with requests
+     * @return The current in amps
+     */
+    double CowMotorController::GetRefreshTorqueCurrent()
+    {
+        return m_Talon->GetTorqueCurrent().Refresh().GetValue().value();
+    }
+
+    /** 
      * @brief Sets the current position of the motor to a new value in turns. Used to zero.
      * @return Status code returned by talon
      */
