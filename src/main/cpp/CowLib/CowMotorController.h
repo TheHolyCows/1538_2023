@@ -248,6 +248,8 @@ namespace CowLib
 
         double GetPosition();
         double GetVelocity();
+        double GetTorqueCurrent();
+        double GetRefreshTorqueCurrent();
 
         int SetSensorPosition(double turns);
 
