@@ -63,6 +63,14 @@ void Claw::SetOpen(bool open)
     m_Open = open;
 }
 
+bool Claw::IsStalled()
+{
+    // 150 amps determined as good threshould from testing but any value from 100 -> 200
+    // seems viable
+    // used to determine if we have possession of game piece
+    return fabs(m_IntakeMotor->GetTorqueCurrent()) >= 150.0;
+}
+
 void Claw::ResetConstants()
 {
     m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
@@ -94,7 +102,8 @@ Claw::~Claw()
     delete m_Solenoid;
 }
 
-void Claw::BrakeMode(bool brakeMode) {
+void Claw::BrakeMode(bool brakeMode)
+{
     if (brakeMode)
     {
         m_WristMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::BRAKE);

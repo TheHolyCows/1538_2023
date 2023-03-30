@@ -66,6 +66,9 @@ void OperatorController::Handle(CowRobot *bot)
     // New claw logic
     if (m_CB->GetOperatorButton(BT_CONE))
     {
+        // alternatively this can be put in the ARM_GND button, however, that would cause
+        // issues going to ground with a game piece in the intake
+        bot->AllowAutoStow();
         bot->GetArm()->SetClawState(CLAW_INTAKE);
         bot->GetArm()->SetArmCargo(CG_CONE);
         Vision::GetInstance()->SetCargo(CG_CONE);
@@ -73,6 +76,7 @@ void OperatorController::Handle(CowRobot *bot)
     }
     else if (m_CB->GetOperatorButton(BT_CUBE))
     {
+        bot->AllowAutoStow();
         bot->GetArm()->SetClawState(CLAW_INTAKE);
         bot->GetArm()->SetArmCargo(CG_CUBE);
         Vision::GetInstance()->SetCargo(CG_CUBE);
@@ -115,7 +119,8 @@ void OperatorController::Handle(CowRobot *bot)
     {
         bot->SetArmState(ARM_HUMAN, CG_NONE);
     }
-    else if (m_CB->GetOperatorButton(BT_WRIST_FLIP)) {
+    else if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
+    {
         bot->SetArmState(ARM_UP, CG_NONE);
     }
 

@@ -45,6 +45,8 @@ public:
 
     double GetIntakeSpeed();
 
+    bool IsStalled();
+
     void SetOpen(bool open);
 
     void ResetConstants();
