@@ -92,8 +92,8 @@ AutoModes::AutoModes()
                                             false,
                                             16.5,
                                             10));
-    twoPointFiveGP.push_back(new WaitCommand(0.1, false));
-    twoPointFiveGP.push_back(new ClawCommand(CLAW_EXHAUST, 0.13));
+    twoPointFiveGP.push_back(new WaitCommand(0.08, false));
+    twoPointFiveGP.push_back(new ClawCommand(CLAW_EXHAUST, 0.10));
     twoPointFiveGP.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     twoPointFiveGP.push_back(new WaitCommand(0.1, false));
     twoPointFiveGP.push_back(pathWithEvents(
