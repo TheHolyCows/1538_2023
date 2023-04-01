@@ -105,10 +105,10 @@ void CowRobot::Handle()
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
     // log the following every 200 ms
-    if (m_DSUpdateCount % 10 == 0)
+    if (m_DSUpdateCount % 15 == 0)
     {
         // m_DSUpdateCount is reset in PrintToDS
-        CowLib::CowLogger::LogGyro(m_Gyro->GetPitchDegrees(), m_Gyro->GetRollDegrees(), m_Gyro->GetYawDegrees());
+        CowLib::CowLogger::LogGyro(m_Gyro);
         CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
     }
 
@@ -157,6 +157,10 @@ void CowRobot::AllowAutoStow()
 {
     if (m_Arm->GetArmState() == ARM_GND)
     {
+        if (!m_AutoStowAllowed)
+        {
+            m_Arm->GetClaw().ResetStowTimer();
+        }
         m_AutoStowAllowed = true;
     }
     else

@@ -138,12 +138,16 @@ namespace CowLib
      * @param roll - roll of the bot (in degrees)
      * @param yaw - yaw of the bot (in degrees)
     */
-    void CowLogger::LogGyro(double pitch, double roll, double yaw)
+    void CowLogger::LogGyro(CowPigeon *gyro)
     {
         if ((int) CONSTANT("DEBUG") != CowLogger::LOG_DBG)
         {
             return;
         }
+
+        double pitch = gyro->GetPitchDegrees();
+        double roll  = gyro->GetRollDegrees();
+        double yaw   = gyro->GetYawDegrees();
 
         CowGyroLog logPacket;
         logPacket.hdr.msgType = CowLogger::GYRO_LOG;
