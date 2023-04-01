@@ -9,6 +9,7 @@
 #define __COW_LOGGER_H__
 
 #include "../CowConstants.h"
+#include "../CowPigeon.h"
 #include "CowMotorController.h"
 
 #include <algorithm>
@@ -60,7 +61,7 @@ namespace CowLib
 
         void RegisterMotor(uint32_t, CowLib::CowMotorController *);
         static void LogAutoMode(frc::DriverStation::Alliance, const char *);
-        static void LogGyro(double, double, double);
+        static void LogGyro(CowPigeon *);
         static void LogPose(double, double, double);
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
