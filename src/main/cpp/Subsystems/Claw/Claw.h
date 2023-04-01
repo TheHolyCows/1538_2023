@@ -12,6 +12,7 @@
 #include "../../CowLib/Conversions.h"
 #include "../../CowLib/CowMotorController.h"
 
+#include <frc/filter/LinearFilter.h>
 #include <frc/Solenoid.h>
 #include <iostream>
 
@@ -30,6 +31,10 @@ private:
 
     bool m_Open;
 
+    frc::LinearFilter<double> m_CurrentFilter = frc::LinearFilter<double>::MovingAverage(2);
+    double m_TorqueCurrent;
+    int m_StowTimer;
+
 public:
     Claw(int wristMotor, int intakeMotor, int solenoidChannel);
 
@@ -44,6 +49,8 @@ public:
     void SetIntakeSpeed(double percent);
 
     double GetIntakeSpeed();
+
+    void ResetStowTimer();
 
     bool IsStalled();
 
