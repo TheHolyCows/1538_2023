@@ -23,6 +23,8 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
     m_Open = false;
 
+    m_TorqueCurrent = 0;
+
     ResetConstants();
 }
 
@@ -63,12 +65,22 @@ void Claw::SetOpen(bool open)
     m_Open = open;
 }
 
+void Claw::ResetStowTimer()
+{
+    // 8 * 20 ms
+    m_StowTimer = 6;
+}
+
 bool Claw::IsStalled()
 {
-    // 150 amps determined as good threshould from testing but any value from 100 -> 200
     // seems viable
     // used to determine if we have possession of game piece
-    return fabs(m_IntakeMotor->GetTorqueCurrent()) >= 150.0;
+    if (m_StowTimer-- > 0)
+    {
+        return false;
+    }
+
+    return m_TorqueCurrent >= 50.0 && fabs(GetIntakeSpeed() < 5);
 }
 
 void Claw::ResetConstants()
@@ -93,6 +105,10 @@ void Claw::Handle()
     {
         m_Solenoid->Set(m_Open);
     }
+
+    // don't think this is the most efficient way of doing this
+    // ideally you only check when we are intaking...
+    m_TorqueCurrent = m_CurrentFilter.Calculate(fabs(m_IntakeMotor->GetTorqueCurrent()));
 }
 
 Claw::~Claw()
