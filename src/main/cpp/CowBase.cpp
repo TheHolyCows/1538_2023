@@ -111,17 +111,20 @@ void CowBase::DisabledPeriodic()
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 30 == 0)
+    if (m_DisabledCount++ % 35 == 0)
     {
         m_Alliance = frc::DriverStation::GetAlliance();
         CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
 
-        if (m_ControlBoard->GetOperatorButton(BT_STOW)) {
+        if (m_ControlBoard->GetOperatorButton(BT_STOW))
+        {
             m_Bot->GetArm()->GetPivot().BrakeMode(false);
             m_Bot->GetArm()->GetTelescope().BrakeMode(false);
             m_Bot->GetArm()->GetClaw().BrakeMode(false);
-        } else {
+        }
+        else
+        {
             m_Bot->GetArm()->GetPivot().BrakeMode(true);
             m_Bot->GetArm()->GetTelescope().BrakeMode(true);
             m_Bot->GetArm()->GetClaw().BrakeMode(true);
