@@ -236,7 +236,14 @@ void Arm::UpdateClawState()
     switch (m_ClawState)
     {
     case CLAW_OFF :
-        m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_SPEED"));
+        if (m_Cargo == CG_CONE)
+        {
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_CONE"));
+        }
+        else
+        {
+            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_OFF_CUBE"));
+        }
 
         if (m_ResetCargoFlag)
         {
@@ -430,11 +437,11 @@ void Arm::RequestPosition(double angle, double extension, double clawOffset)
 
     m_Claw->RequestWristAngle(safeWrist);
 
-    if (m_LoopCount % 20 == 0) // fires every 400ms
-    {
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
-        CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
-    }
+    // if (m_LoopCount % 20 == 0) // fires every 400ms
+    // {
+    //     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "angle: %f\text: %f\n", safeAngle, safeExt);
+    //     CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "wrist: %f\n", safeWrist);
+    // }
 
     m_PrevState = GetArmState();
 }

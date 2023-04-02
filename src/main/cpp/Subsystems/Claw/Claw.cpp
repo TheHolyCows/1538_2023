@@ -7,6 +7,8 @@
 
 #include "Claw.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 {
     m_WristMotor  = new CowLib::CowMotorController(wristMotor);
@@ -30,6 +32,11 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
 void Claw::RequestWristAngle(double angle)
 {
+    frc::SmartDashboard::PutNumber("wrist req", angle);
+    frc::SmartDashboard::PutNumber(
+        "wrist actual",
+        CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1);
+
     m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }
 
@@ -80,7 +87,7 @@ bool Claw::IsStalled()
         return false;
     }
 
-    return m_TorqueCurrent >= 50.0 && fabs(GetIntakeSpeed() < 5);
+    return m_TorqueCurrent >= CONSTANT("INTAKE_CURRENT_TRIGGER") && fabs(GetIntakeSpeed() < 5);
 }
 
 void Claw::ResetConstants()
@@ -88,6 +95,8 @@ void Claw::ResetConstants()
     m_WristMotor->SetPID(CONSTANT("WRIST_P"), CONSTANT("WRIST_I"), CONSTANT("WRIST_D"), CONSTANT("WRIST_F"));
     m_WristMotor->SetMotionMagic(CONSTANT("WRIST_V"), CONSTANT("WRIST_A"));
     // m_IntakeMotor->SetPID(CONSTANT("INTK_P"), CONSTANT("INTK_I"), CONSTANT("INTK_D"), CONSTANT("INTK_F"));
+
+    m_CurrentFilter = frc::LinearFilter<double>::MovingAverage(CONSTANT("INTAKE_CURRENT_LPF"));
 }
 
 void Claw::Handle()

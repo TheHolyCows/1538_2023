@@ -31,7 +31,8 @@ private:
 
     bool m_Open;
 
-    frc::LinearFilter<double> m_CurrentFilter = frc::LinearFilter<double>::MovingAverage(2);
+    frc::LinearFilter<double> m_CurrentFilter
+        = frc::LinearFilter<double>::MovingAverage(CONSTANT("INTAKE_CURRENT_LPF"));
     double m_TorqueCurrent;
     int m_StowTimer;
 
