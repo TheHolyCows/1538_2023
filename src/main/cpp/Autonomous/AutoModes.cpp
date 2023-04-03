@@ -19,7 +19,7 @@ AutoModes::AutoModes()
     auto pathWithEvents = [](const std::string &name,
                              const std::vector<TrajectoryEvent> &events,
                              bool resetOdometry = true,
-                             double speed       = 16.5,
+                             double speed       = 20.21,
                              double accel       = 14)
     {
         std::deque<RobotCommand *> series;
@@ -83,14 +83,14 @@ AutoModes::AutoModes()
                                               { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
                                               { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
                                             false,
-                                            16.5,
+                                            20.21,
                                             12));
     twoPointFiveGP.push_back(stow());
     twoPointFiveGP.push_back(pathWithEvents("3 GP LZ - score cube 1",
                                             { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                               { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                             false,
-                                            16.5,
+                                            20.21,
                                             10));
     twoPointFiveGP.push_back(new WaitCommand(0.08, false));
     twoPointFiveGP.push_back(new ClawCommand(CLAW_EXHAUST, 0.10));
@@ -100,7 +100,7 @@ AutoModes::AutoModes()
         "3 GP LZ - intake cube 2",
         { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) }, { 1, startGroundIntake(CG_CUBE) } },
         false,
-        16.5,
+        20.21,
         8));
     twoPointFiveGP.push_back(stow());
 
@@ -113,7 +113,7 @@ AutoModes::AutoModes()
     m_Modes["3 GP LZ ( [] [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.3));
     m_Modes["3 GP LZ ( [] [] )"].push_back(stow());
     m_Modes["3 GP LZ ( [] [] )"].push_back(
-        new PathplannerSwerveTrajectoryCommand("LZ - drive away", 16.5, 12, true, false));
+        new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 12, true, false));
 
     m_Modes["2.5 GP & Balance LZ ( [] [] )"] = twoPointFiveGP;
     m_Modes["2.5 GP & Balance LZ ( [] [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
@@ -163,7 +163,7 @@ AutoModes::AutoModes()
                                           { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
                                           { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
                                         true,
-                                        16.5,
+                                        20.21,
                                         8));
 
     twoGPGuard.push_back(stow());
@@ -172,7 +172,7 @@ AutoModes::AutoModes()
                                         { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                           { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                         false,
-                                        16.5,
+                                        20.21,
                                         8));
     twoGPGuard.push_back(new WaitCommand(0.2, false));
     twoGPGuard.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
@@ -200,7 +200,7 @@ AutoModes::AutoModes()
         "Guard - intake 2",
         { { 0.3, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
         false,
-        16.5,
+        20.21,
         8));
     m_Modes["2.5 GP Guard FLIP ARM ( [] ^ )"].push_back(stow());
 

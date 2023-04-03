@@ -84,6 +84,8 @@ public:
     bool GetLocked() const;
     void SetLocked(bool isLocked);
 
+    void SetBrakeMode(bool brakeMode);
+
     void ResetConstants();
     void ResetEncoders();
 

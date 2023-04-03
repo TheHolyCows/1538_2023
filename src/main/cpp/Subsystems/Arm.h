@@ -81,6 +81,8 @@ private:
     bool m_ReInitArmLPF;
     CowLib::CowLPF *m_ArmLPF;
 
+    bool m_BrakeMode;
+
 public:
     /**
      * @brief Arm Constructor
@@ -198,6 +200,8 @@ public:
     Telescope &GetTelescope() const { return *m_Telescope; }
 
     Claw &GetClaw() const { return *m_Claw; }
+
+    void SetBrakeMode(bool brakeMode);
 };
 
 #endif /* SRC_SUBSYSTEMS_ARM_H_ */
