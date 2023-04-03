@@ -47,6 +47,8 @@ public:
 
     virtual void SetTargetState(CowLib::CowSwerveModuleState state, bool force = false) = 0;
 
+    virtual void SetBrakeMode(bool brakeMode);
+
     virtual void ResetConstants() = 0;
     virtual void ResetEncoders()  = 0;
 

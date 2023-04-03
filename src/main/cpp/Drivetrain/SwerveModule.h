@@ -36,6 +36,8 @@ private:
 
     std::unique_ptr<CowLib::CowCANCoder> m_Encoder;
 
+    bool m_BrakeMode;
+
 public:
     /**
      * @brief Construct a new SwerveModule object
@@ -59,6 +61,8 @@ public:
      * @param force force angle during low speeds
      */
     void SetTargetState(CowLib::CowSwerveModuleState state, bool force = false) override;
+
+    void SetBrakeMode(bool brakeMode) override;
 
     void ResetConstants() override;
 

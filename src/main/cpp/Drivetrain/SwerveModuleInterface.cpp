@@ -69,3 +69,7 @@ CowLib::CowSwerveModuleState SwerveModuleInterface::Optimize(CowLib::CowSwerveMo
 
     return CowLib::CowSwerveModuleState{ targetSpeed, targetAngle };
 }
+
+void SwerveModuleInterface::SetBrakeMode(bool brakeMode)
+{
+}

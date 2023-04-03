@@ -23,6 +23,8 @@ SwerveModule::SwerveModule(const int id,
 
     m_PreviousAngle = 0;
 
+    m_BrakeMode = true;
+
     ResetConstants();
     ResetEncoders();
 
@@ -129,4 +131,23 @@ void SwerveModule::Handle()
     frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angle", m_Angle);
     frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/velocity", m_Velocity);
     frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angular velocity", m_AngularVelocity);
+}
+
+void SwerveModule::SetBrakeMode(bool brakeMode)
+{
+    if (brakeMode == m_BrakeMode)
+    {
+        return;
+    }
+
+    m_BrakeMode = brakeMode;
+
+    if (m_BrakeMode)
+    {
+        m_DriveMotor->SetNeutralMode(CowLib::CowMotorController::BRAKE);
+    }
+    else
+    {
+        m_DriveMotor->SetNeutralMode(CowLib::CowMotorController::COAST);
+    }
 }

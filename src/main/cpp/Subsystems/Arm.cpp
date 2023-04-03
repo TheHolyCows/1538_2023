@@ -47,6 +47,8 @@ Arm::Arm(int pivotMotor, int telescopeMotor, int wristMotor, int intakeMotor, in
 
     m_ClawState = CLAW_OFF;
 
+    m_BrakeMode = true;
+
     ResetConstants();
 }
 
@@ -571,4 +573,18 @@ void Arm::Handle()
 void Arm::UseManualControl(bool manual)
 {
     m_ManualControl = manual;
+}
+
+void Arm::SetBrakeMode(bool brakeMode)
+{
+    if (m_BrakeMode == brakeMode)
+    {
+        return;
+    }
+
+    m_BrakeMode = brakeMode;
+
+    m_Pivot->BrakeMode(brakeMode);
+    m_Telescope->BrakeMode(brakeMode);
+    m_Claw->BrakeMode(brakeMode);
 }

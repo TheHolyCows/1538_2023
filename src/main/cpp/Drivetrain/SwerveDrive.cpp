@@ -251,3 +251,11 @@ void SwerveDrive::Handle()
 
     m_Pose = m_Odometry->GetWPIPose();
 }
+
+void SwerveDrive::SetBrakeMode(bool brakeMode)
+{
+    for (auto module : m_Modules)
+    {
+        module->SetBrakeMode(brakeMode);
+    }
+}

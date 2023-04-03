@@ -46,11 +46,15 @@ void CowBase::DisabledInit()
     printf("DISABLED INIT -------------------\n");
 
     m_Bot->GetDriveController()->ResetHeadingLock();
+
+    m_Bot->GetDrivetrain()->SetBrakeMode(true);
 }
 
 void CowBase::AutonomousInit()
 {
     m_Bot->GetDrivetrain()->ResetEncoders();
+
+    m_Bot->GetDrivetrain()->SetBrakeMode(false);
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;
@@ -66,6 +70,8 @@ void CowBase::AutonomousInit()
 
 void CowBase::TeleopInit()
 {
+    m_Bot->GetDrivetrain()->SetBrakeMode(false);
+
     m_Bot->StartTime();
     // m_Bot->GetGyro()->FinalizeCalibration();
     std::cout << "setting controller " << m_OpController << std::endl;
@@ -119,15 +125,11 @@ void CowBase::DisabledPeriodic()
 
         if (m_ControlBoard->GetOperatorButton(BT_STOW))
         {
-            m_Bot->GetArm()->GetPivot().BrakeMode(false);
-            m_Bot->GetArm()->GetTelescope().BrakeMode(false);
-            m_Bot->GetArm()->GetClaw().BrakeMode(false);
+            m_Bot->GetArm()->SetBrakeMode(false);
         }
         else
         {
-            m_Bot->GetArm()->GetPivot().BrakeMode(true);
-            m_Bot->GetArm()->GetTelescope().BrakeMode(true);
-            m_Bot->GetArm()->GetClaw().BrakeMode(true);
+            m_Bot->GetArm()->SetBrakeMode(true);
         }
     }
 }
