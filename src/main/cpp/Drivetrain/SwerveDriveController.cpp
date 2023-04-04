@@ -121,15 +121,17 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
         }
     }
 
-    //    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
-    //    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
+    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
+    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
-    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
-                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
-                             omega,
-                             fieldRelative,
-                             centerOfRotationX,
-                             centerOfRotationY);
+    x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
+    y = ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false);
+    if (x == 0 && y == 0 && fabs(rotation) < CONSTANT("STICK_DEADBAND"))
+    {
+        omega = 0;
+    }
+
+    m_Drivetrain.SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY);
 
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
