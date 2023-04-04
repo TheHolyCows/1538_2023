@@ -10,9 +10,9 @@
 
 #include "../../CowConstants.h"
 #include "../../CowLib/Conversions.h"
+#include "../../CowLib/CowLPF.h"
 #include "../../CowLib/CowMotorController.h"
 
-#include <frc/filter/LinearFilter.h>
 #include <frc/Solenoid.h>
 #include <iostream>
 
@@ -31,8 +31,7 @@ private:
 
     bool m_Open;
 
-    frc::LinearFilter<double> m_CurrentFilter
-        = frc::LinearFilter<double>::MovingAverage(CONSTANT("INTAKE_CURRENT_LPF"));
+    CowLib::CowLPF *m_CurrentFilter;
     double m_TorqueCurrent;
     int m_StowTimer;
 

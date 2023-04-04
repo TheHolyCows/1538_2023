@@ -25,6 +25,7 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
     m_Open = false;
 
+    m_CurrentFilter = new CowLib::CowLPF(CONSTANT("INTAKE_CURRENT_LPF"));
     m_TorqueCurrent = 0;
 
     ResetConstants();
@@ -96,7 +97,7 @@ void Claw::ResetConstants()
     m_WristMotor->SetMotionMagic(CONSTANT("WRIST_V"), CONSTANT("WRIST_A"));
     // m_IntakeMotor->SetPID(CONSTANT("INTK_P"), CONSTANT("INTK_I"), CONSTANT("INTK_D"), CONSTANT("INTK_F"));
 
-    m_CurrentFilter = frc::LinearFilter<double>::MovingAverage(CONSTANT("INTAKE_CURRENT_LPF"));
+    m_CurrentFilter->UpdateBeta(CONSTANT("INTAKE_CURRENT_LPF"));
 }
 
 void Claw::Handle()
@@ -117,7 +118,7 @@ void Claw::Handle()
 
     // don't think this is the most efficient way of doing this
     // ideally you only check when we are intaking...
-    m_TorqueCurrent = m_CurrentFilter.Calculate(fabs(m_IntakeMotor->GetTorqueCurrent()));
+    m_TorqueCurrent = m_CurrentFilter->Calculate(fabs(m_IntakeMotor->GetTorqueCurrent()));
 }
 
 Claw::~Claw()
