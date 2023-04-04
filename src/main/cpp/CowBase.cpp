@@ -54,7 +54,7 @@ void CowBase::AutonomousInit()
 {
     m_Bot->GetDrivetrain()->ResetEncoders();
 
-    m_Bot->GetDrivetrain()->SetBrakeMode(false);
+    m_Bot->GetDrivetrain()->SetBrakeMode(true);
 
     m_AutoController->SetCommandList(AutoModes::GetInstance()->GetCommandList());
     std::cout << "Done setting command list" << std::endl;

@@ -80,14 +80,14 @@ AutoModes::AutoModes()
     twoPointFiveGP.push_back(setClaw(CG_CUBE));
     twoPointFiveGP.push_back(pathWithEvents("3 GP LZ - intake cube 1",
                                             { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
-                                              { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
+                                              { 0.15, new ClawCommand(CLAW_INTAKE, 0) },
                                               { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
                                             false,
                                             20.21,
                                             12));
     twoPointFiveGP.push_back(stow());
     twoPointFiveGP.push_back(pathWithEvents("3 GP LZ - score cube 1",
-                                            { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
+                                            { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                               { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                             false,
                                             20.21,
@@ -160,7 +160,7 @@ AutoModes::AutoModes()
     twoGPGuard.push_back(new WaitCommand(0.1, false));
     twoGPGuard.push_back(pathWithEvents("Guard - intake 1",
                                         { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
-                                          { 0.3, new ClawCommand(CLAW_INTAKE, 0) },
+                                          { 0.15, new ClawCommand(CLAW_INTAKE, 0) },
                                           { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
                                         true,
                                         20.21,
@@ -169,7 +169,7 @@ AutoModes::AutoModes()
     twoGPGuard.push_back(stow());
 
     twoGPGuard.push_back(pathWithEvents("Guard - score 1",
-                                        { { 0.2, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
+                                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                           { 0.1, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                         false,
                                         20.21,
@@ -198,7 +198,7 @@ AutoModes::AutoModes()
         }));
     m_Modes["2.5 GP Guard FLIP ARM ( [] ^ )"].push_back(pathWithEvents(
         "Guard - intake 2",
-        { { 0.3, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
+        { { 0.15, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) }, { 1, startGroundIntake(CG_CONE) } },
         false,
         20.21,
         8));
