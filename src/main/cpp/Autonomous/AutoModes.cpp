@@ -57,7 +57,7 @@ AutoModes::AutoModes()
         return new SeriesCommand({ new UpdateArmStateCommand(ARM_STOW, false), new ClawCommand(CLAW_OFF, 0) });
     };
 
-    auto scoreConeL2 = []()
+    [[maybe_unused]] auto scoreConeL2 = []()
     {
         return new SeriesCommand({ new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true),
                                    new WaitCommand(0.6, false),
@@ -203,6 +203,29 @@ AutoModes::AutoModes()
         20.21,
         8));
     m_Modes["2.5 GP Guard FLIP ARM ( [] ^ )"].push_back(stow());
+
+    // m_Modes["LZ Test"].push_back(new WaitCommand(0.125, false));
+    // m_Modes["LZ Test"].push_back(setClaw(CG_CONE));
+    // m_Modes["LZ Test"].push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
+    // m_Modes["LZ Test"].push_back(new PathplannerSwerveTrajectoryCommand("cone L2 start", 8, 4, true, true));
+    // m_Modes["LZ Test"].push_back(new WaitCommand(0.6, false));
+    // m_Modes["LZ Test"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    // m_Modes["LZ Test"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    // m_Modes["LZ Test"].push_back(new WaitCommand(0.1, false));
+    // m_Modes["LZ Test"].push_back(stow());
+    // // m_Modes["LZ Test"].push_back(setClaw());
+    // m_Modes["LZ Test"].push_back(pathWithEvents("LZ - loop 1",
+    //                                             {
+    //                                                 { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) },
+    //                                                 { 0.1, new UpdateArmStateCommand(ARM_GND, CG_CONE, false, true) },
+    //                                                 { 0.05, new ClawCommand(CLAW_INTAKE, 2) },
+    //                                                 { 0.05, stow() },
+    //                                                 { 0.2, new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true) },
+    //                                                 { 0.2, new ClawCommand(CLAW_EXHAUST, 0.3) },
+    //                                                 { 0.2, new UpdateArmStateCommand(ARM_DRIVER_STOW, false) },
+    //                                                 { 0.2, new WaitCommand(0.2, false) },
+    //                                                 { 0.2, new UpdateArmStateCommand(ARM_STOW, false) },
+    //                                             }));
 
     m_Iterator = m_Modes.begin();
 }
