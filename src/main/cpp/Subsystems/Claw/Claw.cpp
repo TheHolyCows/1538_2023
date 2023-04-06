@@ -33,10 +33,10 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
 
 void Claw::RequestWristAngle(double angle)
 {
-    frc::SmartDashboard::PutNumber("wrist req", angle);
-    frc::SmartDashboard::PutNumber(
-        "wrist actual",
-        CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1);
+    // frc::SmartDashboard::PutNumber("wrist req", angle);
+    // frc::SmartDashboard::PutNumber(
+    //     "wrist actual",
+    //     CowLib::Conversions::FalconToDegrees(m_WristMotor->GetPosition(), CONSTANT("WRIST_GEAR_RATIO")) * -1);
 
     m_WristControlRequest.Position = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("WRIST_GEAR_RATIO")) * -1;
 }

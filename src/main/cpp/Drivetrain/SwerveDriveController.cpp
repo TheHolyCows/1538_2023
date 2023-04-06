@@ -94,7 +94,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     double omega = 0;
 
-    frc::SmartDashboard::PutNumber("rotation axis", rotation);
+    // frc::SmartDashboard::PutNumber("rotation axis", rotation);
 
     if (fabs(rotation) > CONSTANT("STICK_DEADBAND"))
     {
@@ -106,7 +106,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
         double heading = m_Drivetrain.GetPoseRot();
         if (fabs(heading - m_PrevHeading) < CONSTANT("HEADING_PID_THRESHOLD"))
         {
-            frc::SmartDashboard::PutNumber("heading lock setpoint", m_TargetHeading);
+            // frc::SmartDashboard::PutNumber("heading lock setpoint", m_TargetHeading);
 
             if (!m_HeadingLocked)
             {
@@ -121,8 +121,8 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
         }
     }
 
-    frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
-    frc::SmartDashboard::PutNumber("omega deg / sec", omega);
+    // frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
+    // frc::SmartDashboard::PutNumber("omega deg / sec", omega);
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
     y = ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false);

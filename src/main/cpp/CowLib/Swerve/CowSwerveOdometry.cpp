@@ -19,7 +19,7 @@ namespace CowLib
                                          double initialY,
                                          double initialRotation)
     {
-        frc::SmartDashboard::PutData("field", &m_Field);
+        // frc::SmartDashboard::PutData("field", &m_Field);
 
         std::array<frc::SwerveModulePosition, 4> zeroPositions;
         for (int i = 0; i < 4; i++)

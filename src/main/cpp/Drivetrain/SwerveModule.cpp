@@ -33,8 +33,8 @@ SwerveModule::SwerveModule(const int id,
                               id,
                               m_Encoder->GetAbsolutePosition(),
                               m_RotationMotor->GetPosition());
-    frc::SmartDashboard::PutNumber("swerve/module " + std::to_string(m_Id) + "/absolute encoder angle",
-                                   m_Encoder->GetAbsolutePosition());
+    // frc::SmartDashboard::PutNumber("swerve/module " + std::to_string(m_Id) + "/absolute encoder angle",
+    // m_Encoder->GetAbsolutePosition());
 }
 
 void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force)
@@ -65,14 +65,14 @@ void SwerveModule::SetTargetState(CowLib::CowSwerveModuleState state, bool force
     m_RotationControlRequest.Position = targetAngle * CONSTANT("SWERVE_ROTATION_GEAR_RATIO") / 360.0;
     // m_RotationControlRequest.FeedForward
     // = state.omega * 12 * 0.3 / (360 * (6380 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO")) / 60);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/feedforward",
-                                   m_RotationControlRequest.FeedForward);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/omega", state.omega);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/feedforward",
+    //                                m_RotationControlRequest.FeedForward);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/omega", state.omega);
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "module ");
 
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/target velocity", optimized.velocity);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/target angle", optimized.angle);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angle error", m_Angle - optimized.angle);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/target velocity", optimized.velocity);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/target angle", optimized.angle);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angle error", m_Angle - optimized.angle);
 }
 
 void SwerveModule::ResetConstants()
@@ -127,10 +127,10 @@ void SwerveModule::Handle()
 
     m_AngularVelocity = m_RotationMotor->GetVelocity() * 360.0 / CONSTANT("SWERVE_ROTATION_GEAR_RATIO");
 
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/position", m_Position);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angle", m_Angle);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/velocity", m_Velocity);
-    frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angular velocity", m_AngularVelocity);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/position", m_Position);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angle", m_Angle);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/velocity", m_Velocity);
+    // frc::SmartDashboard::PutNumber("swerve/module" + std::to_string(m_Id) + "/angular velocity", m_AngularVelocity);
 }
 
 void SwerveModule::SetBrakeMode(bool brakeMode)

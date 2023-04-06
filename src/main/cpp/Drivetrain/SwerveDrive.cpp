@@ -231,21 +231,21 @@ void SwerveDrive::AddVisionMeasurement(frc::Pose2d pose, double timestamp)
 void SwerveDrive::Handle()
 {
     std::array<CowLib::CowSwerveModulePosition, 4> modulePositions{};
-    std::array<CowLib::CowSwerveModuleState, 4> moduleStates{};
+    // std::array<CowLib::CowSwerveModuleState, 4> moduleStates{};
     for (auto module : m_Modules)
     {
         module->Handle();
         modulePositions[module->GetID()] = module->GetPosition();
-        moduleStates[module->GetID()]    = module->GetState();
+        // moduleStates[module->GetID()]    = module->GetState();
     }
 
-    if (!frc::RobotBase::IsReal())
-    {
-        m_Gyro->SetYaw(m_Kinematics->GetInternalKinematics()
-                           ->ToChassisSpeeds(CowLib::CowSwerveModuleState::ToWPIExtendedArray(moduleStates))
-                           .omega.value()
-                       + m_Gyro->GetYawDegrees());
-    }
+    // if (!frc::RobotBase::IsReal())
+    // {
+    //     m_Gyro->SetYaw(m_Kinematics->GetInternalKinematics()
+    //                        ->ToChassisSpeeds(CowLib::CowSwerveModuleState::ToWPIExtendedArray(moduleStates))
+    //                        .omega.value()
+    //                    + m_Gyro->GetYawDegrees());
+    // }
 
     m_Odometry->Update(m_Gyro->GetYawDegrees(), modulePositions);
 
