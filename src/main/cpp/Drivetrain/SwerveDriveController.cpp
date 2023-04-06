@@ -35,6 +35,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     // frc::SmartDashboard::PutNumber("rotation axis", rotation);
 
+    double heading = m_Gyro.GetYawDegrees();
     if (fabs(rotation) > CONSTANT("STICK_DEADBAND"))
     {
         omega           = ProcessDriveAxis(rotation, CONSTANT("DESIRED_MAX_ANG_VEL"), false);
@@ -43,21 +44,22 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     else
     {
         // double heading = m_Drivetrain.GetPoseRot();
-        double heading = m_Gyro.GetYawDegrees();
-        if (fabs(heading - m_PrevHeading) < CONSTANT("HEADING_PID_THRESHOLD"))
+        if (fabs(heading - m_PrevHeading) < CONSTANT("HEADING_PID_THRESHOLD") && !m_HeadingLocked)
         {
             // frc::SmartDashboard::PutNumber("heading lock setpoint", m_TargetHeading);
 
-            if (!m_HeadingLocked)
-            {
-                m_TargetHeading = heading;
-                m_HeadingLocked = true;
-            }
+            // if (!m_HeadingLocked)
+            // {
+            m_TargetHeading = m_PrevHeading;
+            m_HeadingLocked = true;
+            // }
+        }
+        else if (m_HeadingLocked)
+        {
+            omega = m_HeadingPIDController->Calculate(units::meter_t{ heading }, units::meter_t{ m_TargetHeading });
         }
 
         // omega = (fmod(heading, 360) - fmod(m_TargetHeading, 360)) * CONSTANT("HEADING_P");
-        omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
-                                                  units::meter_t{ m_TargetHeading });
         // frc::SmartDashboard::PutNumber("heading pid error", m_HeadingPIDController->GetPositionError());
         // frc::SmartDashboard::PutNumber("heading pid output", omega);
     }
@@ -74,7 +76,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     m_Drivetrain.SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY);
 
-    m_PrevHeading = m_Gyro.GetYawDegrees();
+    m_PrevHeading = heading;
 }
 
 void SwerveDriveController::LockHeading(double x, double y, bool useRawInputs)
