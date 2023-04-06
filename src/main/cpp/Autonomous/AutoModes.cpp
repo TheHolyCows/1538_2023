@@ -1,5 +1,6 @@
 #include "AutoModes.h"
 
+#include "Commands/LambdaCommand.h"
 #include "Commands/ParallelCommand.h"
 #include "Commands/PathplannerSwerveTrajectoryCommand.h"
 #include "Commands/UpdateArmStateCommand.h"
@@ -206,7 +207,7 @@ AutoModes::AutoModes()
 
     m_Modes["L3 Link LZ"].push_back(setClaw(CG_CONE));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, false, true));
-    m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.7, false));
+    m_Modes["L3 Link LZ"].push_back(new WaitCommand(1.1, false));
     m_Modes["L3 Link LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.1, false));
@@ -217,13 +218,13 @@ AutoModes::AutoModes()
                        { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
                          { 0.15, new ClawCommand(CLAW_INTAKE, 0) },
                          { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
-                       false,
+                       true,
                        20.21,
                        12));
     m_Modes["L3 Link LZ"].push_back(stow());
     m_Modes["L3 Link LZ"].push_back(pathWithEvents("L3 Link LZ - score cube",
                                                    { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
-                                                     { 0.3, new UpdateArmStateCommand(ARM_L3, CG_CUBE, false, true) } },
+                                                     { 0.4, new UpdateArmStateCommand(ARM_L3, CG_CUBE, false, true) } },
                                                    false,
                                                    20.21,
                                                    10));
@@ -240,17 +241,18 @@ AutoModes::AutoModes()
         8));
     m_Modes["L3 Link LZ"].push_back(stow());
 
-    m_Modes["L3 Link LZ"] = twoPointFiveGP;
     m_Modes["L3 Link LZ"].push_back(
         pathWithEvents("L3 Link LZ - score cone",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, false) } },
                        false));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_L3, true));
+    m_Modes["L3 Link LZ"].push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->ManualPosition(0.2, true); }));
+    m_Modes["L3 Link LZ"].push_back(new WaitCommand(2, false));
     m_Modes["L3 Link LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.1, false));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
-    m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 16, true, false));
+    // m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 16, true, false));
 
     m_Iterator = m_Modes.begin();
 }

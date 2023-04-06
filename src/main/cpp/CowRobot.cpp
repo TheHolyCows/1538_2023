@@ -105,12 +105,12 @@ void CowRobot::Handle()
     // logger code below should have checks for debug mode before sending out data
     CowLib::CowLogger::GetInstance()->Handle();
     // log the following every 200 ms
-    if (m_DSUpdateCount % 15 == 0)
-    {
-        // m_DSUpdateCount is reset in PrintToDS
-        CowLib::CowLogger::LogGyro(m_Gyro);
-        CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
-    }
+    // if (m_DSUpdateCount % 15 == 0)
+    // {
+    //     // m_DSUpdateCount is reset in PrintToDS
+    //     CowLib::CowLogger::LogGyro(m_Gyro);
+    //     CowLib::CowLogger::LogPose(m_Drivetrain->GetPoseX(), m_Drivetrain->GetPoseY(), m_Drivetrain->GetPoseRot());
+    // }
 
     //    // APRIL TAG BOTPOSE
     //    std::optional<Vision::BotPoseResult> visionPose = Vision::GetInstance()->GetBotPose();
@@ -120,11 +120,11 @@ void CowRobot::Handle()
     //    }
 
     // accelerometers
-    double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
+    // double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
 
     // positive is true, negative is false
     // bool direction = (zVal - m_PrevZ) > 0 ? true : false;
-    m_PrevZ = zVal;
+    // m_PrevZ = zVal;
 
     PrintToDS();
 
