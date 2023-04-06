@@ -31,67 +31,6 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     double centerOfRotationX = 0;
     double centerOfRotationY = 0;
 
-    // if (m_CB->GetLeftDriveStickAxis(3) > 0.85)
-    // {
-    //     if (m_EvasiveSwerveWheel == NONE)
-    //     {
-    //         double stickAngle = atan2(m_CB->GetLeftDriveStickAxis(1), m_CB->GetLeftDriveStickAxis(0)) * 180 / M_PI;
-    //         stickAngle        = (stickAngle < 0) ? (360 + stickAngle) : stickAngle;
-
-    //         double robotOrientedAngle = bot->GetGyro()->GetYawDegrees() + stickAngle;
-
-    //         // set wheel based on quadrant
-    //         if (robotOrientedAngle >= 0 && robotOrientedAngle < 90)
-    //         {
-    //             m_EvasiveSwerveWheel = FRONT_LEFT;
-    //         }
-    //         else if (robotOrientedAngle >= 90 && robotOrientedAngle < 180)
-    //         {
-    //             m_EvasiveSwerveWheel = FRONT_RIGHT;
-    //         }
-    //         else if (robotOrientedAngle >= 180 && robotOrientedAngle < 270)
-    //         {
-    //             m_EvasiveSwerveWheel = BACK_RIGHT;
-    //         }
-    //         else if (robotOrientedAngle >= 270 && robotOrientedAngle < 360)
-    //         {
-    //             m_EvasiveSwerveWheel = BACK_LEFT;
-    //         }
-    //         else
-    //         {
-    //             CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_ERR, "Invalid angle for quick turn");
-    //         }
-    //     }
-
-    //     const double wb = CONSTANT("WHEEL_BASE");
-
-    //     switch (m_EvasiveSwerveWheel)
-    //     {
-    //     case FRONT_LEFT :
-    //         centerOfRotationX = wb;
-    //         centerOfRotationY = wb;
-    //         break;
-    //     case FRONT_RIGHT :
-    //         centerOfRotationX = wb;
-    //         centerOfRotationY = -wb;
-    //         break;
-    //     case BACK_LEFT :
-    //         centerOfRotationX = -wb;
-    //         centerOfRotationY = wb;
-    //         break;
-    //     case BACK_RIGHT :
-    //         centerOfRotationX = -wb;
-    //         centerOfRotationY = -wb;
-    //         break;
-    //     case NONE :
-    //         break;
-    //     }
-    // }
-    // else
-    // {
-    //     m_EvasiveSwerveWheel = NONE;
-    // }
-
     double omega = 0;
 
     // frc::SmartDashboard::PutNumber("rotation axis", rotation);
@@ -103,7 +42,8 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     }
     else
     {
-        double heading = m_Drivetrain.GetPoseRot();
+        // double heading = m_Drivetrain.GetPoseRot();
+        double heading = m_Gyro.GetYawDegrees();
         if (fabs(heading - m_PrevHeading) < CONSTANT("HEADING_PID_THRESHOLD"))
         {
             // frc::SmartDashboard::PutNumber("heading lock setpoint", m_TargetHeading);
@@ -113,12 +53,13 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
                 m_TargetHeading = heading;
                 m_HeadingLocked = true;
             }
-
-            omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
-                                                      units::meter_t{ m_TargetHeading });
-            //            frc::SmartDashboard::PutNumber("heading pid error", m_HeadingPIDController->GetPositionError());
-            //            frc::SmartDashboard::PutNumber("heading pid output", omega);
         }
+
+        // omega = (fmod(heading, 360) - fmod(m_TargetHeading, 360)) * CONSTANT("HEADING_P");
+        omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
+                                                  units::meter_t{ m_TargetHeading });
+        // frc::SmartDashboard::PutNumber("heading pid error", m_HeadingPIDController->GetPositionError());
+        // frc::SmartDashboard::PutNumber("heading pid output", omega);
     }
 
     // frc::SmartDashboard::PutNumber("heading locked", m_HeadingLocked);
@@ -133,7 +74,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
 
     m_Drivetrain.SetVelocity(x, y, omega, fieldRelative, centerOfRotationX, centerOfRotationY);
 
-    m_PrevHeading = m_Drivetrain.GetPoseRot();
+    m_PrevHeading = m_Gyro.GetYawDegrees();
 }
 
 void SwerveDriveController::LockHeading(double x, double y, bool useRawInputs)
