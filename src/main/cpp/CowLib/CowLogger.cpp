@@ -59,6 +59,8 @@ namespace CowLib
 
         uint16_t port   = ((uint16_t) CONSTANT("LOG_SERVER_PORT"));
         m_LogServerPort = htons(port);
+
+        m_RegisteredVarLog = 0;
     }
 
     /**
@@ -274,6 +276,10 @@ namespace CowLib
         logPacket.encoderCt   = encoderCt;
 
         SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    int CowLogger::RegisterVarLog(const char *name)
+    {
     }
 
     /**
