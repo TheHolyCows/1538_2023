@@ -236,8 +236,8 @@ AutoModes::AutoModes()
     m_Modes["L3 Link LZ"].push_back(setClaw(CG_CUBE));
     m_Modes["L3 Link LZ"].push_back(pathWithEvents("L3 Link LZ - intake cone",
                                                    { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
-                                                     { 0.9, startGroundIntake(CG_CUBE) },
-                                                     { 0.7, setClaw(CG_CONE) } },
+                                                     { 1.2, startGroundIntake(CG_CUBE) },
+                                                     { 0.4, setClaw(CG_CONE) } },
                                                    false,
                                                    20.21,
                                                    8.33));
