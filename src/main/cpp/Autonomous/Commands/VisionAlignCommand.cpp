@@ -12,6 +12,7 @@ bool VisionAlignCommand::IsComplete(CowRobot *robot)
 {
     if (m_Timer->HasElapsed(m_Timeout))
     {
+        robot->GetDrivetrain()->SetVelocity(0, 0, 0, true);
         return true;
     }
 
