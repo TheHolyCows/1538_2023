@@ -65,8 +65,7 @@ void Pivot::ResetConstants()
 
 void Pivot::Handle()
 {
-    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic,
-                      m_TargetAngle * 2048 + CONSTANT("ARM_ZERO_OFFSET"));
+    m_PivotMotor->Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, m_TargetAngle * 2048);
 
     if (m_TickCount++ % 10 == 0) // 200 miliseconds
     {
