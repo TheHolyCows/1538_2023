@@ -60,7 +60,7 @@ namespace CowLib
         uint16_t port   = ((uint16_t) CONSTANT("LOG_SERVER_PORT"));
         m_LogServerPort = htons(port);
 
-        m_RegisteredVarLog = 0;
+        m_RegisteredVarLogs = 0;
     }
 
     /**
@@ -280,6 +280,61 @@ namespace CowLib
 
     int CowLogger::RegisterVarLog(const char *name)
     {
+        if (m_RegisteredVarLogs >= REGISTERED_VARLOG_MAX)
+        {
+            return -1;
+        }
+
+        int logId = m_RegisteredVarLogs;
+        m_RegisteredVarLogs++;
+
+        CowVarReg logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAR_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarReg);
+        logPacket.id          = logId;
+
+        memset(logPacket.name, 0x0, sizeof(logPacket.name));
+        // sub 1 from len to allow space for '\0'
+        strncpy(logPacket.name, name, sizeof(logPacket.name) - 1);
+
+        SendLog(&logPacket, sizeof(logPacket));
+
+        return logId;
+    }
+
+    void CowLogger::LogVar(CowLogger::CowLogLevel logLevel, int id, double value)
+    {
+        if (logLevel > (int) CONSTANT("DEBUG"))
+        {
+            return;
+        }
+
+        CowVarVal logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAL_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarVal);
+        logPacket.id          = id;
+        logPacket.value       = value;
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    void CowLogger::LogVar(CowLogger::CowLogLevel logLevel, int id, bool value)
+    {
+        if (logLevel > (int) CONSTANT("DEBUG"))
+        {
+            return;
+        }
+
+        CowVarBool logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAL_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarBool);
+        logPacket.id          = id;
+        logPacket.value       = (uint16_t) value;
+
+        SendLog(&logPacket, sizeof(logPacket));
     }
 
     /**

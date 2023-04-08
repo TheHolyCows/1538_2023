@@ -70,8 +70,8 @@ namespace CowLib
         static void LogMsg(CowLogLevel, const char *fmt, ...);
 
         static int RegisterVarLog(const char *);
-        static void LogVar(int id, double value);
-        static void LogVar(int id, bool value);
+        static void LogVar(CowLogLevel, int id, double value);
+        static void LogVar(CowLogLevel, int id, bool value);
 
         void Handle();
         void Reset();
@@ -101,7 +101,7 @@ namespace CowLib
         // assuming we don't have more than 24 motors ever
         CowLib::CowMotorController *m_RegisteredMotors[REGISTERED_MOTORS_MAX];
 
-        int m_RegisteredVarLog;
+        static int m_RegisteredVarLogs;
 
         struct CowLogHdr
         {
