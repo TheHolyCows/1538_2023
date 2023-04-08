@@ -251,7 +251,7 @@ AutoModes::AutoModes()
                        false));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_L3, false));
     m_Modes["L3 Link LZ"].push_back(new VisionAlignCommand(0.5, CG_CONE));
-    m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("slow forwards", 4, 2, true, true));
+    // m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("slow forwards", 4, 2, true, true));
     m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.1, false));
     m_Modes["L3 Link LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 0.1));
     m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
