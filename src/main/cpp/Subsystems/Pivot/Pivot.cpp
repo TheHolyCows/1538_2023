@@ -22,12 +22,14 @@ Pivot::Pivot(const int motorID)
 
 void Pivot::RequestAngle(double angle)
 {
-    m_TargetAngle = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO"));
+    m_TargetAngle
+        = CowLib::Conversions::DegreesToFalcon(angle, CONSTANT("PIVOT_GEAR_RATIO")) + CONSTANT("ARM_ZERO_OFFSET");
 }
 
 double Pivot::GetSetpoint()
 {
-    return CowLib::Conversions::FalconToDegrees(m_TargetAngle, CONSTANT("PIVOT_GEAR_RATIO"));
+    return CowLib::Conversions::FalconToDegrees(m_TargetAngle - CONSTANT("ARM_ZERO_OFFSET"),
+                                                CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
 bool Pivot::AtTarget()
@@ -37,7 +39,8 @@ bool Pivot::AtTarget()
 
 double Pivot::GetAngle()
 {
-    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048,
+    return CowLib::Conversions::FalconToDegrees(m_PivotMotor->GetSelectedSensorPosition() / 2048
+                                                    - CONSTANT("ARM_ZERO_OFFSET"),
                                                 CONSTANT("PIVOT_GEAR_RATIO"));
 }
 
