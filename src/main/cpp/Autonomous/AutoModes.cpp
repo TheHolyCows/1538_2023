@@ -245,38 +245,39 @@ AutoModes::AutoModes()
     lzbase.push_back(new WaitCommand(0.1, false));
     lzbase.push_back(stow());
 
-    m_Modes["L3 Link LZ"] = lzbase;
-    m_Modes["L3 Link LZ"].push_back(
+    m_Modes["L3 Link LZ ( [] -> ^ )"] = lzbase;
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(
         pathWithEvents("L3 Link LZ - score cone",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        false));
-    m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_L3, false));
-    m_Modes["L3 Link LZ"].push_back(new VisionAlignCommand(0.5, CG_CONE));
-    // m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("slow forwards", 4, 2, true, true));
-    m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.7, false));
-    m_Modes["L3 Link LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
-    m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["L3 Link LZ"].push_back(new WaitCommand(0.1, false));
-    m_Modes["L3 Link LZ"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
-    // m_Modes["L3 Link LZ"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 16, true, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L3, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
+    // m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new PathplannerSwerveTrajectoryCommand("slow forwards", 4, 2, true, true));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    // m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 16, true, false));
 
-    m_Modes["3 GP LZ"] = lzbase;
-    m_Modes["3 GP LZ"].push_back(pathWithEvents("L3 Link LZ - score cone",
-                                                { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
-                                                false));
-    m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_L2, false));
-    m_Modes["3 GP LZ"].push_back(new VisionAlignCommand(0.4, CG_CONE));
-    m_Modes["3 GP LZ"].push_back(new WaitCommand(0.5, false));
-    m_Modes["3 GP LZ"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
-    m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["3 GP LZ"].push_back(new WaitCommand(0.1, false));
-    m_Modes["3 GP LZ"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["3 GP LZ ( [] -> ^ )"] = lzbase;
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(
+        pathWithEvents("L3 Link LZ - score cone",
+                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
+                       false));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.4, CG_CONE));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new WaitCommand(0.5, false));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
-    m_Modes["2.5 balance LZ"] = lzbase;
-    m_Modes["2.5 balance LZ"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true));
-    m_Modes["2.5 balance LZ"].push_back(
+    m_Modes["2.5 balance LZ ( [] -> ^ )"] = lzbase;
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true));
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(
         new PathplannerSwerveTrajectoryCommand("LZ - to CS outside 2", 10, 8, true, false));
-    m_Modes["2.5 balance LZ"].push_back(new BalanceCommand(-3, 7, 15, true));
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(new BalanceCommand(-3, 7, 15, true));
 
     std::deque<RobotCommand *> guardbase;
     guardbase.push_back(setClaw(CG_CONE));
@@ -322,7 +323,7 @@ AutoModes::AutoModes()
     guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.1));
     guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, true));
     guardbase.push_back(stow());
-    m_Modes["Guard 3 GP"] = guardbase;
+    m_Modes["Guard 3 GP ( [] -> [] )"] = guardbase;
 
     m_Iterator = m_Modes.begin();
 }
