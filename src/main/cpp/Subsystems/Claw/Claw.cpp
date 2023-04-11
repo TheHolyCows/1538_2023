@@ -28,6 +28,9 @@ Claw::Claw(int wristMotor, int intakeMotor, int solenoidChannel)
     m_CurrentFilter = new CowLib::CowLPF(CONSTANT("INTAKE_CURRENT_LPF"));
     m_TorqueCurrent = 0;
 
+    // m_TempLogId = CowLib::CowLogger::RegisterVarLog("INTAKE TEMP");
+    // CowLib::CowLogger::LogVar(CowLib::CowLogger::LOG_OFF, m_TempLogId, true);
+
     ResetConstants();
 }
 
@@ -115,6 +118,19 @@ void Claw::Handle()
     {
         m_Solenoid->Set(m_Open);
     }
+
+    // if (m_CycleCount++ % 75 == 0) // 75 -> every 1.5 second
+    // {
+    //     m_CycleCount = 1;
+
+    //     double temp = m_IntakeMotor->GetInternalTalon()->GetDeviceTemp().GetValue().value();
+
+    //     // potentially change the log level of these
+    //     if (temp > 90)
+    //     {
+    //         CowLib::CowLogger::LogVar(CowLib::CowLogger::LOG_OFF, m_TempLogId, false);
+    //     }
+    // }
 
     // don't think this is the most efficient way of doing this
     // ideally you only check when we are intaking...

@@ -29,6 +29,8 @@ namespace CowLib
 
     CowLogger::CowLogger()
     {
+        m_RegisteredVarLogs = 0;
+
         m_TickCount = 0;
         m_IdToLog   = 0;
         memset(m_RegisteredMotors, 0x0, sizeof(m_RegisteredMotors));
@@ -59,8 +61,6 @@ namespace CowLib
 
         uint16_t port   = ((uint16_t) CONSTANT("LOG_SERVER_PORT"));
         m_LogServerPort = htons(port);
-
-        m_RegisteredVarLogs = 0;
     }
 
     /**
@@ -280,13 +280,12 @@ namespace CowLib
 
     int CowLogger::RegisterVarLog(const char *name)
     {
-        if (m_RegisteredVarLogs >= REGISTERED_VARLOG_MAX)
+        if (CowLogger::GetInstance()->m_RegisteredVarLogs >= REGISTERED_VARLOG_MAX)
         {
             return -1;
         }
 
-        int logId = m_RegisteredVarLogs;
-        m_RegisteredVarLogs++;
+        int logId = CowLogger::CowLogger::GetInstance()->m_RegisteredVarLogs++;
 
         CowVarReg logPacket;
 

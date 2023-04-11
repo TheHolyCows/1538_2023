@@ -101,7 +101,7 @@ namespace CowLib
         // assuming we don't have more than 24 motors ever
         CowLib::CowMotorController *m_RegisteredMotors[REGISTERED_MOTORS_MAX];
 
-        static int m_RegisteredVarLogs;
+        int m_RegisteredVarLogs;
 
         struct CowLogHdr
         {
