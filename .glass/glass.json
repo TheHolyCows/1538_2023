@@ -1,0 +1,107 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "april tag": {
+          "open": true,
+          "y": {
+            "open": true
+          }
+        },
+        "arm": {
+          "open": true
+        },
+        "field": {
+          "open": true
+        },
+        "omega deg ": {
+          "open": true
+        },
+        "open": true,
+        "quick turn": {
+          "open": true
+        },
+        "swerve": {
+          "module 0": {
+            "open": true
+          },
+          "module 1": {
+            "open": true
+          },
+          "module 2": {
+            "open": true
+          },
+          "module 3": {
+            "open": true
+          }
+        }
+      },
+      "limelight-back": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/field": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT3)",
+    "serverTeam": "1538"
+  },
+  "Plots": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 355,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/x accel"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "height": 338,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/gyro yaw"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
