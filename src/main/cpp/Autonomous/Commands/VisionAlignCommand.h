@@ -3,19 +3,24 @@
 #include "../../CowLib/CowTimer.h"
 #include "../../CowRobot.h"
 #include "RobotCommand.h"
+#include "../../CowPigeon.h"
 
 #include <memory>
 
-class CubeAlignCommand : public RobotCommand
+class VisionAlignCommand : public RobotCommand
 {
 private:
     std::unique_ptr<CowLib::CowTimer> m_Timer;
 
+    CowPigeon& m_Gyro;
+
     const double m_Timeout;
 
+    ARM_CARGO m_Cargo;
+
 public:
-    CubeAlignCommand(const double timeout);
-    ~CubeAlignCommand() = default;
+    VisionAlignCommand(double timeout, ARM_CARGO cargo);
+    ~VisionAlignCommand() override = default;
 
     bool IsComplete(CowRobot *robot) override;
 

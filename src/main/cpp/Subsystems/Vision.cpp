@@ -67,7 +67,7 @@ bool Vision::CubeYAligned()
     return fabs(tx) < CONSTANT("CUBE_Y_TOLERANCE");
 }
 
-double Vision::Cube3dYPID()
+[[maybe_unused]] double Vision::Cube3dYPID()
 {
     if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
@@ -100,7 +100,7 @@ double Vision::Cube3dYPID()
     return yOutput;
 }
 
-double Vision::Cube3dYawPID()
+[[maybe_unused]] double Vision::Cube3dYawPID()
 {
     if (GetPipeline() != LL_PIPELINE_APRIL_TAG_3D)
     {
@@ -243,9 +243,11 @@ void Vision::SetInverted(bool flipped)
     m_Flipped = flipped;
 }
 
-std::shared_ptr<nt::NetworkTable> Vision::GetLimelightTable() const
+std::shared_ptr<nt::NetworkTable> Vision::GetLimelightTable()
 {
-    std::string name = (m_Flipped ? "limelight-front" : "limelight-back");
+    // Only one limelight now
+    std::string name = "limelight";
+    // std::string name = (m_Flipped ? "limelight-front" : "limelight-back");
 
     return nt::NetworkTableInstance::GetDefault().GetTable(name);
     //    m_LimelightTable = nt::NetworkTableInstance::GetDefault().GetTable("limelight");

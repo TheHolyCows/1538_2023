@@ -121,11 +121,23 @@ void CowRobot::Handle()
 
     // accelerometers
     double zVal = m_ZFilter.Calculate(m_Accelerometer->GetZ());
+
     // positive is true, negative is false
     // bool direction = (zVal - m_PrevZ) > 0 ? true : false;
     m_PrevZ = zVal;
 
     PrintToDS();
+
+    double xAccel = m_Accelerometer->GetX();
+    frc::SmartDashboard::PutNumber("x accel", xAccel);
+    frc::SmartDashboard::PutNumber("gyro yaw", m_Gyro->GetYawDegrees());
+    if (m_Arm->GetArmState() == ARM_HUMAN && m_Arm->GetClawState() == CLAW_INTAKE && fabs(xAccel) > CONSTANT("GYRO_RESET_ACCEL"))
+    {
+        m_Gyro->SetYaw(0);
+        m_DriveController->ResetHeadingLock();
+    }
+
+
 }
 
 void CowRobot::StartTime()
@@ -192,7 +204,7 @@ void CowRobot::ArmSM()
         {
             m_Arm->RequestPosition(CONSTANT("ARM_L3_CUBE_ANGLE"),
                                    CONSTANT("ARM_L3_CUBE_EXT"),
-                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+                                   CONSTANT("WRIST_OFFSET_L3_CUBE"));
         }
         else if (m_Arm->GetArmCargo() == CG_CONE)
         {
@@ -206,7 +218,7 @@ void CowRobot::ArmSM()
         {
             m_Arm->RequestPosition(CONSTANT("ARM_L2_CUBE_ANGLE"),
                                    CONSTANT("ARM_L2_CUBE_EXT"),
-                                   CONSTANT("WRIST_OFFSET_SCORE_CUBE"));
+                                   CONSTANT("WRIST_OFFSET_L2_CUBE"));
         }
         else if (m_Arm->GetArmCargo() == CG_CONE)
         {
@@ -230,11 +242,24 @@ void CowRobot::ArmSM()
         }
         break;
     case ARM_HUMAN :
-        m_Arm->RequestPosition(CONSTANT("ARM_HUM_ANGLE"), CONSTANT("ARM_HUM_EXT"), CONSTANT("WRIST_OFFSET_HUM"));
+        if (m_Arm->GetArmCargo() == CG_CUBE)
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_HUM_CUBE_ANGLE"),
+                                   CONSTANT("ARM_HUM_CUBE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_HUM_CUBE"));
+        }
+        else
+        {
+            m_Arm->RequestPosition(CONSTANT("ARM_HUM_CONE_ANGLE"),
+                                   CONSTANT("ARM_HUM_CONE_EXT"),
+                                   CONSTANT("WRIST_OFFSET_HUM_CONE"));
+        }
         break;
     case ARM_DRIVER_STOW :
         m_Arm->RequestSafeStow();
         break;
+    case ARM_UP :
+        m_Arm->RequestPosition(0, 0);
     default :
         break;
     }

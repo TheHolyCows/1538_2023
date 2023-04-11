@@ -86,12 +86,6 @@ void CowBase::DisabledPeriodic()
     //     m_Display->DisplayPeriodic();
     // }
 
-    if (m_ControlBoard->GetOperatorButton(BT_STOW)) {
-        m_Bot->GetArm()->GetPivot().BrakeMode(false);
-    } else {
-        m_Bot->GetArm()->GetPivot().BrakeMode(true);
-    }
-
     if (m_ControlBoard->GetConstantsResetButton())
     {
         printf("RESETTING CONSTANTS\n");
@@ -117,11 +111,21 @@ void CowBase::DisabledPeriodic()
         // m_Bot->GetArm()->DisabledCalibration();
     }
 
-    if (m_DisabledCount++ % 10 == 0) // 200 ms tick rate
+    if (m_DisabledCount++ % 30 == 0)
     {
         m_Alliance = frc::DriverStation::GetAlliance();
         CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
+
+        if (m_ControlBoard->GetOperatorButton(BT_STOW)) {
+            m_Bot->GetArm()->GetPivot().BrakeMode(false);
+            m_Bot->GetArm()->GetTelescope().BrakeMode(false);
+            m_Bot->GetArm()->GetClaw().BrakeMode(false);
+        } else {
+            m_Bot->GetArm()->GetPivot().BrakeMode(true);
+            m_Bot->GetArm()->GetTelescope().BrakeMode(true);
+            m_Bot->GetArm()->GetClaw().BrakeMode(true);
+        }
     }
 }
 

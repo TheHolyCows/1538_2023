@@ -41,7 +41,7 @@ bool CowControlBoard::GetRobotRelativeButton()
 
 bool CowControlBoard::GetVisionTargetButton()
 {
-    return (GetDriveAxis(6) > 0.85);
+    return (GetDriveAxis(5) > 0.85);
 }
 
 bool CowControlBoard::GetDriveButton(int button)
@@ -61,7 +61,7 @@ double CowControlBoard::GetLeftDriveStickX()
 
 double CowControlBoard::GetLeftDriveStickY()
 {
-    return m_DriverControlStick->GetRawAxis(1);
+    return m_DriverControlStick->GetRawAxis(1) * -1;
 }
 
 double CowControlBoard::GetRightDriveStickX()

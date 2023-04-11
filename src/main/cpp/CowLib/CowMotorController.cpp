@@ -1,8 +1,8 @@
 #include "CowMotorController.h"
 
-#include <utility>
-
 #include "CowLogger.h"
+
+#include <utility>
 
 namespace CowLib
 {
@@ -104,7 +104,16 @@ namespace CowLib
     {
         auto &configuator = m_Talon->GetConfigurator();
 
-        visit([&configuator](auto &&config) { configuator.Apply(config); }, config);
+        visit(
+            [&configuator](auto &&config)
+            {
+                ctre::phoenix::StatusCode res;
+                // do
+                // {
+                res = configuator.Apply(config);
+                // } while (!res.IsOK());
+            },
+            config);
     }
 
     /** 
@@ -151,7 +160,10 @@ namespace CowLib
             break;
         }
 
-        ApplyConfig(config);
+        auto res = m_Talon->GetConfigurator().Apply(config);
+        // printf("neutral mode %s\n", res.GetName());
+
+        // ApplyConfig(config);
     }
 
     CowMotorController::NeutralMode CowMotorController::GetNeutralMode()

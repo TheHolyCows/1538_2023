@@ -115,3 +115,15 @@ void Telescope::UsePIDSet(Telescope::PIDSet set)
 
     m_PrevPIDSet = set;
 }
+
+void Telescope::BrakeMode(bool brakeMode)
+{
+    if (brakeMode)
+    {
+        m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::BRAKE);
+    }
+    else
+    {
+        m_TelescopeMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::COAST);
+    }
+}

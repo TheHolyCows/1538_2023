@@ -12,7 +12,7 @@ void OperatorController::Handle(CowRobot *bot)
     bot->GetArm()->InvertArm(inverted);
     Vision::GetInstance()->SetInverted(inverted);
 
-    if (m_CB->GetDriveAxis(3) > 0.8 && m_CB->GetDriveAxis(5) > 0.8)
+    if (m_CB->GetDriveAxis(2) > 0.8 && m_CB->GetDriveAxis(6) > 0.8)
     {
         bot->GetDrivetrain()->SetLocked(true);
         bot->GetDrivetrain()->SetVelocity(0, 0, 0);
@@ -24,22 +24,21 @@ void OperatorController::Handle(CowRobot *bot)
 
     if (m_CB->GetVisionTargetButton())
     {
-        switch (bot->GetArm()->GetArmCargo())
-        {
-        case CG_CONE :
-            bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
-            break;
-        case CG_CUBE :
-            bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
-            break;
-        default :
-            break;
-        }
+        // switch (bot->GetArm()->GetArmCargo())
+        // {
+        // case CG_CONE :
+        //     bot->GetDriveController()->ConeAlign(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
+        //     break;
+        // case CG_CUBE :
+        //     bot->GetDriveController()->CubeAlign(m_CB->GetLeftDriveStickY());
+        //     break;
+        // default :
+        //     break;
+        // }
     }
-    else if (m_CB->GetDriveAxis(2) > 0.8) // Align heading
+    else if (m_CB->GetDriveAxis(3) > 0.8) // Align heading
     {
-        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(),
-                                               m_CB->GetLeftDriveStickX());
+        bot->GetDriveController()->LockHeading(m_CB->GetLeftDriveStickY(), m_CB->GetLeftDriveStickX());
     }
     else
     {
@@ -51,18 +50,18 @@ void OperatorController::Handle(CowRobot *bot)
     }
 
     // ARM STATES
-    if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
-    {
-        if (!m_WristFlipCheck)
-        {
-            bot->GetArm()->FlipWristState();
-        }
-        m_WristFlipCheck = true;
-    }
-    else
-    {
-        m_WristFlipCheck = false;
-    }
+    // if (m_CB->GetOperatorButton(BT_WRIST_FLIP))
+    // {
+    //     if (!m_WristFlipCheck)
+    //     {
+    //         bot->GetArm()->FlipWristState();
+    //     }
+    //     m_WristFlipCheck = true;
+    // }
+    // else
+    // {
+    m_WristFlipCheck = false;
+    // }
 
     // New claw logic
     if (m_CB->GetOperatorButton(BT_CONE))
@@ -115,6 +114,9 @@ void OperatorController::Handle(CowRobot *bot)
     else if (m_CB->GetOperatorButton(BT_HUMAN))
     {
         bot->SetArmState(ARM_HUMAN, CG_NONE);
+    }
+    else if (m_CB->GetOperatorButton(BT_WRIST_FLIP)) {
+        bot->SetArmState(ARM_UP, CG_NONE);
     }
 
     // manual control - not sure if this will be final implementation

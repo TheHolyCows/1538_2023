@@ -31,7 +31,6 @@ void SeriesCommand::Handle(CowRobot* robot)
 
     if (m_CurrentCommand->IsComplete(robot)) {
         m_CurrentCommand->Finish(robot);
-        delete m_CurrentCommand;
 
         if (m_Commands.empty()) {
             m_CurrentCommand = nullptr;

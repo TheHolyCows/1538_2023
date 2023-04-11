@@ -134,7 +134,7 @@ void SwerveDriveController::Drive(double x, double y, double rotation, bool fiel
     m_PrevHeading = m_Drivetrain.GetPoseRot();
 }
 
-void SwerveDriveController::LockHeading(double x, double y)
+void SwerveDriveController::LockHeading(double x, double y, bool useRawInputs)
 {
     double currentHeading = m_Gyro.GetYawDegrees();
 
@@ -161,16 +161,27 @@ void SwerveDriveController::LockHeading(double x, double y)
     double omega = m_HeadingPIDController->Calculate(units::meter_t{ m_Gyro.GetYawDegrees() },
                                                      units::meter_t{ m_TargetHeading });
 
-    m_Drivetrain.SetVelocity(ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false),
-                             ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false),
-                             omega,
-                             true,
-                             0,
-                             0);
+    if (!useRawInputs)
+    {
+        x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
+        y = ProcessDriveAxis(y, CONSTANT("DESIRED_MAX_SPEED"), false);
+    }
+
+    m_Drivetrain.SetVelocity(x, y, omega, true, 0, 0);
 }
 
 void SwerveDriveController::CubeAlign(double x)
 {
+    // Check if heading is aligned
+    if (fabs(fmod(m_Gyro.GetYawDegrees(), 180)) > CONSTANT("HEADING_TOLERANCE"))
+    {
+        // If not, run the heading lock function
+        LockHeading(x, 0);
+        return;
+    }
+
+    // Otherwise, continue with vision alignment
+
     double y = Vision::GetInstance()->CubeYPID();
 
     x = ProcessDriveAxis(x, CONSTANT("DESIRED_MAX_SPEED"), false);
@@ -180,10 +191,19 @@ void SwerveDriveController::CubeAlign(double x)
 
 void SwerveDriveController::ConeAlign(double x, double yInput)
 {
+    // Check if heading is aligned
+    if (fabs(fmod(m_Gyro.GetYawDegrees(), 180)) > CONSTANT("HEADING_TOLERANCE"))
+    {
+        // If not, run the heading lock function
+        LockHeading(x, yInput);
+        return;
+    }
+
+    // Otherwise, continue with vision alignment
     double y = Vision::GetInstance()->ConeYPID();
 
     // Override if yInput is above override threshold
-    if (fabs(yInput) > CONSTANT("CONE_Y_OVERRIDE_THRESHOLD"))
+    if (fabs(yInput) < CONSTANT("CONE_Y_OVERRIDE_THRESHOLD"))
     {
         y = ProcessDriveAxis(yInput, CONSTANT("DESIRED_MAX_SPEED"), false);
     }

@@ -77,7 +77,7 @@ double Arm::GetSafeAngle(double reqAngle, const double curAngle, const double cu
     }
 
     // lock out extension until we reach desired angle +/- a few degrees
-    if (fabs(curAngle) < fabs(reqAngle) - 5 || fabs(curAngle) > fabs(reqAngle) + 5
+    if (fabs(curAngle) < fabs(reqAngle) - 8 || fabs(curAngle) > fabs(reqAngle) + 8
         || std::signbit(curAngle) != std::signbit(reqAngle))
     {
         m_ExtLockout = true;
@@ -139,11 +139,11 @@ double Arm::GetSafeWristAngle(double curPivotAngle, double reqPivotAngle)
     //  1. when intaking and the flip wrist button has been pressed for cone pickup
     //       and wrist is perpendicular to the floor (TODO: this should also change safe pivot angle by a few degrees)
     //  2. when inside bot perimeter
-    if (reqPivotAngle < 20 && reqPivotAngle > -20 && m_State != ARM_HUMAN) // keep in temporarily
-    {
-        return 90;
-    }
-    else if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
+    // if (reqPivotAngle < 20 && reqPivotAngle > -20 && m_State != ARM_HUMAN) // keep in temporarily
+    // {
+    //     return 90;
+    // }
+    if (fabs(reqPivotAngle) > CONSTANT("PIVOT_WITHIN_BOT"))
     {
         // theoretically, wrist angle should be opposite to pivot angle?
         return reqPivotAngle > 0 ? m_WristMaxAngle : 0;
@@ -261,13 +261,27 @@ void Arm::UpdateClawState()
     case CLAW_EXHAUST :
         if (m_Cargo == CG_CUBE)
         {
-            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE"));
+            if (m_State == ARM_GND)
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE_GND"));
+            }
+            else
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_SCORE_CUBE"));
+            }
         }
         else if (m_Cargo == CG_CONE)
         {
+            if (m_State == ARM_STOW)
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_STOW_CONE"));
+            }
+            else
+            {
+                m_Claw->SetIntakeSpeed(CONSTANT("CLAW_L3_SCORE_CONE"));
+            }
             // if (m_State == ARM_L3)
             // {
-            m_Claw->SetIntakeSpeed(CONSTANT("CLAW_L3_SCORE_CONE"));
             // }
             // else
             // {
@@ -489,6 +503,7 @@ void Arm::RequestSafeStow()
 {
     double curAngle = m_Pivot->GetAngle();
     double reqAngle = CONSTANT("SCORE_STOW_ANGLE");
+    // reqAngle = curAngle;
 
     if (m_ArmInvert)
     {
@@ -520,7 +535,12 @@ void Arm::RequestSafeStow()
 
     if (fabs(curAngle) > fabs(reqAngle) - CONSTANT("DRIVER_STOW_THRESHOLD")
         && fabs(curAngle) < fabs(reqAngle) + CONSTANT("DRIVER_STOW_THRESHOLD"))
+    {
         m_Telescope->RequestPosition(CONSTANT("SCORE_STOW_EXT"));
+    }
+
+    double wristAngle = m_Pivot->GetAngle() > 0 ? 135 : 45;
+    m_Claw->RequestWristAngle(wristAngle);
 }
 
 void Arm::Handle()
