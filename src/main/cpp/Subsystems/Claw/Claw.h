@@ -68,6 +68,8 @@ public:
     virtual ~Claw();
 
     void BrakeMode(bool);
+
+    void CheckPCM();
 };
 
 #endif /* SRC_SUBSYSTEMS_CLAW_H_ */

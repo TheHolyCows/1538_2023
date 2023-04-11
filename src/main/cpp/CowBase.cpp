@@ -123,6 +123,9 @@ void CowBase::DisabledPeriodic()
         CowLib::CowLogger::LogAutoMode(m_Alliance, AutoModes::GetInstance()->GetName().c_str());
         m_DisabledCount = 1;
 
+        // does a Get on the PCM to verify it is there
+        m_Bot->GetArm()->GetClaw().CheckPCM();
+
         if (m_ControlBoard->GetOperatorButton(BT_STOW))
         {
             m_Bot->GetArm()->SetBrakeMode(false);

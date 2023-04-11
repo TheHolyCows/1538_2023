@@ -155,3 +155,8 @@ void Claw::BrakeMode(bool brakeMode)
         m_WristMotor->SetNeutralMode(CowLib::CowMotorController::NeutralMode::COAST);
     }
 }
+
+void Claw::CheckPCM()
+{
+    m_Solenoid->Get();
+}
