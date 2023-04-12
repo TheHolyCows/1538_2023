@@ -1,5 +1,6 @@
 #include "AutoModes.h"
 
+#include "Commands/ClawCommand.h"
 #include "Commands/LambdaCommand.h"
 #include "Commands/ParallelCommand.h"
 #include "Commands/PathplannerSwerveTrajectoryCommand.h"
@@ -281,15 +282,15 @@ AutoModes::AutoModes()
 
     std::deque<RobotCommand *> guardbase;
     guardbase.push_back(setClaw(CG_CONE));
-    guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
-    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - start", 8, 4, true, true));
-    guardbase.push_back(new WaitCommand(0.5, false));
+    guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true));
+    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - start", 8, 8, true, true));
+    guardbase.push_back(new WaitCommand(0.2, false));
     guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     guardbase.push_back(new WaitCommand(0.05, false));
     guardbase.push_back(stow());
     guardbase.push_back(setClaw(CG_CUBE));
-    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - intake 1a", 20.21, 14, false, true));
+    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - intake 1a", 20.21, 14, false, false));
     guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false));
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - intake 1b", 20, 3, false));
     guardbase.push_back(pathWithEvents("Guard - intake 1c", { { 0.2, startGroundIntake(CG_CUBE) } }, false, 20.21, 14));
@@ -313,18 +314,26 @@ AutoModes::AutoModes()
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - intake 2b", 20, 3, false));
     guardbase.push_back(pathWithEvents("Guard - intake 2c", { { 0.2, startGroundIntake(CG_CUBE) } }, false, 20.21, 14));
     guardbase.push_back(stow());
-    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2a", 20.21, 14, false, true));
-    guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
-    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2b", 20, 3, false));
-    guardbase.push_back(pathWithEvents("Guard - score 2c",
-                                       { { 0.3, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false) } },
-                                       false,
-                                       20.21,
-                                       14));
-    guardbase.push_back(new WaitCommand(0.4, false));
-    guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.1));
-    guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, true));
-    guardbase.push_back(stow());
+    guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2a", 20.21, 14, true));
+    guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CUBE, true, true));
+    guardbase.push_back(new WaitCommand(0.8, false));
+    guardbase.push_back(setClaw(CG_CONE));
+    guardbase.push_back(new WaitCommand(0.1, false));
+    guardbase.push_back(new ClawCommand(CLAW_NONE, 0));
+    guardbase.push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->GetClaw().SetIntakeSpeed(-1); }));
+    guardbase.push_back(new WaitCommand(0.3, false));
+    guardbase.push_back(new ClawCommand(CLAW_OFF, 0));
+    // guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
+    // guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2b", 20, 3, false));
+    // guardbase.push_back(pathWithEvents("Guard - score 2c",
+    //                                    { { 0.3, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false) } },
+    //                                    false,
+    //                                    20.21,
+    //                                    14));
+    // guardbase.push_back(new WaitCommand(0.4, false));
+    // guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.1));
+    // guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, true));
+    // guardbase.push_back(stow());
     m_Modes["Guard 3 GP ( [] -> [] )"] = guardbase;
 
     m_Iterator = m_Modes.begin();

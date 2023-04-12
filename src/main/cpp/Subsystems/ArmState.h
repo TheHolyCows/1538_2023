@@ -17,6 +17,7 @@ enum CLAW_STATE
     CLAW_OFF = 0,
     CLAW_INTAKE,
     CLAW_EXHAUST,
+    CLAW_NONE,
 };
 
 enum ARM_CARGO
