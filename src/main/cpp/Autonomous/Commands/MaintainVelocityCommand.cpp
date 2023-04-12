@@ -33,7 +33,7 @@ void MaintainVelocityCommand::Start(CowRobot *robot)
 
 void MaintainVelocityCommand::Handle(CowRobot *robot)
 {
-    frc::Pose2d currentPose = robot->GetDrivetrain()->GetPose();
+    // frc::Pose2d currentPose = robot->GetDrivetrain()->GetPose();
 }
 
 void MaintainVelocityCommand::Finish(CowRobot *robot)

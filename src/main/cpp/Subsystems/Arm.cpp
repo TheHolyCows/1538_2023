@@ -302,6 +302,8 @@ void Arm::UpdateClawState()
             m_ResetCargoFlag = true;
         }
         break;
+    case CLAW_NONE :
+        break;
     }
 
     m_Claw->SetOpen(open);
