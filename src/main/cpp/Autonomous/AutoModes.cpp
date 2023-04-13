@@ -282,9 +282,9 @@ AutoModes::AutoModes()
 
     std::deque<RobotCommand *> guardbase;
     guardbase.push_back(setClaw(CG_CONE));
-    guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, true, true));
+    guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - start", 8, 8, true, true));
-    guardbase.push_back(new WaitCommand(0.2, false));
+    guardbase.push_back(new WaitCommand(0.5, false));
     guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     guardbase.push_back(new WaitCommand(0.05, false));
@@ -305,7 +305,7 @@ AutoModes::AutoModes()
                                        14));
     guardbase.push_back(new VisionAlignCommand(0.3, CG_CONE));
     guardbase.push_back(new WaitCommand(0.2, false));
-    guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    guardbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.3));
     guardbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, true));
     guardbase.push_back(stow());
 
@@ -314,15 +314,17 @@ AutoModes::AutoModes()
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - intake 2b", 20, 3, false));
     guardbase.push_back(pathWithEvents("Guard - intake 2c", { { 0.2, startGroundIntake(CG_CUBE) } }, false, 20.21, 14));
     guardbase.push_back(stow());
+    guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2a", 20.21, 14, true));
     guardbase.push_back(new UpdateArmStateCommand(ARM_L2, CG_CUBE, true, true));
-    guardbase.push_back(new WaitCommand(0.8, false));
+    guardbase.push_back(new WaitCommand(0.2, false));
     guardbase.push_back(setClaw(CG_CONE));
     guardbase.push_back(new WaitCommand(0.1, false));
     guardbase.push_back(new ClawCommand(CLAW_NONE, 0));
     guardbase.push_back(new LambdaCommand([](CowRobot *bot) { bot->GetArm()->GetClaw().SetIntakeSpeed(-1); }));
-    guardbase.push_back(new WaitCommand(0.3, false));
+    guardbase.push_back(new WaitCommand(0.1, false));
     guardbase.push_back(new ClawCommand(CLAW_OFF, 0));
+    guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
     // guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
     // guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 2b", 20, 3, false));
     // guardbase.push_back(pathWithEvents("Guard - score 2c",
