@@ -299,7 +299,7 @@ AutoModes::AutoModes()
     guardbase.push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
     guardbase.push_back(new PathplannerSwerveTrajectoryCommand("Guard - score 1b", 20, 3, false));
     guardbase.push_back(pathWithEvents("Guard - score 1c",
-                                       { { 0.3, new UpdateArmStateCommand(ARM_L3, CG_CUBE, false) } },
+                                       { { 0.3, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false) } },
                                        false,
                                        20.21,
                                        14));
