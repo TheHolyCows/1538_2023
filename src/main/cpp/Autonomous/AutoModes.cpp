@@ -235,13 +235,12 @@ AutoModes::AutoModes()
     lzbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     lzbase.push_back(new WaitCommand(0.1, false));
     lzbase.push_back(setClaw(CG_CUBE));
-    lzbase.push_back(pathWithEvents("L3 Link LZ - intake cone",
-                                    { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
-                                      { 1.2, startGroundIntake(CG_CUBE) },
-                                      { 0.4, setClaw(CG_CONE) } },
-                                    false,
-                                    20.21,
-                                    8.33));
+    lzbase.push_back(pathWithEvents(
+        "L3 Link LZ - intake cone",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) }, { 1.2, startGroundIntake(CG_CUBE) } },
+        false,
+        20.21,
+        8.33));
     lzbase.push_back(setClaw(CG_CONE));
     lzbase.push_back(new WaitCommand(0.1, false));
     lzbase.push_back(stow());
