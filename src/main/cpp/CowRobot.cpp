@@ -128,15 +128,15 @@ void CowRobot::Handle()
 
     PrintToDS();
 
-    double xAccel = m_Accelerometer->GetX();
-    // frc::SmartDashboard::PutNumber("x accel", xAccel);
-    // frc::SmartDashboard::PutNumber("gyro yaw", m_Gyro->GetYawDegrees());
-    if (m_Arm->GetArmState() == ARM_HUMAN && m_Arm->GetClawState() == CLAW_INTAKE
-        && fabs(xAccel) > CONSTANT("GYRO_RESET_ACCEL"))
-    {
-        m_Gyro->SetYaw(0);
-        m_DriveController->ResetHeadingLock();
-    }
+    // double xAccel = m_Accelerometer->GetX();
+    // // frc::SmartDashboard::PutNumber("x accel", xAccel);
+    // // frc::SmartDashboard::PutNumber("gyro yaw", m_Gyro->GetYawDegrees());
+    // if (m_Arm->GetArmState() == ARM_HUMAN && m_Arm->GetClawState() == CLAW_INTAKE
+    //     && fabs(xAccel) > CONSTANT("GYRO_RESET_ACCEL"))
+    // {
+    //     m_Gyro->SetYaw(0);
+    //     m_DriveController->ResetHeadingLock();
+    // }
 }
 
 void CowRobot::StartTime()
