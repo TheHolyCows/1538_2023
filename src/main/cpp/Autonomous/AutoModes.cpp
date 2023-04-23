@@ -226,7 +226,7 @@ AutoModes::AutoModes()
     lzbase.push_back(stow());
     lzbase.push_back(pathWithEvents("L3 Link LZ - score cube",
                                     { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
-                                      { 0.4, new UpdateArmStateCommand(ARM_L3, CG_CUBE, false, true) } },
+                                      { 0.4, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                     false,
                                     20.21,
                                     10.25));
@@ -245,6 +245,44 @@ AutoModes::AutoModes()
     lzbase.push_back(new WaitCommand(0.1, false));
     lzbase.push_back(stow());
 
+    std::deque<RobotCommand *> bluelzbase;
+    bluelzbase.push_back(setClaw(CG_CONE));
+    bluelzbase.push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, false, true));
+    bluelzbase.push_back(new WaitCommand(1.1, false));
+    bluelzbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.20));
+    bluelzbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    bluelzbase.push_back(new WaitCommand(0.1, false));
+    bluelzbase.push_back(stow());
+    bluelzbase.push_back(setClaw(CG_CUBE));
+    bluelzbase.push_back(pathWithEvents("L3 Link LZ - intake cube BLUE",
+                                        { { 0.02, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false) },
+                                          { 0.15, new ClawCommand(CLAW_INTAKE, 0) },
+                                          { 0.01, new UpdateArmStateCommand(ARM_GND, CG_CUBE, false) } },
+                                        true,
+                                        20.21,
+                                        11));
+    bluelzbase.push_back(stow());
+    bluelzbase.push_back(pathWithEvents("L3 Link LZ - score cube BLUE",
+                                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
+                                          { 0.4, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
+                                        false,
+                                        20.21,
+                                        10.25));
+    bluelzbase.push_back(new WaitCommand(0.1, false));
+    bluelzbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.10));
+    bluelzbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    bluelzbase.push_back(new WaitCommand(0.1, false));
+    bluelzbase.push_back(setClaw(CG_CUBE));
+    bluelzbase.push_back(pathWithEvents(
+        "L3 Link LZ - intake cone BLUE",
+        { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) }, { 1.2, startGroundIntake(CG_CUBE) } },
+        false,
+        20.21,
+        8.33));
+    bluelzbase.push_back(setClaw(CG_CONE));
+    bluelzbase.push_back(new WaitCommand(0.08, false));
+    bluelzbase.push_back(stow());
+
     m_Modes["L3 Link LZ ( [] -> ^ )"] = lzbase;
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(
         pathWithEvents("L3 Link LZ - score cone",
@@ -260,18 +298,31 @@ AutoModes::AutoModes()
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
     // m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new PathplannerSwerveTrajectoryCommand("LZ - drive away", 20.21, 16, true, false));
 
-    m_Modes["3 GP LZ ( [] -> ^ )"] = lzbase;
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(
+    m_Modes["3 GP LZ RED ( [] -> ^ )"] = lzbase;
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(
         pathWithEvents("L3 Link LZ - score cone",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        false));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.4, CG_CONE));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new WaitCommand(0.5, false));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
-    m_Modes["3 GP LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new VisionAlignCommand(0.4, CG_CONE));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.5, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"] = bluelzbase;
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(
+        pathWithEvents("L3 Link LZ - score cone BLUE",
+                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
+                       false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new VisionAlignCommand(0.4, CG_CONE));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new WaitCommand(0.5, false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
     m_Modes["2.5 balance LZ ( [] -> ^ )"] = lzbase;
     m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true));
