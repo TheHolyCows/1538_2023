@@ -1,5 +1,9 @@
 # Team 1538 / The Holy Cows
 
+33-13-0
+2023 San Diego Regional Winners
+2023 Newton Division Finalists
+
 ### How to use
 * Make sure you have wpilib installed.
 * Build the code with `./gradlew build`
