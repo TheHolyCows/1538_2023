@@ -1,4 +1,4 @@
-# Team 1538 / The Holy Cow
+# Team 1538 / The Holy Cows
 
 ### How to use
 * Make sure you have wpilib installed.
