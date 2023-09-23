@@ -210,7 +210,7 @@ AutoModes::AutoModes()
     std::deque<RobotCommand *> lzbase;
     lzbase.push_back(setClaw(CG_CONE));
     lzbase.push_back(new UpdateArmStateCommand(ARM_L3, CG_CONE, false, true));
-    lzbase.push_back(new WaitCommand(1.1, false));
+    lzbase.push_back(new WaitCommand(1.3, false));
     lzbase.push_back(new ClawCommand(CLAW_EXHAUST, 0.20));
     lzbase.push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     lzbase.push_back(new WaitCommand(0.1, false));
@@ -288,11 +288,11 @@ AutoModes::AutoModes()
         pathWithEvents("L3 Link LZ - score cone",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L3, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
     // m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new PathplannerSwerveTrajectoryCommand("slow forwards", 4, 2, true, true));
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
     m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
