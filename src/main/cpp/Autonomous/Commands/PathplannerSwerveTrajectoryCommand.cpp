@@ -4,6 +4,7 @@ PathplannerSwerveTrajectoryCommand::PathplannerSwerveTrajectoryCommand(const std
                                                                        double maxSpeed,
                                                                        double maxAccel,
                                                                        bool stopAtEnd,
+                                                                       frc::DriverStation::Alliance alliance,
                                                                        bool resetOdometry,
                                                                        std::vector<Event> events)
 {
@@ -17,9 +18,16 @@ PathplannerSwerveTrajectoryCommand::PathplannerSwerveTrajectoryCommand(const std
                                                       units::feet_per_second_t{ maxSpeed },
                                                       units::feet_per_second_squared_t{ maxAccel });
 
-    m_Trajectory
-        = pathplanner::PathPlannerTrajectory::transformTrajectoryForAlliance(m_Trajectory,
-                                                                             frc::DriverStation::GetAlliance());
+    if (alliance == frc::DriverStation::Alliance::kInvalid)
+    {
+        m_Trajectory
+            = pathplanner::PathPlannerTrajectory::transformTrajectoryForAlliance(m_Trajectory,
+                                                                                 frc::DriverStation::GetAlliance());
+    }
+    else
+    {
+        m_Trajectory = pathplanner::PathPlannerTrajectory::transformTrajectoryForAlliance(m_Trajectory, alliance);
+    }
 
     // CowLib::CowLogger::LogMsg(CowLib::CowLogger::LOG_DBG, "Loaded trajectory %s", trajectoryName.c_str());
 

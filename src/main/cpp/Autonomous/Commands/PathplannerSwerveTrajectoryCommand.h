@@ -26,6 +26,7 @@ public:
                                        double maxSpeed,
                                        double maxAccel,
                                        bool stop,
+                                       frc::DriverStation::Alliance alliance,
                                        bool resetOdometry        = false,
                                        std::vector<Event> events = {});
     ~PathplannerSwerveTrajectoryCommand() override;
