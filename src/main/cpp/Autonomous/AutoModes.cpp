@@ -246,10 +246,10 @@ AutoModes::AutoModes()
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        frc::DriverStation::Alliance::kRed,
                        false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L3, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
     m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
     m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
     m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
@@ -261,10 +261,10 @@ AutoModes::AutoModes()
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        frc::DriverStation::Alliance::kBlue,
                        false));
-    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L3, false));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
-    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.14));
+    m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
