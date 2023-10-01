@@ -201,7 +201,7 @@ AutoModes::AutoModes()
                                         20.21,
                                         11));
     bluelzbase.push_back(stow());
-    bluelzbase.push_back(pathWithEvents("L3 Link LZ - score cube",
+    bluelzbase.push_back(pathWithEvents("L3 Link LZ - score cube CHEZZY",
                                         { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) },
                                           { 0.4, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false, true) } },
                                         frc::DriverStation::Alliance::kBlue,
@@ -214,7 +214,7 @@ AutoModes::AutoModes()
     bluelzbase.push_back(new WaitCommand(0.1, false));
     bluelzbase.push_back(setClaw(CG_CUBE));
     bluelzbase.push_back(pathWithEvents(
-        "L3 Link LZ - intake cone",
+        "L3 Link LZ - intake cone CHEZZY",
         { { 0.5, new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true) }, { 1.2, startGroundIntake(CG_CUBE) } },
         frc::DriverStation::Alliance::kBlue,
         false,
@@ -257,7 +257,7 @@ AutoModes::AutoModes()
     /* 3GP LZ BLUE */
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"] = bluelzbase;
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(
-        pathWithEvents("L3 Link LZ - score cone",
+        pathWithEvents("L3 Link LZ - score cone CHEZZY",
                        { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
                        frc::DriverStation::Alliance::kBlue,
                        false));
