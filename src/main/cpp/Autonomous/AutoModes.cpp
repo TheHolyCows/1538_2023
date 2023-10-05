@@ -140,6 +140,33 @@ AutoModes::AutoModes()
     lzbase.push_back(new WaitCommand(0.1, false));
     lzbase.push_back(stow());
 
+    /* standard 3 gp lz */
+    m_Modes["L3 Link LZ ( [] -> ^ )"] = lzbase;
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(
+        pathWithEvents("L3 Link LZ - score cone",
+                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
+                       frc::DriverStation::Alliance::kInvalid,
+                       false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    /* 2.5 Balance LZ */
+    m_Modes["2.5 balance LZ ( [] -> ^ )"] = lzbase;
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true));
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("LZ - to CS outside 2",
+                                               10,
+                                               8,
+                                               true,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               false));
+    m_Modes["2.5 balance LZ ( [] -> ^ )"].push_back(new BalanceCommand(-3, 7, 15, true));
+
     /* LZ BASE - RED */
     std::deque<RobotCommand *> redlzbase;
     redlzbase.push_back(setClaw(CG_CONE));
@@ -181,6 +208,21 @@ AutoModes::AutoModes()
     redlzbase.push_back(setClaw(CG_CONE));
     redlzbase.push_back(new WaitCommand(0.1, false));
     redlzbase.push_back(stow());
+
+    /* 3 GP LZ RED */
+    m_Modes["3 GP LZ RED ( [] -> ^ )"] = redlzbase;
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(
+        pathWithEvents("L3 Link LZ - score cone",
+                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
+                       frc::DriverStation::Alliance::kRed,
+                       false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
 
     /* LZ BASE - BLUE */
     std::deque<RobotCommand *> bluelzbase;
@@ -224,36 +266,6 @@ AutoModes::AutoModes()
     bluelzbase.push_back(new WaitCommand(0.1, false));
     bluelzbase.push_back(stow());
 
-    /* standard 3 gp lz */
-    m_Modes["L3 Link LZ ( [] -> ^ )"] = lzbase;
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(
-        pathWithEvents("L3 Link LZ - score cone",
-                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
-                       frc::DriverStation::Alliance::kInvalid,
-                       false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
-    m_Modes["L3 Link LZ ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
-
-    /* 3 GP LZ RED */
-    m_Modes["3 GP LZ RED ( [] -> ^ )"] = redlzbase;
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(
-        pathWithEvents("L3 Link LZ - score cone",
-                       { { 0.1, new UpdateArmStateCommand(ARM_STOW, CG_CONE, false, true) } },
-                       frc::DriverStation::Alliance::kRed,
-                       false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_L2, false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new VisionAlignCommand(0.5, CG_CONE));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.7, false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
-    m_Modes["3 GP LZ RED ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
-
     /* 3GP LZ BLUE */
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"] = bluelzbase;
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(
@@ -268,6 +280,111 @@ AutoModes::AutoModes()
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new WaitCommand(0.1, false));
     m_Modes["3 GP LZ BLUE ( [] -> ^ )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CONE, true, true));
+
+    /* CABLE GUARD 3 GP */
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(setClaw(CG_CONE));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_L2, CG_CONE, false, true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - start",
+                                               8,
+                                               8,
+                                               true,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.5, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.2));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.05, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(stow());
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(setClaw(CG_CUBE));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - intake 1a",
+                                               20.21,
+                                               14,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - intake 1b",
+                                               20,
+                                               3,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(pathWithEvents("Guard - intake 1c",
+                                                                { { 0.2, startGroundIntake(CG_CUBE) } },
+                                                                frc::DriverStation::Alliance::kInvalid,
+                                                                false,
+                                                                20.21,
+                                                                14));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(stow());
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - score 1a",
+                                               20.21,
+                                               14,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - score 1b",
+                                               20,
+                                               3,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        pathWithEvents("Guard - score 1c",
+                       { { 0.3, new UpdateArmStateCommand(ARM_L2, CG_CUBE, false) } },
+                       frc::DriverStation::Alliance::kInvalid,
+                       false,
+                       20.21,
+                       14));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new VisionAlignCommand(0.3, CG_CONE));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.2, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new ClawCommand(CLAW_EXHAUST, 0.3));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_DRIVER_STOW, true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(stow());
+
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - intake 2a",
+                                               20.21,
+                                               14,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - intake 2b",
+                                               20,
+                                               3,
+                                               false,
+                                               frc::DriverStation::Alliance::kInvalid));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(pathWithEvents("Guard - intake 2c",
+                                                                { { 0.2, startGroundIntake(CG_CUBE) } },
+                                                                frc::DriverStation::Alliance::kInvalid,
+                                                                false,
+                                                                20.21,
+                                                                14));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(stow());
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, false, true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new PathplannerSwerveTrajectoryCommand("Guard - score 2a",
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               20.21,
+                                               14,
+                                               frc::DriverStation::Alliance::kInvalid,
+                                               true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_L2, CG_CUBE, true, true));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.2, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(setClaw(CG_CONE));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new ClawCommand(CLAW_NONE, 0));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(
+        new LambdaCommand([](CowRobot *bot) { bot->GetArm()->GetClaw().SetIntakeSpeed(-1); }));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new WaitCommand(0.1, false));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new ClawCommand(CLAW_OFF, 0));
+    m_Modes["Guard 3 GP ( [] -> [] )"].push_back(new UpdateArmStateCommand(ARM_STOW, CG_CUBE, true, true));
 
     m_Iterator = m_Modes.begin();
 }
