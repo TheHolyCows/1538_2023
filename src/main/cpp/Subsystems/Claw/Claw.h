@@ -10,6 +10,7 @@
 
 #include "../../CowConstants.h"
 #include "../../CowLib/Conversions.h"
+#include "../../CowLib/CowLogger.h"
 #include "../../CowLib/CowLPF.h"
 #include "../../CowLib/CowMotorController.h"
 
@@ -34,6 +35,10 @@ private:
     CowLib::CowLPF *m_CurrentFilter;
     double m_TorqueCurrent;
     int m_StowTimer;
+
+    // logging
+    int m_CycleCount;
+    int m_TempLogId;
 
 public:
     Claw(int wristMotor, int intakeMotor, int solenoidChannel);

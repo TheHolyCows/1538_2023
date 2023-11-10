@@ -29,6 +29,8 @@ namespace CowLib
 
     CowLogger::CowLogger()
     {
+        m_RegisteredVarLogs = 0;
+
         m_TickCount = 0;
         m_IdToLog   = 0;
         memset(m_RegisteredMotors, 0x0, sizeof(m_RegisteredMotors));
@@ -272,6 +274,64 @@ namespace CowLib
         logPacket.motorId     = motorId;
         logPacket.temp        = temp;
         logPacket.encoderCt   = encoderCt;
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    int CowLogger::RegisterVarLog(const char *name)
+    {
+        if (CowLogger::GetInstance()->m_RegisteredVarLogs >= REGISTERED_VARLOG_MAX)
+        {
+            return -1;
+        }
+
+        int logId = CowLogger::CowLogger::GetInstance()->m_RegisteredVarLogs++;
+
+        CowVarReg logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAR_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarReg);
+        logPacket.id          = logId;
+
+        memset(logPacket.name, 0x0, sizeof(logPacket.name));
+        // sub 1 from len to allow space for '\0'
+        strncpy(logPacket.name, name, sizeof(logPacket.name) - 1);
+
+        SendLog(&logPacket, sizeof(logPacket));
+
+        return logId;
+    }
+
+    void CowLogger::LogVar(CowLogger::CowLogLevel logLevel, int id, double value)
+    {
+        if (logLevel > (int) CONSTANT("DEBUG"))
+        {
+            return;
+        }
+
+        CowVarVal logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAL_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarVal);
+        logPacket.id          = id;
+        logPacket.value       = value;
+
+        SendLog(&logPacket, sizeof(logPacket));
+    }
+
+    void CowLogger::LogVar(CowLogger::CowLogLevel logLevel, int id, bool value)
+    {
+        if (logLevel > (int) CONSTANT("DEBUG"))
+        {
+            return;
+        }
+
+        CowVarBool logPacket;
+
+        logPacket.hdr.msgType = CowLogger::VAL_LOG;
+        logPacket.hdr.msgLen  = sizeof(CowVarBool);
+        logPacket.id          = id;
+        logPacket.value       = (uint16_t) value;
 
         SendLog(&logPacket, sizeof(logPacket));
     }
